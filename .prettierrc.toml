@@ -1,0 +1,7 @@
+# This file override .editorconfig
+trailingComma = "none"
+svelteSortOrder = "options-scripts-markup-styles"
+svelteAllowShorthand = true
+bracketSameLine = false
+svelteIndentScriptAndStyle = true
+htmlWhitespaceSensitivity = "ignore"
