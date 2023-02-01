@@ -15,6 +15,8 @@ Tooling:
 - ✅ [NodeJS](https://nodejs.org/en/)
 - ✅ [pnpm](https://pnpm.io/)
 - ✅ [Prettier](https://prettier.io/)
+- ✅ [ESlint](https://eslint.org/)
+
 
 Not included:
 
@@ -70,4 +72,10 @@ Apply Prettier fix example:
 
 ```sh
 $ pnpm run prettier src/app.html
+```
+
+## ESlint
+
+```sh
+$ pnpm run eslint
 ```
