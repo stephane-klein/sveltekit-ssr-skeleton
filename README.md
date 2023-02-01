@@ -12,8 +12,8 @@ Components and libraries:
 Tooling:
 
 - ✅ [asdf](https://asdf-vm.com/)
-- ✅ [[NodeJS](https://nodejs.org/en/)
-- ✅ [[pnpm](https://pnpm.io/)
+- ✅ [NodeJS](https://nodejs.org/en/)
+- ✅ [pnpm](https://pnpm.io/)
 - ✅ [Prettier](https://prettier.io/)
 
 Not included:
