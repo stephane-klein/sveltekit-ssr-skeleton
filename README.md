@@ -17,6 +17,9 @@ Tooling:
 - ✅ [Prettier](https://prettier.io/)
 - ✅ [ESlint](https://eslint.org/)
 
+Methods:
+
+- Deployment based by Docker
 
 Not included:
 
