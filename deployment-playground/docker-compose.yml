@@ -28,7 +28,7 @@ services:
       POSTGRES_DB: postgres
       # Used by graphql-migrate
       DATABASE_URL: postgres://postgres:password@postgres/postgres
-      TWITTER_LOGIN_CALLBACK: http://127.0.0.1:5173/twitter-login/callback/
+      ORIGIN: http://localhost:3000
     depends_on:
       postgres:
         condition: service_healthy
