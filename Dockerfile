@@ -1,5 +1,5 @@
 FROM node:18-alpine
-RUN npm install -g pnpm@7.26.3
+RUN npm install -g pnpm@8.5.1
 
 WORKDIR /app
 COPY . .
@@ -7,7 +7,7 @@ RUN pnpm install --frozen-lockfile --no-optional
 RUN pnpm run build
 
 FROM node:18-alpine
-RUN npm install -g pnpm@7.26.3
+RUN npm install -g pnpm@8.5.1
 
 WORKDIR /app
 
