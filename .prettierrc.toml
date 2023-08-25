@@ -1,4 +1,7 @@
 # This file override .editorconfig
+plugins = [
+    "prettier-plugin-svelte"
+]
 trailingComma = "none"
 svelteSortOrder = "options-scripts-markup-styles"
 svelteAllowShorthand = true
