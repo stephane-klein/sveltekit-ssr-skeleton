@@ -38,7 +38,7 @@ $ pnpm install
 Start database engine:
 
 ```sh
-$ docker compose up -d postgres
+$ docker compose up -d --wait
 $ ./scripts/init.sh
 $ ./scripts/fixtures.sh
 ```
