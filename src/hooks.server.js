@@ -23,6 +23,8 @@ export async function handle({ event, resolve }) {
 
     const response = await resolve(event);
     event.locals.sql.release();
-    console.log(stats);
+    response.headers.set("x-stats-sql-waiting", `${stats.waiting.toFixed(4)}ms`);
+    response.headers.set("x-stats-sql-duration", `${stats.duration.toFixed(4)}ms`);
+    response.headers.set("x-stats-sql-execution", `${stats.execution.toFixed(4)}ms`);
     return response;
 };
