@@ -15,8 +15,8 @@ dependencies:
     specifier: 1.4.1
     version: 1.4.1
   postgres:
-    specifier: https://github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz
-    version: '@github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz'
+    specifier: https://github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz
+    version: '@github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz'
   svelte:
     specifier: 4.2.0
     version: 4.2.0
@@ -3029,8 +3029,8 @@ packages:
     engines: {node: '>=10'}
     dev: true
 
-  '@github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz':
-    resolution: {tarball: https://github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz}
+  '@github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz':
+    resolution: {tarball: https://github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz}
     name: postgres
     version: 3.3.5
     dev: false
