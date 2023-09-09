@@ -5,7 +5,6 @@ export async function load({ locals }) {
             users.username AS username
         FROM public.users
     `;
-    console.log(result);
     return {
         users: result
     };
