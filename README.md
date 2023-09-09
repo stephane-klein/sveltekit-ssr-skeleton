@@ -6,7 +6,8 @@ that I use in my SvelteKit web application projects.
 Components and libraries:
 
 - ✅ [SSR](https://kit.svelte.dev/docs/page-options#ssr) [SvelteKit](https://github.com/sveltejs/kit) with [Hydration](https://kit.svelte.dev/docs/glossary#hydration)
-- ✅ PostgreSQL
+- ✅ PostgreSQL server
+- ✅ [Postgres.js](https://github.com/porsager/postgres) - PostgreSQL client for Node.js
 - ✅ Migration powered by [graphile-migrate](https://github.com/graphile/migrate)
 
 Tooling:

@@ -1,11 +1,12 @@
-import db from "$lib/server/db.js";
+import sql from "$lib/server/db.js";
 
 export async function handle({ event, resolve }) {
     event.locals = {
-        db: await db.connect()
+        // See https://github.com/porsager/postgres/pull/667/files
+        sql: await sql.reserve()
     };
 
     const response = await resolve(event);
-    event.locals.db.release();
+    event.locals.sql.release();
     return response;
 };

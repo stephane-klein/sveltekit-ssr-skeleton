@@ -1,12 +1,7 @@
-import pkg from "pg";
-const { Pool } = pkg;
+import postgres from "postgres";
 
-const pool = new Pool({
-    user: process.env.POSTGRES_USER || "postgres",
-    host: process.env.POSTGRES_HOST || "127.0.0.1",
-    database: process.env.POSTGRES_DB || "myapp",
-    password: process.env.POSTGRES_PASSWORD || "password",
-    port: process.env.POSTGRES_PORT || 5432
-});
+const sql = postgres(
+    process.env.POSTGRES_URL || "postgres://postgres:password@localhost:5432/myapp"
+);
 
-export default pool;
+export default sql;

@@ -14,9 +14,9 @@ dependencies:
   graphile-migrate:
     specifier: 1.4.1
     version: 1.4.1
-  pg:
-    specifier: 8.11.3
-    version: 8.11.3
+  postgres:
+    specifier: https://github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz
+    version: '@github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz'
   svelte:
     specifier: 4.2.0
     version: 4.2.0
@@ -3028,3 +3028,9 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
+
+  '@github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz':
+    resolution: {tarball: https://github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz}
+    name: postgres
+    version: 3.3.5
+    dev: false

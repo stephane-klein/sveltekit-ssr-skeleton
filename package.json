@@ -33,7 +33,7 @@
 		"@sveltejs/kit": "1.24.1",
 		"@sveltejs/adapter-node": "1.3.1",
 		"graphile-migrate": "1.4.1",
-		"pg": "8.11.3",
+		"postgres": "https://github.com/porsager/postgres/archive/b4c2526ba13e4f20f286b087887510e36c855f2f.tar.gz",
 		"vite": "4.4.9",
 		"svelte": "4.2.0"
 	}
