@@ -1,9 +1,7 @@
-import db from "$lib/server/db.js";
-
-export async function load() {
+export async function load({ locals }) {
     return {
         users: (
-            await db.query(
+            await locals.db.query(
                 `
                     SELECT
                         users.id AS id,
