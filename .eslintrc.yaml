@@ -13,7 +13,6 @@ extends:
   - standard
   - eslint:recommended
   - plugin:import/warnings
-  - plugin:jest/recommended
   - plugin:svelte/recommended
   - prettier
 
