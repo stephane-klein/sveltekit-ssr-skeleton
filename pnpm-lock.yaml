@@ -15,8 +15,8 @@ dependencies:
     specifier: 1.4.1
     version: 1.4.1
   postgres:
-    specifier: https://github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz
-    version: '@github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz'
+    specifier: 3.4.3
+    version: 3.4.3
   svelte:
     specifier: 4.2.2
     version: 4.2.2
@@ -2359,6 +2359,11 @@ packages:
       xtend: 4.0.2
     dev: false
 
+  /postgres@3.4.3:
+    resolution: {integrity: sha512-iHJn4+M9vbTdHSdDzNkC0crHq+1CUdFhx+YqCE+SqWxPjm+Zu63jq7yZborOBF64c8pc58O5uMudyL1FQcHacA==}
+    engines: {node: '>=12'}
+    dev: false
+
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -3021,9 +3026,3 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
     dev: true
-
-  '@github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz':
-    resolution: {tarball: https://github.com/stephane-klein/postgres/archive/3a7e99f68c94827a901d901e22eb5ff45deda85d.tar.gz}
-    name: postgres
-    version: 3.3.5
-    dev: false
