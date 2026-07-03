@@ -14,11 +14,11 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
 - Containers: Podman Compose
+- Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
 
 ## Roadmap:
 
-- [ ] Gitleaks integration ([see](https://github.com/stephane-klein/sklein-devbox-chezmoi/tree/main/dot_config/opencode/skill/sklein-add-gitleaks))
 - [ ] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
 - [ ] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
 - [ ] Implement an authentication system based on the recommendations from https://lucia-auth.com/
@@ -80,6 +80,30 @@ $ mise teardown # stop the database and delete all data
 ## Deployment Playground
 
 The [`deployment-playground/`](./deployment-playground/) directory contains a local playground for testing the application in a production-like environment.
+```
+## Contribution
+
+### Secret detection with gitleaks
+
+[Gitleaks](https://github.com/gitleaks/gitleaks) scans for secrets before they
+reach the remote repository.
+
+- **`git commit`** — the `git-hooks/pre-commit` hook checks staged files.
+
+Configuration is in `.gitleaks.toml`.
+
+**One-time setup after clone:**
+
+```
+mise install
+mise run setup-git-hooks
+```
+
+**Manual scan** (outside of hooks):
+
+```
+mise run gitleaks-scan        # full project scan
+mise run gitleaks-check-push  # pre-push scan
 ```
 
 
