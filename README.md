@@ -1,5 +1,7 @@
 # SvelteKit SSR Stéphane Klein skeleton
 
+> Warning: you are on the `skeleton-2023` branch — my outdated mid-2023 skeleton. See the new 2026 version on [`main`](https://github.com/stephane-klein/sveltekit-ssr-skeleton/tree/main).
+
 I try to gather and maintain, in this skeleton, my standard components configuration
 that I use in my SvelteKit web application projects.
 
