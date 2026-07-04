@@ -17,6 +17,7 @@ Skeleton gathering standard components configuration for SvelteKit web applicati
 ## Code Quality
 
 This project uses [Biome](https://biomejs.dev) for linting and formatting:
+
 - `pnpm lint` — check for code issues
 - `pnpm format` — auto-format code
 - `pnpm check` — run both (format + lint + organize imports)
@@ -40,14 +41,44 @@ The following files are examples meant to be replaced with your actual project c
 - `sqls/migrations/00001_initial/` — example migration (creates a sample `contacts` table)
 - `sqls/fixtures/00001_contacts.sql` — example fixture data
 - `sqls/schema.sql` — example consolidated schema
-- `src/hello_world.js` — example script demonstrating database access
-- `README.md` — update the example output in the Getting Started section when replacing `src/hello_world.js`
 
-These files are marked with comments (`-- Example` / `// Example`) at the top. Replace or remove them as needed.
+These files are marked with comments (`-- Example`) at the top. Replace or remove them as needed.
 
 > **Remove this entire section once the example files have been replaced or deleted.**
 
+## SvelteKit
 
+This project uses **SvelteKit 2** with `@sveltejs/adapter-node` for SSR.
+
+### Container build (multi-stage)
+
+The `Containerfile` uses a two-stage build:
+
+1. **Stage 1 (`build`)** — installs all deps, runs `pnpm build`
+2. **Stage 2 (production)** — installs only prod deps, copies `build/`, `src/db.js`, `src/logger.js`, `src/migrate.js`, `src/seed.js`, and `sqls/`
+
+The production image runs `node /app/build/index.js` via the `serve` command in `entrypoint.sh` (which also runs migrations before starting the server).
+
+## Node.js Paradigms
+
+### Code style
+
+- Inline simple logic: prefer inline expressions over extracting helper functions for trivial operations (e.g., single `await sql` calls).
+- Extract functions only when code reuse, readability, or testability genuinely benefits.
+
+### Functional style
+
+- Prefer chaining `.map()`, `.filter()`, `.reduce()`, `.forEach()` over imperative loops.
+- Avoid intermediate variables without semantic value (*expression-oriented*):
+  prefer `getMonths().map(...)` to `const months = getMonths(); months.map(...)`.
+  Prefer `(await Promise.all(...)).forEach(...)` to `const results = []; for (...)`.
+  If a step is complex, prefer a comment over a superfluous variable.
+- Avoid mutations: no `.push()` in a loop if `.map()` suffices (*immutability*).
+
+### To avoid
+
+- Tacit programming / point-free style: always explicitly name function arguments.
+  Prefer `[1,2,3].map(n => add1(n))` to `[1,2,3].map(add1)`.
 
 ## Documentation Maintenance
 

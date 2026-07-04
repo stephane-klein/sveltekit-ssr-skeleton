@@ -12,9 +12,9 @@ case "$COMMAND" in
         node src/migrate.js
         node src/seed.js
         ;;
-    hello|"")
+    serve|"")
         node src/migrate.js
-        node src/hello_world.js
+        exec node /app/build/index.js
         ;;
     *)
         exec "$@"

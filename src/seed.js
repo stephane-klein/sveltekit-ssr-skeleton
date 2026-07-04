@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 // Utility script — loads and executes all SQL fixture files from sqls/fixtures/
-import { readFileSync, readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { join, dirname } from "node:path";
-
-import { logger } from "./logger.js";
-import { sql, waitForDb } from "./db.js";
+import { logger } from "./lib/backend/logger.js";
+import { POSTGRES_SCHEMA, sql, waitForDb } from "./lib/backend/pg.js";
 
 await waitForDb();
+
+logger.info({ schema: POSTGRES_SCHEMA }, "Using PostgreSQL schema");
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixturesDir = join(__dirname, "..", "sqls/fixtures");

@@ -8,11 +8,12 @@
     "format": "biome format --write",
     "lint": "biome lint",
     "lint:pkg": "pnpm npmPkgJsonLint .",
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
 
     "migrate": "node src/migrate.js",
-    "seed": "node src/seed.js",
-
-    "hello": "node src/hello_world.js"
+    "seed": "node src/seed.js"
   },
   "dependencies": {
     "pino": "^10.3.1",
@@ -22,6 +23,10 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.2",
-    "npm-package-json-lint": ""
+    "@sveltejs/adapter-node": "^5.5.7",
+    "@sveltejs/kit": "^2.69.0",
+    "npm-package-json-lint": "",
+    "svelte": "^5.56.4",
+    "vite": "^8.1.3"
   }
 }

@@ -10,6 +10,9 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 
 - Runtime: Node.js 24 (ESM)
 - Package manager: pnpm
+- Framework: SvelteKit 2 (SSR)
+- Bundler: Vite
+- Adapter: @sveltejs/adapter-node
 - Database: PostgreSQL 18
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
@@ -19,7 +22,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 
 ## Roadmap:
 
-- [ ] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
+- [x] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
 - [ ] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
 - [ ] Implement an authentication system based on the recommendations from https://lucia-auth.com/
   - [ ] Allow API endpoint access with API tokens
@@ -48,39 +51,21 @@ Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle ins
 ## Getting Started
 
 ```bash
-$ mise install  # install Node.js and pnpm via mise
+$ mise install      # install Node.js and pnpm via mise
 $ pnpm install
-$ mise run up   # start PostgreSQL container
-$ reload        # load environment variables
-$ mise migrate  # run database migrations
-$ mise seed     # populate with demo data
-$ ./src/hello_world.js  # sample application
-contacts: Result(3) [
-  {
-    id: '1',
-    firstname: 'Alice',
-    lastname: 'Martin',
-    created_at: 2026-05-24T14:08:06.606Z
-  },
-  {
-    id: '2',
-    firstname: 'Bob',
-    lastname: 'Durand',
-    created_at: 2026-05-24T14:08:06.606Z
-  },
-  {
-    id: '3',
-    firstname: 'Charlie',
-    lastname: 'Petit',
-    created_at: 2026-05-24T14:08:06.606Z
-  }
-]
-$ mise teardown # stop the database and delete all data
+$ mise run up       # start PostgreSQL container
+$ reload            # load environment variables
+$ mise run migrate  # run database migrations
+$ mise run seed     # populate with demo data
+$ mise run dev      # start SvelteKit dev server on http://localhost:5173
+```
+
+Open http://localhost:5173 in your browser.
 
 ## Deployment Playground
 
 The [`deployment-playground/`](./deployment-playground/) directory contains a local playground for testing the application in a production-like environment.
-```
+
 ## Contribution
 
 ### Secret detection with gitleaks
