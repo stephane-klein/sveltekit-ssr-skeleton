@@ -13,6 +13,7 @@ node = "24.18.0"
 pnpm = "11.9.0"
 usql = "0.21.4"
 "aqua:gitleaks/gitleaks" = "8.30.1"
+helm = "4.2.2"
 
 [tasks.dev]
 run = "pnpm run dev"
@@ -78,6 +79,22 @@ podman build \\
   -t ghcr.io/stephane-klein/my-app:latest .
 """
 
+[tasks.login-ghcr]
+run = """
+if ! gh auth token &>/dev/null; then
+    echo "Error: gh not authenticated. Please run:"
+    echo "  gh auth login -s repo,write:packages,read:org"
+    exit 1
+fi
+podman logout ghcr.io 2>/dev/null || true
+podman login ghcr.io -u stephane-klein --password-stdin <<< "$(gh auth token)"
+"""
+description = "Login to GitHub Container Registry using gh CLI"
+
+[tasks.push-image]
+run = "podman push ghcr.io/stephane-klein/my-app:latest"
+description = "Push the container image to GitHub Container Registry"
+
 [tasks.build-dev-image]
 quiet = true
 run = """
@@ -106,4 +123,36 @@ run = "scripts/gitleaks-check-push.sh"
 [tasks.gitleaks-scan]
 run = "gitleaks dir --no-banner -v {{config_root}}"
 
+[tasks.login-ghcr-helm]
+description = "Authenticate Helm with GitHub Container Registry using gh CLI"
+run = """
+helm registry login ghcr.io -u stephane-klein --password-stdin <<< "$(gh auth token)"
+"""
 
+[tasks.deploy-helm-test]
+run = "scripts/deploy-helm-test.sh"
+
+[tasks.destroy-helm-test]
+run = "scripts/destroy-helm-test.sh"
+
+[tasks.publish-chart]
+description = "Package and push Helm chart to OCI registry (ghcr.io)"
+run = """
+helm package helm/my-app -d /tmp && \
+helm push /tmp/my-app-*.tgz oci://ghcr.io/stephane-klein/charts
+"""
+
+[tasks.make-packages-public]
+description = "Print instructions to make GHCR packages publicly readable (no API available)"
+run = """
+echo "==> GitHub REST API does not support changing package visibility."
+echo "==> Manual steps required:"
+echo ""
+echo "1. Open in your browser:"
+echo "   https://github.com/users/stephane-klein/packages/container/my-app/settings"
+echo "   -> Danger Zone > Change visibility > Public"
+echo ""
+echo "2. Open in your browser:"
+echo "   https://github.com/users/stephane-klein/packages/container/charts%2Fmy-app/settings"
+echo "   -> Danger Zone > Change visibility > Public"
+"""

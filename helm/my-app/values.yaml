@@ -1,0 +1,55 @@
+# Default values for my-app.
+# This is a YAML-formatted file.
+
+seed:
+  enabled: false
+
+app:
+  image:
+    repository: ghcr.io/stephane-klein/my-app
+    tag: latest
+    pullPolicy: Always
+
+  replicaCount: 1
+
+# PostgreSQL connection — built from the CNPG app secret.
+postgresql:
+  schema: public
+
+# CloudNativePG cluster configuration — deployed in the same namespace as the app.
+cnpg:
+  clusterName: my-app
+  namespace: ""
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.4
+  storage:
+    size: 1Gi
+  # PostgreSQL `postgres` user password (auto-generated if empty)
+  # Used for bootstrap and superuser access.
+  bootstrapPassword: ""
+
+# HTTP server (SvelteKit adapter-node)
+port: 3000
+
+# Ingress — expose the HTTP service externally
+ingress:
+  enabled: false
+  host: ""
+  path: /
+  className: ""
+  annotations: {}
+  tls: []
+
+# Resource limits
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+
+# Node selector, tolerations, affinity (optional)
+nodeSelector: {}
+tolerations: []
+affinity: {}

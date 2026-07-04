@@ -1,0 +1,107 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    {{- include "my-app.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.app.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: my-app
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        {{- include "my-app.labels" . | nindent 8 }}
+    spec:
+      {{- if .Values.seed.enabled }}
+      initContainers:
+        - name: seed
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          command: ["/entrypoint.sh", "seed"]
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: dbname
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: password
+            - name: MY_APP_POSTGRES_URL
+              value: "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST).{{ .Values.cnpg.namespace }}:$(DB_PORT)/$(DB_NAME)"
+            - name: MY_APP_POSTGRES_SCHEMA
+              value: {{ .Values.postgresql.schema }}
+      {{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
+          imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          env:
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: host
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: dbname
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: username
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.cnpg.clusterName }}-app
+                  key: password
+            - name: MY_APP_POSTGRES_URL
+              value: "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST).{{ .Values.cnpg.namespace }}:$(DB_PORT)/$(DB_NAME)"
+            - name: MY_APP_POSTGRES_SCHEMA
+              value: {{ .Values.postgresql.schema }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            failureThreshold: 3
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}

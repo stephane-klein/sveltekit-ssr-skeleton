@@ -19,11 +19,12 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
+- Helm chart: Kubernetes deployment
 
 ## Roadmap:
 
 - [x] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
-- [ ] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
+- [x] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
 - [ ] Implement an authentication system based on the recommendations from https://lucia-auth.com/
   - [ ] Allow API endpoint access with API tokens
   - [ ] Allow web login with OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
@@ -65,6 +66,25 @@ Open http://localhost:5173 in your browser.
 ## Deployment Playground
 
 The [`deployment-playground/`](./deployment-playground/) directory contains a local playground for testing the application in a production-like environment.
+
+## Build and push container image
+
+```bash
+$ mise run build-image
+$ mise run login-ghcr
+$ mise run push-image
+````
+
+## Publish Helm chart
+
+Helm chart source code is in: [`./helm/`](./helm/)
+
+```bash
+$ mise run login-ghcr-helm    # one-time: authenticate Helm with GHCR
+$ mise run publish-chart      # package and push to oci://ghcr.io/stephane-klein/charts
+```
+
+The chart is published at `oci://ghcr.io/stephane-klein/charts/my-app`.
 
 ## Contribution
 
