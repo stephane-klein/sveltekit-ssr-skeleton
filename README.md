@@ -16,6 +16,10 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Database: PostgreSQL 18
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
+- Authentication: sessions & API tokens following [Lucia recommendations](https://lucia-auth.com/sessions/overview)
+- CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
+- API docs: [Scalar](https://scalar.com/) (interactive reference at `/api/reference`)
+- OpenAPI spec: served at `/api/v1/openapi.json`
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
@@ -25,10 +29,13 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 
 - [x] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
 - [x] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
-- [ ] Implement an authentication system based on the recommendations from https://lucia-auth.com/
-  - [ ] Allow API endpoint access with API tokens
-  - [ ] Allow web login with OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
-- [ ] Tailwind CSS integration
+- [x] Implement authentication system based on [Lucia's recommendations](https://lucia-auth.com/)
+  - [x] Login with email/password
+  - [x] CLI `add-user` for creating users
+  - [x] Session management (cookie-based, rolling expiration)
+  - [x] Password reset flow (token-based)
+  - [x] API tokens for programmatic access
+  - [ ] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/)) — TODO
 
 ## AI-Assisted Development
 
@@ -63,6 +70,77 @@ $ mise run dev      # start SvelteKit dev server on http://localhost:5173
 
 Open http://localhost:5173 in your browser.
 
+## Authentication
+
+### Creating a user
+
+```bash
+$ pnpm add-user --email=user@example.com --password=yourpassword
+
+# Read password from stdin
+$ echo "yourpassword" | pnpm add-user --email=user@example.com --password-stdin
+```
+
+### Session flow
+
+Users authenticate via the web UI at `/login`. Sessions are stored in PostgreSQL with
+rolling expiration (30 days, refreshed when more than 50% elapsed).
+
+### API tokens
+
+Generate tokens from the web UI at `/my/tokens` or via CLI:
+
+```bash
+$ pnpm create-api-token --email=user@example.com --name="CI/CD deploy"
+```
+
+Tokens are SHA-256 hashed before storage — the raw value is shown only once
+at creation.
+
+```bash
+$ curl -H "Authorization: Bearer <token>" https://your-app.example.com/api/v1/contacts
+```
+
+### Password reset
+
+Users can reset their password via `/reset-password`. A time-limited token
+(30 minutes) is generated and stored in the database. The token is presented via
+query parameter to `/change-password`.
+
+### API documentation
+
+An interactive API reference is available at [`/api/reference`](/api/reference),
+powered by [Scalar](https://scalar.com/). It reads the OpenAPI 3.0 spec served
+at `/api/v1/openapi.json`.
+
+```bash
+$ curl http://localhost:5173/api/v1/openapi.json
+```
+
+## REST API
+
+### Authentication
+
+API endpoints accept both session cookies and `Authorization: Bearer <token>` headers.
+
+### Endpoints
+
+| Méthode | Route | Description |
+|:--------|:------|:------------|
+| `GET` | `/api/v1/contacts/` | List contacts |
+| `POST` | `/api/v1/contacts/` | Create a contact (`firstname` required) |
+| `GET` | `/api/v1/contacts/:id/` | Get a contact |
+| `PATCH` | `/api/v1/contacts/:id/` | Update a contact (partial) |
+| `DELETE` | `/api/v1/contacts/:id/` | Delete a contact |
+
+```bash
+$ curl -H "Authorization: Bearer <token>" http://localhost:5173/api/v1/contacts/
+$ curl -X POST -H "Authorization: Bearer <token>" \
+    -H "Content-Type: application/json" \
+    -d '{"firstname":"Alice","lastname":"Martin"}' \
+    http://localhost:5173/api/v1/contacts/
+```
+
 ## Deployment Playground
 
 The [`deployment-playground/`](./deployment-playground/) directory contains a local playground for testing the application in a production-like environment.
@@ -73,7 +151,7 @@ The [`deployment-playground/`](./deployment-playground/) directory contains a lo
 $ mise run build-image
 $ mise run login-ghcr
 $ mise run push-image
-````
+```
 
 ## Publish Helm chart
 
@@ -99,16 +177,16 @@ Configuration is in `.gitleaks.toml`.
 
 **One-time setup after clone:**
 
-```
-mise install
-mise run setup-git-hooks
+```bash
+$ mise install
+$ mise run setup-git-hooks
 ```
 
 **Manual scan** (outside of hooks):
 
-```
-mise run gitleaks-scan        # full project scan
-mise run gitleaks-check-push  # pre-push scan
+```bash
+$ mise run gitleaks-scan        # full project scan
+$ mise run gitleaks-check-push  # pre-push scan
 ```
 
 

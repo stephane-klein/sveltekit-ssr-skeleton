@@ -1,11 +1,3 @@
--- Example schema — replace with your actual consolidated schema
-CREATE TABLE contacts (
-    id         BIGINT                   GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-    firstname  TEXT                     NOT NULL,
-    lastname   TEXT                     NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
 CREATE TABLE users (
     id              TEXT                     NOT NULL PRIMARY KEY,
     email           TEXT                     NOT NULL UNIQUE,
@@ -44,14 +36,3 @@ CREATE TABLE api_tokens (
 );
 
 CREATE INDEX idx_api_tokens_user_id ON api_tokens (user_id);
-
-CREATE TABLE password_reset_tokens (
-    id         TEXT                     NOT NULL PRIMARY KEY,
-    user_id    TEXT                     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    token_hash TEXT                     NOT NULL UNIQUE,
-    expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
-    used       BOOLEAN                  NOT NULL DEFAULT FALSE,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens (user_id);
