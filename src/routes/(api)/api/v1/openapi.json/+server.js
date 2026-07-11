@@ -10,6 +10,170 @@ export function GET() {
         },
         servers: [{ url: "" }],
         paths: {
+            "/api/v1/admin/users": {
+                get: {
+                    summary: "List users (admin)",
+                    security: [{ adminBearer: [] }],
+                    parameters: [
+                        { name: "cursor", in: "query", schema: { type: "string" }, description: "Pagination cursor" },
+                        { name: "page_size", in: "query", schema: { type: "integer", default: 20, maximum: 100 } },
+                    ],
+                    responses: {
+                        200: {
+                            description: "List of users",
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            data: {
+                                                type: "array",
+                                                items: { $ref: "#/components/schemas/AdminUser" },
+                                            },
+                                            next_cursor: { type: "string", nullable: true },
+                                            _links: { $ref: "#/components/schemas/Links" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+                post: {
+                    summary: "Create a user (admin)",
+                    security: [{ adminBearer: [] }],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    required: ["email", "display_name", "password"],
+                                    properties: {
+                                        email: { type: "string", format: "email", example: "user@example.com" },
+                                        display_name: { type: "string", example: "John Doe" },
+                                        password: {
+                                            type: "string",
+                                            format: "password",
+                                            minLength: 6,
+                                            example: "s3cur3!",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    responses: {
+                        201: {
+                            description: "User created",
+                            headers: {
+                                Location: {
+                                    schema: { type: "string", format: "uri" },
+                                    description: "URL of the created user",
+                                },
+                            },
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            data: { $ref: "#/components/schemas/AdminUser" },
+                                            _links: { $ref: "#/components/schemas/Links" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        409: { $ref: "#/components/responses/Conflict" },
+                        422: { $ref: "#/components/responses/Unprocessable" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+            },
+            "/api/v1/admin/users/{id}": {
+                get: {
+                    summary: "Get a user (admin)",
+                    security: [{ adminBearer: [] }],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+                    responses: {
+                        200: {
+                            description: "User details",
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            data: { $ref: "#/components/schemas/AdminUser" },
+                                            _links: { $ref: "#/components/schemas/Links" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+                patch: {
+                    summary: "Update a user (admin, partial)",
+                    security: [{ adminBearer: [] }],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+                    requestBody: {
+                        required: true,
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        email: { type: "string", format: "email", example: "newemail@example.com" },
+                                        display_name: { type: "string", example: "New Name" },
+                                        password: { type: "string", format: "password", minLength: 8 },
+                                        is_active: { type: "boolean" },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    responses: {
+                        200: {
+                            description: "User updated",
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            data: { $ref: "#/components/schemas/AdminUser" },
+                                            _links: { $ref: "#/components/schemas/Links" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
+                        409: { $ref: "#/components/responses/Conflict" },
+                        422: { $ref: "#/components/responses/Unprocessable" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+                delete: {
+                    summary: "Delete a user (admin)",
+                    security: [{ adminBearer: [] }],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+                    responses: {
+                        204: { description: "Deleted (no content)" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+            },
             "/api/v1/contacts": {
                 get: {
                     summary: "List contacts",
@@ -178,6 +342,17 @@ export function GET() {
                         },
                     },
                 },
+                AdminUser: {
+                    type: "object",
+                    properties: {
+                        id: { type: "string", example: "nano-id-abc123" },
+                        email: { type: "string", format: "email", example: "user@example.com" },
+                        display_name: { type: "string", example: "John Doe" },
+                        is_active: { type: "boolean", example: true },
+                        created_at: { type: "string", format: "date-time", example: "2026-07-11T09:00:00+02:00" },
+                        updated_at: { type: "string", format: "date-time", example: "2026-07-11T09:00:00+02:00" },
+                    },
+                },
                 ProblemDetail: {
                     type: "object",
                     properties: {
@@ -214,8 +389,24 @@ export function GET() {
                         },
                     },
                 },
+                Conflict: {
+                    description: "Conflict",
+                    content: {
+                        "application/problem+json": {
+                            schema: { $ref: "#/components/schemas/ProblemDetail" },
+                        },
+                    },
+                },
                 Unprocessable: {
                     description: "Unprocessable Entity",
+                    content: {
+                        "application/problem+json": {
+                            schema: { $ref: "#/components/schemas/ProblemDetail" },
+                        },
+                    },
+                },
+                InternalError: {
+                    description: "Internal Server Error",
                     content: {
                         "application/problem+json": {
                             schema: { $ref: "#/components/schemas/ProblemDetail" },
@@ -228,6 +419,11 @@ export function GET() {
                     type: "http",
                     scheme: "bearer",
                     description: "API token generated from /my/tokens or create-api-token CLI",
+                },
+                adminBearer: {
+                    type: "http",
+                    scheme: "bearer",
+                    description: "Super admin token set via MY_APP_ADMIN_TOKEN environment variable",
                 },
             },
         },

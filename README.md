@@ -82,6 +82,17 @@ $ pnpm add-user --email=user@example.com --password=yourpassword
 $ echo "yourpassword" | pnpm add-user --email=user@example.com --password-stdin
 ```
 
+### Creating a user via REST API
+
+Set the `MY_APP_ADMIN_TOKEN` environment variable, then use the admin API:
+
+```bash
+$ curl -s -X POST -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d '{"email":"api-user@example.com","display_name":"API User","password":"password"}' \
+    http://localhost:5173/api/v1/admin/users | jq
+```
+
 ### Session flow
 
 Users authenticate via the web UI at `/login`. Sessions are stored in PostgreSQL with
