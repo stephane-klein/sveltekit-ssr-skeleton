@@ -43,6 +43,7 @@ export function GET() {
                 },
                 post: {
                     summary: "Create a user (admin)",
+                    description: "Either email+display_name+password or oidc_issuer+oidc_subject must be provided",
                     security: [{ adminBearer: [] }],
                     requestBody: {
                         required: true,
@@ -50,7 +51,6 @@ export function GET() {
                             "application/json": {
                                 schema: {
                                     type: "object",
-                                    required: ["email", "display_name", "password"],
                                     properties: {
                                         email: { type: "string", format: "email", example: "user@example.com" },
                                         display_name: { type: "string", example: "John Doe" },
@@ -59,6 +59,14 @@ export function GET() {
                                             format: "password",
                                             minLength: 6,
                                             example: "s3cur3!",
+                                        },
+                                        oidc_issuer: {
+                                            type: "string",
+                                            example: "https://auth.example.com",
+                                        },
+                                        oidc_subject: {
+                                            type: "string",
+                                            example: "johndoe",
                                         },
                                     },
                                 },
@@ -133,6 +141,8 @@ export function GET() {
                                         email: { type: "string", format: "email", example: "newemail@example.com" },
                                         display_name: { type: "string", example: "New Name" },
                                         password: { type: "string", format: "password", minLength: 8 },
+                                        oidc_issuer: { type: "string", example: "https://auth.example.com" },
+                                        oidc_subject: { type: "string", example: "johndoe" },
                                         is_active: { type: "boolean" },
                                     },
                                 },
@@ -348,6 +358,8 @@ export function GET() {
                         id: { type: "string", example: "nano-id-abc123" },
                         email: { type: "string", format: "email", example: "user@example.com" },
                         display_name: { type: "string", example: "John Doe" },
+                        oidc_issuer: { type: "string", nullable: true, example: "https://auth.example.com" },
+                        oidc_subject: { type: "string", nullable: true, example: "johndoe" },
                         is_active: { type: "boolean", example: true },
                         created_at: { type: "string", format: "date-time", example: "2026-07-11T09:00:00+02:00" },
                         updated_at: { type: "string", format: "date-time", example: "2026-07-11T09:00:00+02:00" },

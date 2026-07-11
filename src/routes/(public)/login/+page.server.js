@@ -2,6 +2,12 @@ import { fail, redirect } from "@sveltejs/kit";
 import { createSession, SESSION_COOKIE_NAME, verifyPassword } from "$lib/backend/auth.js";
 import { sql } from "$lib/backend/pg.js";
 
+export function load() {
+    return {
+        autheliaIssuer: process.env.AUTHELIA_ISSUER || null,
+    };
+}
+
 export const actions = {
     default: async ({ request, cookies }) => {
         const data = await request.formData();

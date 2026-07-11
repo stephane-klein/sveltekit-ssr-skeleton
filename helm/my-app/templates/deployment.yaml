@@ -15,6 +15,7 @@ spec:
       labels:
         {{- include "my-app.labels" . | nindent 8 }}
     spec:
+      dnsPolicy: {{ .Values.dnsPolicy }}
       {{- if .Values.seed.enabled }}
       initContainers:
         - name: seed
@@ -56,6 +57,32 @@ spec:
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
           env:
+            {{- $origin := .Values.origin }}
+            {{- if not $origin }}
+              {{- if and .Values.ingress.enabled .Values.ingress.host }}
+                {{- $origin = printf "https://%s" .Values.ingress.host }}
+              {{- end }}
+            {{- end }}
+            {{- if $origin }}
+            - name: ORIGIN
+              value: {{ $origin }}
+            {{- end }}
+            {{- if .Values.oidc.enabled }}
+            - name: AUTHELIA_ISSUER
+              value: {{ .Values.oidc.issuer }}
+            - name: AUTHELIA_CLIENT_ID
+              value: {{ .Values.oidc.clientId }}
+            - name: AUTHELIA_CLIENT_SECRET
+              value: {{ .Values.oidc.clientSecret }}
+            {{- end }}
+            {{- if .Values.adminToken }}
+            - name: MY_APP_ADMIN_TOKEN
+              value: {{ .Values.adminToken }}
+            {{- end }}
+            {{- if .Values.nodeTLSRejectUnauthorized }}
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
+            {{- end }}
             - name: DB_HOST
               valueFrom:
                 secretKeyRef:

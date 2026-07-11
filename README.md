@@ -17,6 +17,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
 - Authentication: sessions & API tokens following [Lucia recommendations](https://lucia-auth.com/sessions/overview)
+- OIDC client: [Arctic](https://arcticjs.dev/)
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - API docs: [Scalar](https://scalar.com/) (interactive reference at `/api/reference`)
 - OpenAPI spec: served at `/api/v1/openapi.json`
@@ -36,7 +37,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
   - [x] Session management (cookie-based, rolling expiration)
   - [x] Password reset flow (token-based)
   - [x] API tokens for programmatic access
-  - [ ] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/)) — TODO
+  - [x] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
 
 ## AI-Assisted Development
 
@@ -76,7 +77,12 @@ Open http://localhost:5173 in your browser.
 ### Creating a user
 
 ```bash
-$ pnpm add-user --email=user@example.com --password=yourpassword
+$ pnpm add-user \
+  --email=john.doe@example.com \
+  --password=yourpassword \
+  --display-name="John Doe" \
+  --oidc-issuer=https://127.0.0.1:9091 \
+  --oidc-subject=johndoe
 
 # Read password from stdin
 $ echo "yourpassword" | pnpm add-user --email=user@example.com --password-stdin
@@ -118,6 +124,25 @@ $ curl -H "Authorization: Bearer <token>" https://your-app.example.com/api/v1/co
 Users can reset their password via `/reset-password`. A time-limited token
 (30 minutes) is generated and stored in the database. The token is presented via
 query parameter to `/change-password`.
+
+### OpenID Connect
+
+Authentication via an external OIDC provider (like [Authelia](https://www.authelia.com/))
+using the [Arctic](https://arcticjs.dev/) library.
+
+Create a user linked to an OIDC identity:
+
+```bash
+$ pnpm add-user \
+    --email=user@example.com \
+    --display-name="User" \
+    --oidc-issuer=https://your-authelia.example.com \
+    --oidc-subject=username
+```
+
+On the login page, click **Sign in with Authelia** to authenticate
+via the external OIDC provider. A local test environment is available
+in [`authelia-test-env/`](./authelia-test-env/).
 
 ### API documentation
 

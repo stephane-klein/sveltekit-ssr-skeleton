@@ -15,11 +15,11 @@ services:
 
   app:
     image: ghcr.io/stephane-klein/my-app:dev
-    ports:
-      - 3000
     depends_on:
       postgres:
         condition: service_healthy
+    extra_hosts:
+      - "auth.127.0.0.1.sslip.io:host-gateway"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
       interval: 15s
@@ -28,8 +28,45 @@ services:
       retries: 3
     environment:
       MY_APP_POSTGRES_URL: postgres://postgres:password@postgres:5432/postgres
-      ORIGIN: http://localhost:3000
+      MY_APP_ADMIN_TOKEN: playground-admin-token-change-me-in-prod
+      ORIGIN: https://app.127.0.0.1.sslip.io
+      AUTHELIA_ISSUER: https://auth.127.0.0.1.sslip.io
+      AUTHELIA_CLIENT_ID: my-app
+      AUTHELIA_CLIENT_SECRET: client-secret-playground
+      NODE_TLS_REJECT_UNAUTHORIZED: 0
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      app:
+        condition: service_started
+      authelia:
+        condition: service_started
+
+  authelia:
+    image: authelia/authelia:latest
+    restart: unless-stopped
+    volumes:
+      - ./authelia/configuration.yml:/config/configuration.yml
+      - ./authelia/users.yml:/config/users.yml
+      - ./authelia/cert.pem:/config/cert.pem
+      - ./authelia/key.pem:/config/key.pem
+      - authelia_data:/data
+    depends_on:
+      redis:
+        condition: service_started
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
 
 volumes:
   postgres:
     name: ${COMPOSE_PROJECT_NAME}_postgres
+  authelia_data:

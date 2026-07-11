@@ -1,11 +1,10 @@
 <script>
-    let { form } = $props();
+    let { data, form } = $props();
 </script>
 
 <svelte:head>
     <title>Sign in — my-app</title>
 </svelte:head>
-
 <header class="border-b border-gray-300">
     <div class="page px-5 py-2">
         <a
@@ -20,6 +19,17 @@
 
     {#if form?.error}
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
+    {/if}
+
+    {#if data.autheliaIssuer}
+        <a
+            href="/login/oidc/authorize"
+            class="block max-w-sm text-center px-4 py-1.5 border border-gray-300 rounded-sm text-sm font-semibold mb-5 hover:bg-gray-50"
+        >
+            Sign in with Authelia
+        </a>
+
+        <hr class="max-w-sm mb-5 border-gray-300" />
     {/if}
 
     <form

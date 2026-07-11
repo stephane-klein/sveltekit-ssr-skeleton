@@ -40,6 +40,30 @@ ingress:
   annotations: {}
   tls: []
 
+# Public origin URL (e.g. https://my-app.example.com).
+# Auto-derived from ingress.host when ingress is enabled.
+# Explicitly set this value to override.
+origin: ""
+
+# Admin API token — Bearer authentication for /api/v1/admin/* endpoints.
+# Must be at least 32 characters long.
+adminToken: ""
+
+# OpenID Connect / Authelia configuration
+oidc:
+  enabled: false
+  issuer: ""
+  clientId: ""
+  # AUTHELIA_CLIENT_SECRET — passed directly as env var.
+  # In production, consider creating a Secret and referencing it via envFrom.
+  clientSecret: ""
+
+# Pod DNS policy — use ClusterFirstWithHostNet to resolve sklein.internal from pods
+dnsPolicy: ClusterFirst
+
+# Allow unauthorized TLS connections (e.g. self-signed CA for internal services)
+nodeTLSRejectUnauthorized: false
+
 # Resource limits
 resources:
   requests:

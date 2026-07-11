@@ -15,7 +15,7 @@ export async function GET(event) {
     if (authError) return authError;
 
     const [user] = await sql`
-        SELECT id, email, display_name, is_active, created_at, updated_at
+        SELECT id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
         FROM users WHERE id = ${event.params.id}
     `;
 
@@ -60,6 +60,22 @@ export async function PATCH(event) {
         return problem(422, "is_active must be a boolean", event.request.url);
     }
 
+    if (body.oidc_issuer !== undefined || body.oidc_subject !== undefined) {
+        if (body.oidc_issuer === undefined || body.oidc_subject === undefined) {
+            return problem(422, "Both oidc_issuer and oidc_subject must be provided together", event.request.url);
+        }
+
+        const oidcIssuer = body.oidc_issuer.replace(/\/$/, '');
+        const conflict = await sql`
+            SELECT id FROM users
+            WHERE oidc_issuer = ${oidcIssuer.trim()} AND oidc_subject = ${body.oidc_subject.trim()}
+            AND id != ${event.params.id}
+        `;
+        if (conflict.length > 0) {
+            return problem(409, "A user with this OIDC pair already exists", event.request.url);
+        }
+    }
+
     if (Object.keys(body).length === 0) {
         return problem(400, "No fields to update", event.request.url);
     }
@@ -77,10 +93,12 @@ export async function PATCH(event) {
             email         = COALESCE(${body.email?.trim() || null}, email),
             display_name  = COALESCE(${body.display_name?.trim() || null}, display_name),
             password_hash = CASE WHEN ${!!body.password} THEN ${passwordHash} ELSE password_hash END,
+            oidc_issuer   = COALESCE(${body.oidc_issuer?.replace(/\/$/, '').trim() || null}, oidc_issuer),
+            oidc_subject  = COALESCE(${body.oidc_subject?.trim() || null}, oidc_subject),
             is_active     = COALESCE(${body.is_active !== undefined ? body.is_active : null}, is_active),
             updated_at    = ${now}
         WHERE id = ${event.params.id}
-        RETURNING id, email, display_name, is_active, created_at, updated_at
+        RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
     `;
 
     return json({
