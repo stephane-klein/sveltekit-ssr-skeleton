@@ -1,16 +1,17 @@
+<script>
+    let { data } = $props();
+</script>
+
 <svelte:head>
     <title>Delete contact — my-app</title>
 </svelte:head>
-
-<script>
-    let { data } = $props()
-</script>
 
 <main class="page px-5 pt-9 pb-24">
     <h1 class="text-xl font-bold mb-6 tracking-tight">Delete contact</h1>
 
     <p class="text-sm text-gray-600 mb-4">
-        Are you sure you want to delete <strong>{data.contact.firstname} {data.contact.lastname}</strong>? This cannot be undone.
+        Are you sure you want to delete <strong>{data.contact.firstname} {data.contact.lastname}</strong>? This cannot
+        be undone.
     </p>
 
     <form method="POST">
@@ -21,7 +22,10 @@
             >
                 Yes, delete
             </button>
-            <a href="/contacts" class="text-sm text-blue-600 hover:underline">Cancel</a>
+            <a
+                href="/contacts"
+                class="text-sm text-blue-600 hover:underline">Cancel</a
+            >
         </div>
     </form>
 </main>

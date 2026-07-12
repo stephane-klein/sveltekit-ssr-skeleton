@@ -23,6 +23,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
+- Lint/Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
 - Helm chart: Kubernetes deployment
 
 ## Roadmap:
@@ -125,13 +126,13 @@ API endpoints accept both session cookies and `Authorization: Bearer <token>` he
 
 ### Endpoints
 
-| Méthode | Route | Description |
-|:--------|:------|:------------|
-| `GET` | `/api/v1/contacts/` | List contacts |
-| `POST` | `/api/v1/contacts/` | Create a contact (`firstname` required) |
-| `GET` | `/api/v1/contacts/:id/` | Get a contact |
-| `PATCH` | `/api/v1/contacts/:id/` | Update a contact (partial) |
-| `DELETE` | `/api/v1/contacts/:id/` | Delete a contact |
+| Méthode  | Route                   | Description                             |
+| :------- | :---------------------- | :-------------------------------------- |
+| `GET`    | `/api/v1/contacts/`     | List contacts                           |
+| `POST`   | `/api/v1/contacts/`     | Create a contact (`firstname` required) |
+| `GET`    | `/api/v1/contacts/:id/` | Get a contact                           |
+| `PATCH`  | `/api/v1/contacts/:id/` | Update a contact (partial)              |
+| `DELETE` | `/api/v1/contacts/:id/` | Delete a contact                        |
 
 ```bash
 $ curl -H "Authorization: Bearer <token>" http://localhost:5173/api/v1/contacts/
@@ -188,5 +189,3 @@ $ mise run setup-git-hooks
 $ mise run gitleaks-scan        # full project scan
 $ mise run gitleaks-check-push  # pre-push scan
 ```
-
-

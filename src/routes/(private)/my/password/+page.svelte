@@ -1,16 +1,18 @@
+<script>
+    let { form } = $props();
+</script>
+
 <svelte:head>
     <title>Change password — my-app</title>
 </svelte:head>
-
-<script>
-    let { form } = $props()
-</script>
 
 <main class="page px-5 pt-9 pb-24">
     <h1 class="text-xl font-bold mb-7 tracking-tight">Change password</h1>
 
     <div class="mb-9">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">Password</h2>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">
+            Password
+        </h2>
 
         {#if form?.error}
             <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
@@ -22,7 +24,10 @@
 
         <form method="POST">
             <div class="mb-3.5">
-                <label for="current-password" class="block text-sm font-semibold mb-1">Current password</label>
+                <label
+                    for="current-password"
+                    class="block text-sm font-semibold mb-1">Current password</label
+                >
                 <input
                     type="password"
                     id="current-password"
@@ -34,7 +39,10 @@
             </div>
 
             <div class="mb-3.5">
-                <label for="new-password" class="block text-sm font-semibold mb-1">New password</label>
+                <label
+                    for="new-password"
+                    class="block text-sm font-semibold mb-1">New password</label
+                >
                 <input
                     type="password"
                     id="new-password"
@@ -47,7 +55,10 @@
             </div>
 
             <div class="mb-3.5">
-                <label for="confirm" class="block text-sm font-semibold mb-1">Confirm new password</label>
+                <label
+                    for="confirm"
+                    class="block text-sm font-semibold mb-1">Confirm new password</label
+                >
                 <input
                     type="password"
                     id="confirm"

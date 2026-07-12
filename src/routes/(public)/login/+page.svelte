@@ -1,14 +1,17 @@
+<script>
+    let { form } = $props();
+</script>
+
 <svelte:head>
     <title>Sign in — my-app</title>
 </svelte:head>
 
-<script>
-let { form } = $props();
-</script>
-
 <header class="border-b border-gray-300">
     <div class="page px-5 py-2">
-        <a href="/" class="font-bold text-base no-underline hover:underline">my-app</a>
+        <a
+            href="/"
+            class="font-bold text-base no-underline hover:underline">my-app</a
+        >
     </div>
 </header>
 
@@ -19,9 +22,16 @@ let { form } = $props();
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
     {/if}
 
-    <form method="POST" class="max-w-sm" novalidate>
+    <form
+        method="POST"
+        class="max-w-sm"
+        novalidate
+    >
         <div class="mb-3">
-            <label for="email" class="block text-sm font-semibold mb-1">Email</label>
+            <label
+                for="email"
+                class="block text-sm font-semibold mb-1">Email</label
+            >
             <input
                 type="email"
                 id="email"
@@ -34,7 +44,10 @@ let { form } = $props();
         </div>
 
         <div class="mb-3">
-            <label for="password" class="block text-sm font-semibold mb-1">Password</label>
+            <label
+                for="password"
+                class="block text-sm font-semibold mb-1">Password</label
+            >
             <input
                 type="password"
                 id="password"
@@ -52,14 +65,23 @@ let { form } = $props();
             >
                 Sign in
             </button>
-            <a href="/reset-password" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
+            <a
+                href="/reset-password"
+                class="text-sm text-blue-600 hover:underline">Forgot password?</a
+            >
         </div>
     </form>
 
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
         No account?
-        <a href="/signup" class="text-blue-600 hover:underline">Create one</a>
+        <a
+            href="/signup"
+            class="text-blue-600 hover:underline">Create one</a
+        >
         ·
-        <a href="/" class="text-blue-600 hover:underline">Back to homepage</a>
+        <a
+            href="/"
+            class="text-blue-600 hover:underline">Back to homepage</a
+        >
     </p>
 </main>

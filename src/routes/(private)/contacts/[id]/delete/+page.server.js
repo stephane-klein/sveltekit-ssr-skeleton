@@ -1,4 +1,4 @@
-import { redirect, fail } from "@sveltejs/kit";
+import { redirect } from "@sveltejs/kit";
 import { sql } from "$lib/backend/pg.js";
 
 export async function load(event) {

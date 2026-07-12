@@ -5,9 +5,7 @@ function problem(status, detail, instance) {
     return json(
         {
             type: "about:blank",
-            title: [400, "Bad Request", 401, "Unauthorized", 404, "Not Found"][
-                [400, 401, 404].indexOf(status) * 2 + 1
-            ],
+            title: [400, "Bad Request", 401, "Unauthorized", 404, "Not Found"][[400, 401, 404].indexOf(status) * 2 + 1],
             status,
             detail,
             instance,

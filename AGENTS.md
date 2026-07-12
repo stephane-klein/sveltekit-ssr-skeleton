@@ -16,13 +16,14 @@ Skeleton gathering standard components configuration for SvelteKit web applicati
 
 ## Code Quality
 
-This project uses [Biome](https://biomejs.dev) for linting and formatting:
+This project uses **ESLint** with `eslint-plugin-svelte` for linting and
+**Prettier** with `prettier-plugin-svelte` for formatting:
 
 - `pnpm lint` — check for code issues
 - `pnpm format` — auto-format code
-- `pnpm check` — run both (format + lint + organize imports)
+- `pnpm check` — run both (format check + lint)
 
-Configuration: `biome.jsonc`
+Configuration: `eslint.config.js`, `prettier.config.js`
 
 ## Database
 
@@ -69,11 +70,11 @@ The production image runs `node /app/build/index.js` via the `serve` command in 
 ### Functional style
 
 - Prefer chaining `.map()`, `.filter()`, `.reduce()`, `.forEach()` over imperative loops.
-- Avoid intermediate variables without semantic value (*expression-oriented*):
+- Avoid intermediate variables without semantic value (_expression-oriented_):
   prefer `getMonths().map(...)` to `const months = getMonths(); months.map(...)`.
   Prefer `(await Promise.all(...)).forEach(...)` to `const results = []; for (...)`.
   If a step is complex, prefer a comment over a superfluous variable.
-- Avoid mutations: no `.push()` in a loop if `.map()` suffices (*immutability*).
+- Avoid mutations: no `.push()` in a loop if `.map()` suffices (_immutability_).
 
 ### To avoid
 

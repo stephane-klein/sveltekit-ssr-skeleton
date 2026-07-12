@@ -15,7 +15,7 @@ export function GET() {
                     summary: "List contacts",
                     security: [{ bearerAuth: [] }],
                     responses: {
-                        "200": {
+                        200: {
                             description: "List of contacts",
                             content: {
                                 "application/json": {
@@ -32,7 +32,7 @@ export function GET() {
                                 },
                             },
                         },
-                        "401": { $ref: "#/components/responses/Unauthorized" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
                     },
                 },
                 post: {
@@ -54,7 +54,7 @@ export function GET() {
                         },
                     },
                     responses: {
-                        "201": {
+                        201: {
                             description: "Contact created",
                             headers: {
                                 Location: {
@@ -74,8 +74,8 @@ export function GET() {
                                 },
                             },
                         },
-                        "400": { $ref: "#/components/responses/BadRequest" },
-                        "401": { $ref: "#/components/responses/Unauthorized" },
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
                     },
                 },
             },
@@ -83,11 +83,9 @@ export function GET() {
                 get: {
                     summary: "Get a contact",
                     security: [{ bearerAuth: [] }],
-                    parameters: [
-                        { name: "id", in: "path", required: true, schema: { type: "integer" } },
-                    ],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
                     responses: {
-                        "200": {
+                        200: {
                             description: "Contact details",
                             content: {
                                 "application/json": {
@@ -101,16 +99,14 @@ export function GET() {
                                 },
                             },
                         },
-                        "401": { $ref: "#/components/responses/Unauthorized" },
-                        "404": { $ref: "#/components/responses/NotFound" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
                     },
                 },
                 patch: {
                     summary: "Update a contact (partial)",
                     security: [{ bearerAuth: [] }],
-                    parameters: [
-                        { name: "id", in: "path", required: true, schema: { type: "integer" } },
-                    ],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
                     requestBody: {
                         required: true,
                         content: {
@@ -126,7 +122,7 @@ export function GET() {
                         },
                     },
                     responses: {
-                        "200": {
+                        200: {
                             description: "Contact updated",
                             content: {
                                 "application/json": {
@@ -140,22 +136,20 @@ export function GET() {
                                 },
                             },
                         },
-                        "400": { $ref: "#/components/responses/BadRequest" },
-                        "401": { $ref: "#/components/responses/Unauthorized" },
-                        "404": { $ref: "#/components/responses/NotFound" },
-                        "422": { $ref: "#/components/responses/Unprocessable" },
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
+                        422: { $ref: "#/components/responses/Unprocessable" },
                     },
                 },
                 delete: {
                     summary: "Delete a contact",
                     security: [{ bearerAuth: [] }],
-                    parameters: [
-                        { name: "id", in: "path", required: true, schema: { type: "integer" } },
-                    ],
+                    parameters: [{ name: "id", in: "path", required: true, schema: { type: "integer" } }],
                     responses: {
-                        "204": { description: "Deleted (no content)" },
-                        "401": { $ref: "#/components/responses/Unauthorized" },
-                        "404": { $ref: "#/components/responses/NotFound" },
+                        204: { description: "Deleted (no content)" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        404: { $ref: "#/components/responses/NotFound" },
                     },
                 },
             },

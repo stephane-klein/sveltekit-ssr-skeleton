@@ -1,10 +1,10 @@
+<script>
+    let { form, data } = $props();
+</script>
+
 <svelte:head>
     <title>Edit contact — my-app</title>
 </svelte:head>
-
-<script>
-    let { form, data } = $props()
-</script>
 
 <main class="page px-5 pt-9 pb-24">
     <h1 class="text-xl font-bold mb-6 tracking-tight">Edit contact</h1>
@@ -13,9 +13,15 @@
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
     {/if}
 
-    <form method="POST" class="max-w-sm">
+    <form
+        method="POST"
+        class="max-w-sm"
+    >
         <div class="mb-3">
-            <label for="firstname" class="block text-sm font-semibold mb-1">First name</label>
+            <label
+                for="firstname"
+                class="block text-sm font-semibold mb-1">First name</label
+            >
             <input
                 type="text"
                 id="firstname"
@@ -29,7 +35,10 @@
         </div>
 
         <div class="mb-3">
-            <label for="lastname" class="block text-sm font-semibold mb-1">Last name</label>
+            <label
+                for="lastname"
+                class="block text-sm font-semibold mb-1">Last name</label
+            >
             <input
                 type="text"
                 id="lastname"
@@ -48,7 +57,10 @@
             >
                 Save
             </button>
-            <a href="/contacts" class="text-sm text-blue-600 hover:underline">Cancel</a>
+            <a
+                href="/contacts"
+                class="text-sm text-blue-600 hover:underline">Cancel</a
+            >
         </div>
     </form>
 </main>

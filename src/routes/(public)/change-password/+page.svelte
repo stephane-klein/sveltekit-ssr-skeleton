@@ -1,14 +1,17 @@
+<script>
+    let { form, data } = $props();
+</script>
+
 <svelte:head>
     <title>Change password — my-app</title>
 </svelte:head>
 
-<script>
-    let { form, data } = $props()
-</script>
-
 <header class="border-b border-gray-300">
     <div class="page px-5 py-2">
-        <a href="/" class="font-bold text-base no-underline hover:underline">my-app</a>
+        <a
+            href="/"
+            class="font-bold text-base no-underline hover:underline">my-app</a
+        >
     </div>
 </header>
 
@@ -18,7 +21,10 @@
     {#if data?.invalid}
         <p class="text-sm text-red-600 mb-3.5">This reset link is invalid or has expired.</p>
         <p class="text-sm text-gray-500">
-            <a href="/reset-password" class="text-blue-600 hover:underline">Request a new reset link</a>
+            <a
+                href="/reset-password"
+                class="text-blue-600 hover:underline">Request a new reset link</a
+            >
         </p>
     {:else}
         {#if data?.valid}
@@ -26,9 +32,16 @@
                 <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
             {/if}
 
-            <form method="POST" class="max-w-sm" novalidate>
+            <form
+                method="POST"
+                class="max-w-sm"
+                novalidate
+            >
                 <div class="mb-3">
-                    <label for="password" class="block text-sm font-semibold mb-1">New password</label>
+                    <label
+                        for="password"
+                        class="block text-sm font-semibold mb-1">New password</label
+                    >
                     <input
                         type="password"
                         id="password"
@@ -42,7 +55,10 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="confirm" class="block text-sm font-semibold mb-1">Confirm new password</label>
+                    <label
+                        for="confirm"
+                        class="block text-sm font-semibold mb-1">Confirm new password</label
+                    >
                     <input
                         type="password"
                         id="confirm"
@@ -66,6 +82,9 @@
     {/if}
 
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
-        <a href="/login" class="text-blue-600 hover:underline">Back to sign in</a>
+        <a
+            href="/login"
+            class="text-blue-600 hover:underline">Back to sign in</a
+        >
     </p>
 </main>

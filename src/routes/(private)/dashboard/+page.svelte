@@ -1,10 +1,10 @@
+<script>
+    let { data } = $props();
+</script>
+
 <svelte:head>
     <title>Dashboard — my-app</title>
 </svelte:head>
-
-<script>
-let { data } = $props();
-</script>
 
 <main class="page px-5 pt-9 pb-24">
     <h1 class="text-xl font-bold mb-2 tracking-tight">Dashboard</h1>

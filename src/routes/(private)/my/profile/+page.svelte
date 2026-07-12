@@ -1,16 +1,18 @@
+<script>
+    let { form, data } = $props();
+</script>
+
 <svelte:head>
     <title>Profile — my-app</title>
 </svelte:head>
-
-<script>
-    let { form, data } = $props()
-</script>
 
 <main class="page px-5 pt-9 pb-24">
     <h1 class="text-xl font-bold mb-7 tracking-tight">Profile</h1>
 
     <div class="mb-9">
-        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">Personal information</h2>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">
+            Personal information
+        </h2>
 
         {#if form?.error}
             <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
@@ -22,7 +24,10 @@
 
         <form method="POST">
             <div class="mb-3.5">
-                <label for="display-name" class="block text-sm font-semibold mb-1">Display name</label>
+                <label
+                    for="display-name"
+                    class="block text-sm font-semibold mb-1">Display name</label
+                >
                 <input
                     type="text"
                     id="display-name"
@@ -34,7 +39,10 @@
             </div>
 
             <div class="mb-3.5">
-                <label for="email" class="block text-sm font-semibold mb-1">Email</label>
+                <label
+                    for="email"
+                    class="block text-sm font-semibold mb-1">Email</label
+                >
                 <input
                     type="email"
                     id="email"

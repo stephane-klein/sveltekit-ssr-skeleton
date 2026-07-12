@@ -1,6 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
 import { hashPassword, validatePasswordResetToken, usePasswordResetToken } from "$lib/backend/auth.js";
-import { sql } from "$lib/backend/pg.js";
 
 export async function load(event) {
     const token = event.url.searchParams.get("token");
