@@ -81,6 +81,14 @@ The production image runs `node /app/build/index.js` via the `serve` command in 
 - Tacit programming / point-free style: always explicitly name function arguments.
   Prefer `[1,2,3].map(n => add1(n))` to `[1,2,3].map(add1)`.
 
+## OpenAPI Spec Sync
+
+The OpenAPI specification is dynamically generated in
+`src/routes/(api)/api/v1/openapi.json/+server.js`.
+
+**Any change to request/response schemas in route handlers must be reflected
+here too.** The Scalar API reference UI at `/api/reference` consumes this spec.
+
 ## Documentation Maintenance
 
 Remove from this file any section or reference that becomes obsolete after file deletions or structural changes. Keep AGENTS.md up to date.
