@@ -1,12 +1,12 @@
 import { json } from "@sveltejs/kit";
-import { PUBLIC_BUILD_STAMP, PUBLIC_GIT_BRANCH, PUBLIC_GIT_DATE, PUBLIC_GIT_HASH } from "$env/static/public";
+import { env } from "$env/dynamic/public";
 
 export function GET() {
     return json({
         environment: process.env.NODE_ENV || "development",
-        branch: PUBLIC_GIT_BRANCH,
-        gitDate: PUBLIC_GIT_DATE,
-        buildStamp: PUBLIC_BUILD_STAMP,
-        gitHash: PUBLIC_GIT_HASH,
+        branch: env.PUBLIC_GIT_BRANCH ?? null,
+        gitDate: env.PUBLIC_GIT_DATE ?? null,
+        buildStamp: env.PUBLIC_BUILD_STAMP ?? null,
+        gitHash: env.PUBLIC_GIT_HASH ?? null,
     });
 }
