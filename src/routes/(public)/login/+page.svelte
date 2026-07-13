@@ -32,6 +32,7 @@
                 for="email"
                 class="block text-sm font-semibold mb-1">Email</label
             >
+            <!-- svelte-ignore a11y_autofocus -->
             <input
                 type="email"
                 id="email"

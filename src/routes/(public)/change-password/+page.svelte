@@ -42,6 +42,7 @@
                         for="password"
                         class="block text-sm font-semibold mb-1">New password</label
                     >
+                    <!-- svelte-ignore a11y_autofocus -->
                     <input
                         type="password"
                         id="password"
