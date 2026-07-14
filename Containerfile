@@ -46,7 +46,7 @@ COPY sqls/ ./sqls/
 COPY entrypoint.sh /entrypoint.sh
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:${PORT:-3000}/health || exit 1
+  CMD curl -f http://localhost:${PORT:-3000}/-/healthy || exit 1
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["serve"]
