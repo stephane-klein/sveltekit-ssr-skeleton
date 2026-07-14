@@ -38,6 +38,9 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
   - [x] Password reset flow (token-based)
   - [x] API tokens for programmatic access
   - [x] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
+- [ ] Add Prometheus metrics export endpoint with `prom-client` (`/metrics`)
+- [ ] Email sending support: password reset, account validation
+- [ ] Container option to optionally load seed SQL data
 
 ## AI-Assisted Development
 
