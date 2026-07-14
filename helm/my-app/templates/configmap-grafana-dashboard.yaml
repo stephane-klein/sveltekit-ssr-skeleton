@@ -1,0 +1,12 @@
+{{- if and .Values.metrics.enabled .Values.metrics.grafanaDashboard.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-grafana-dashboard
+  labels:
+    {{- include "my-app.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  sveltekit-metrics.json: |-
+{{ .Files.Get "dashboards/sveltekit-metrics.json" | replace "PLACEHOLDER_NAMESPACE" .Release.Namespace | indent 4 }}
+{{- end }}

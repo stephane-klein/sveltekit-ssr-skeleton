@@ -1,6 +1,7 @@
 import { SESSION_COOKIE_NAME, validateApiToken, validateSession } from "$lib/backend/auth.js";
 import { sql } from "$lib/backend/pg.js";
 import { logger } from "$lib/backend/logger.js";
+import { renderDuration } from "$lib/backend/metrics.js";
 
 export async function handle({ event, resolve }) {
     event.locals.user = null;
@@ -38,7 +39,17 @@ export async function handle({ event, resolve }) {
         }
     }
 
+    const route = event.route.id;
+
+    // Exclude infra routes (/health, /metrics, etc.) from SSR duration tracking
+    // — they are short endpoints that would pollute the render duration histogram.
+    if (route?.includes("(infra)")) {
+        return resolve(event);
+    }
+
+    const end = renderDuration.startTimer({ route: route ?? "unknown" });
     const response = await resolve(event);
+    end();
 
     return response;
 }

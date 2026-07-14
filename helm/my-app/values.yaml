@@ -73,6 +73,17 @@ resources:
     cpu: 200m
     memory: 128Mi
 
+# Prometheus metrics — exposed at /metrics via prom-client.
+# The pod template is annotated with prometheus.io/* so that
+# Prometheus / VictoriaMetrics with kubernetes_sd_configs
+# auto-discovers and scrapes the targets.
+metrics:
+  enabled: false
+  # Grafana dashboard — ConfigMap labeled grafana_dashboard: "1" so
+  # the Grafana sidecar auto-imports it.
+  grafanaDashboard:
+    enabled: false
+
 # Node selector, tolerations, affinity (optional)
 nodeSelector: {}
 tolerations: []

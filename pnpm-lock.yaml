@@ -13,7 +13,7 @@ importers:
         version: 2.0.2
       '@scalar/sveltekit':
         specifier: ^0.3.9
-        version: 0.3.9(@sveltejs/kit@2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)
+        version: 0.3.9(@sveltejs/kit@2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)
       arctic:
         specifier: ^3.7.0
         version: 3.7.0
@@ -32,6 +32,9 @@ importers:
       postgres-shift:
         specifier: ^0.1.0
         version: 0.1.0
+      prom-client:
+        specifier: ^15.1.3
+        version: 15.1.3
       yargs:
         specifier: ^18.0.0
         version: 18.0.0
@@ -41,10 +44,10 @@ importers:
         version: 10.0.1(eslint@10.7.0(jiti@2.7.0))
       '@sveltejs/adapter-node':
         specifier: ^5.5.7
-        version: 5.5.7(@sveltejs/kit@2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))
+        version: 5.5.7(@sveltejs/kit@2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))
       '@sveltejs/kit':
         specifier: ^2.69.0
-        version: 2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
+        version: 2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
       '@unocss/extractor-svelte':
         specifier: ^66.7.5
         version: 66.7.5
@@ -302,6 +305,10 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@opentelemetry/api@1.9.1':
+    resolution: {integrity: sha512-gLyJlPHPZYdAk1JENA9LeHejZe1Ti77/pTeFm/nMXmQH/HFZlcS/O2XJB+L8fkbrNSqhdtlvjBVjxwUYanNH5Q==}
+    engines: {node: '>=8.0.0'}
 
   '@oslojs/asn1@1.0.0':
     resolution: {integrity: sha512-zw/wn0sj0j0QKbIXfIlnEcTviaCzYOY3V5rAyjR6YtOByFtJiT574+8p9Wlach0lZH9fddD4yb9laEAIl4vXQA==}
@@ -962,6 +969,9 @@ packages:
   balanced-match@4.0.4:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
+
+  bintrees@1.0.2:
+    resolution: {integrity: sha512-VOMgTMwjAaUG580SXn3LacVgjurrbMme7ZZNYGSSV7mmtY6QQRh0Eg3pwIcntQ77DErK1L0NxkbetjcoXzVwKw==}
 
   brace-expansion@5.0.7:
     resolution: {integrity: sha512-7oFy703dxfY3/NLxC1fh2SUCQ0H9rmAY+5EpDVfXjUTTs+HEwR2nYaqLv+GWcTsumwxPfiz6CzCNkwXwBUwqCA==}
@@ -1765,6 +1775,10 @@ packages:
   process-warning@5.0.0:
     resolution: {integrity: sha512-a39t9ApHNx2L4+HBnQKqxxHNs1r7KF+Intd8Q/g1bUh6q0WIp9voPXJ/x0j+ZL45KF1pJd9+q2jLIRMfvEshkA==}
 
+  prom-client@15.1.3:
+    resolution: {integrity: sha512-6ZiOBfCywsD4k1BN9IX0uZhF+tJkV8q8llP64G5Hajs4JOeVLPCwpPVcpXy3BwYiUGgyJzsJJQeOIv7+hDSq8g==}
+    engines: {node: ^16 || ^18 || >=20}
+
   pump@3.0.4:
     resolution: {integrity: sha512-VS7sjc6KR7e1ukRFhQSY5LM2uBWAUPiOPa/A3mkKmiMwSmRFUITt0xuj+/lesgnCv+dPIEYlkzrcyXgquIHMcA==}
 
@@ -1940,6 +1954,9 @@ packages:
   tagged-tag@1.0.0:
     resolution: {integrity: sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng==}
     engines: {node: '>=20'}
+
+  tdigest@0.1.2:
+    resolution: {integrity: sha512-+G0LLgjjo9BZX2MfdvPfH+MKLCrxlXSYec5DaPYP1fe6Iyhf0/fSmJ0bFiZ1F8BT6cGXl2LpltQptzjXKWEkKA==}
 
   thread-stream@4.2.0:
     resolution: {integrity: sha512-e2zZ96wSChazBsbENf/Pcm/4swHt2cEKQ92rhUjkL9GCKiTDJIaTBenjE/m9DXi0QBmTMDkFDdOomUy20A1tDQ==}
@@ -2356,6 +2373,8 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
 
+  '@opentelemetry/api@1.9.1': {}
+
   '@oslojs/asn1@1.0.0':
     dependencies:
       '@oslojs/binary': 1.0.0
@@ -2633,10 +2652,10 @@ snapshots:
       '@scalar/helpers': 0.9.0
       '@scalar/validation': 0.6.0
 
-  '@scalar/sveltekit@0.3.9(@sveltejs/kit@2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)':
+  '@scalar/sveltekit@0.3.9(@sveltejs/kit@2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)':
     dependencies:
       '@scalar/client-side-rendering': 0.3.2
-      '@sveltejs/kit': 2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
+      '@sveltejs/kit': 2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
       svelte: 5.56.4
 
   '@scalar/types@0.16.2':
@@ -2654,16 +2673,16 @@ snapshots:
     dependencies:
       acorn: 8.17.0
 
-  '@sveltejs/adapter-node@5.5.7(@sveltejs/kit@2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))':
+  '@sveltejs/adapter-node@5.5.7(@sveltejs/kit@2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))':
     dependencies:
       '@rollup/plugin-commonjs': 29.0.3(rollup@4.62.2)
       '@rollup/plugin-json': 6.1.0(rollup@4.62.2)
       '@rollup/plugin-node-resolve': 16.0.3(rollup@4.62.2)
       '@rollup/plugin-replace': 6.0.3(rollup@4.62.2)
-      '@sveltejs/kit': 2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
+      '@sveltejs/kit': 2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))
       rollup: 4.62.2
 
-  '@sveltejs/kit@2.69.0(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))':
+  '@sveltejs/kit@2.69.0(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0)))(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))':
     dependencies:
       '@standard-schema/spec': 1.1.0
       '@sveltejs/acorn-typescript': 1.0.10(acorn@8.17.0)
@@ -2680,6 +2699,8 @@ snapshots:
       sirv: 3.0.2
       svelte: 5.56.4
       vite: 8.1.3(jiti@2.7.0)
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
 
   '@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.56.4)(vite@8.1.3(jiti@2.7.0))':
     dependencies:
@@ -2886,6 +2907,8 @@ snapshots:
   axobject-query@4.1.0: {}
 
   balanced-match@4.0.4: {}
+
+  bintrees@1.0.2: {}
 
   brace-expansion@5.0.7:
     dependencies:
@@ -3658,6 +3681,11 @@ snapshots:
 
   process-warning@5.0.0: {}
 
+  prom-client@15.1.3:
+    dependencies:
+      '@opentelemetry/api': 1.9.1
+      tdigest: 0.1.2
+
   pump@3.0.4:
     dependencies:
       end-of-stream: 1.4.5
@@ -3870,6 +3898,10 @@ snapshots:
       - '@typescript-eslint/types'
 
   tagged-tag@1.0.0: {}
+
+  tdigest@0.1.2:
+    dependencies:
+      bintrees: 1.0.2
 
   thread-stream@4.2.0:
     dependencies:

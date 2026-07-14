@@ -21,11 +21,14 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - API docs: [Scalar](https://scalar.com/) (interactive reference at `/api/reference`)
 - OpenAPI spec: served at `/api/v1/openapi.json`
+- Metrics: Prometheus (`prom-client`) at `/-/metrics`
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
 - Lint/Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
 - Helm chart: Kubernetes deployment
+  - Prometheus auto-scraping via `prometheus.io/*` pod annotations
+  - Grafana dashboard deployed as ConfigMap (`grafana_dashboard: "1"` sidecar pattern)
 
 ## Roadmap:
 
@@ -38,7 +41,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
   - [x] Password reset flow (token-based)
   - [x] API tokens for programmatic access
   - [x] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
-- [ ] Add Prometheus metrics export endpoint with `prom-client` (`/metrics`)
+- [x] Add Prometheus metrics export endpoint with `prom-client` (`/-/metrics`)
 - [ ] Email sending support: password reset, account validation
 - [ ] Container option to optionally load seed SQL data
 
@@ -70,7 +73,8 @@ $ mise run up       # start PostgreSQL container
 $ reload            # load environment variables
 $ mise run migrate  # run database migrations
 $ mise run seed     # populate with demo data
-$ mise run dev      # start SvelteKit dev server on http://localhost:5173
+$ mise run dev                # start SvelteKit dev server on http://localhost:5173
+$ mise run preview-prod-build # build and run production server on http://localhost:3000
 ```
 
 Open http://localhost:5173 in your browser.
