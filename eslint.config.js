@@ -16,7 +16,7 @@ const baseRules = {
     semi: "error",
     "array-callback-return": "error",
     "no-useless-concat": "error",
-    "space-before-function-paren": ["error", { anonymous: "never", named: "never", asyncArrow: "always" }],
+    "space-before-function-paren": ["error", { anonymous: "always", named: "never", asyncArrow: "always" }],
     "no-duplicate-imports": "error",
     "no-irregular-whitespace": "off",
     "no-unused-vars": [

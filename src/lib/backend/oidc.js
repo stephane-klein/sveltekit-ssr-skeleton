@@ -19,7 +19,7 @@ async function discoverEndpoints() {
         res = await fetch(discoveryUrl);
     } catch (err) {
         logger.error({ err, discoveryUrl }, "OIDC discovery fetch failed");
-        throw new Error(`Failed to fetch OpenID configuration: ${err.message}`);
+        throw new Error(`Failed to fetch OpenID configuration: ${err.message}`, { cause: err });
     }
 
     if (!res.ok) {
@@ -35,7 +35,7 @@ async function discoverEndpoints() {
         config = await res.json();
     } catch (err) {
         logger.error({ err, discoveryUrl }, "OIDC discovery response was not valid JSON");
-        throw new Error("Failed to parse OpenID configuration");
+        throw new Error("Failed to parse OpenID configuration", { cause: err });
     }
 
     endpointsCache = {
