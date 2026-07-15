@@ -1,17 +1,19 @@
 <script>
+    import { m } from "$lib/paraglide/messages";
+
     let { form, data } = $props();
 </script>
 
 <svelte:head>
-    <title>Profile — my-app</title>
+    <title>{m.my_profile_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <main class="page px-5 pt-9 pb-24">
-    <h1 class="text-xl font-bold mb-7 tracking-tight">Profile</h1>
+    <h1 class="text-xl font-bold mb-7 tracking-tight">{m.my_profile_title()}</h1>
 
     <div class="mb-9">
         <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">
-            Personal information
+            {m.my_profile_section()}
         </h2>
 
         {#if form?.error}
@@ -19,14 +21,14 @@
         {/if}
 
         {#if form?.saved}
-            <p class="text-sm text-green-700 mb-3.5">Saved.</p>
+            <p class="text-sm text-green-700 mb-3.5">{m.my_profile_saved()}</p>
         {/if}
 
         <form method="POST">
             <div class="mb-3.5">
                 <label
                     for="display-name"
-                    class="block text-sm font-semibold mb-1">Display name</label
+                    class="block text-sm font-semibold mb-1">{m.my_profile_display_name_label()}</label
                 >
                 <input
                     type="text"
@@ -41,7 +43,7 @@
             <div class="mb-3.5">
                 <label
                     for="email"
-                    class="block text-sm font-semibold mb-1">Email</label
+                    class="block text-sm font-semibold mb-1">{m.my_profile_email_label()}</label
                 >
                 <input
                     type="email"
@@ -51,7 +53,7 @@
                     autocomplete="email"
                     class="w-full max-w-sm px-2 py-1.5 border border-gray-300 rounded-sm text-sm text-gray-900 bg-white focus:outline-2 focus:outline-blue-600 focus:border-blue-600"
                 />
-                <p class="text-xs text-gray-500 mt-1">Used for sign in and notifications.</p>
+                <p class="text-xs text-gray-500 mt-1">{m.my_profile_email_hint()}</p>
             </div>
 
             <div class="flex items-center gap-3 mt-1.5">
@@ -59,7 +61,7 @@
                     type="submit"
                     class="px-4 py-1.5 rounded-sm text-sm font-semibold cursor-pointer border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 hover:border-blue-700"
                 >
-                    Save changes
+                    {m.my_profile_save()}
                 </button>
             </div>
         </form>

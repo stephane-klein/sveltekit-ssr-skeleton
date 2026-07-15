@@ -1,5 +1,6 @@
 import { redirect } from "@sveltejs/kit";
 import { createSession, SESSION_COOKIE_NAME, validateMagicLoginToken } from "$lib/backend/auth.js";
+import { sql } from "$lib/backend/pg.js";
 
 export async function load({ url, cookies }) {
     const raw = url.searchParams.get("token");
@@ -23,6 +24,12 @@ export async function load({ url, cookies }) {
         secure: process.env.NODE_ENV === "production",
         maxAge: 30 * 24 * 60 * 60,
     });
+
+    const [user] = await sql`SELECT locale FROM users WHERE id = ${result.userId}`;
+
+    if (user?.locale) {
+        cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
+    }
 
     throw redirect(302, "/dashboard");
 }

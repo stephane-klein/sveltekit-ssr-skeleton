@@ -1,3 +1,6 @@
+import { redirect } from "@sveltejs/kit";
+import { sql } from "$lib/backend/pg.js";
+
 export function load(event) {
     return {
         user: event.locals.user,
@@ -5,11 +8,15 @@ export function load(event) {
 }
 
 export const actions = {
-    default: async ({ request }) => {
+    default: async ({ request, cookies, locals }) => {
         const data = await request.formData();
-        const timezone = data.get("timezone");
         const language = data.get("language");
 
-        return { saved: true, timezone, language };
+        if (language && locals.user) {
+            await sql`UPDATE users SET locale = ${language} WHERE id = ${locals.user.id}`;
+            cookies.set("locale", language, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
+        }
+
+        throw redirect(303, "/my/preference/");
     },
 };

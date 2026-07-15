@@ -1,42 +1,43 @@
 <script>
     import { dev } from "$app/environment";
+    import { m } from "$lib/paraglide/messages";
 
     let { form } = $props();
 </script>
 
 <svelte:head>
-    <title>Reset password — my-app</title>
+    <title>{m.reset_password_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <header class="border-b border-gray-300">
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">my-app</a
+            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
         >
     </div>
 </header>
 
 <main class="page px-5 pt-9 pb-24">
-    <h1 class="text-xl font-bold mb-2 tracking-tight">Reset password</h1>
+    <h1 class="text-xl font-bold mb-2 tracking-tight">{m.reset_password_title()}</h1>
     <p class="text-sm text-gray-500 mb-6 max-w-sm">
-        Enter your email and we'll send you a link to reset your password.
+        {m.reset_password_desc()}
     </p>
 
     {#if form?.mail_unavailable}
         <div class="max-w-sm">
-            <p class="text-sm text-red-600 mb-2">Email service is not configured.</p>
+            <p class="text-sm text-red-600 mb-2">{m.reset_password_mail_unavailable_title()}</p>
             <p class="text-xs text-gray-500">
-                The forgot password feature is currently unavailable. Contact the administrator.
+                {m.reset_password_mail_unavailable_desc()}
             </p>
         </div>
     {:else if form?.sent}
         <div class="max-w-sm">
-            <p class="text-sm mb-2">We sent a reset link to <strong class="font-mono">{form.email}</strong>.</p>
+            <p class="text-sm mb-2">{m.reset_password_sent({ email: form.email })}</p>
             <p class="text-xs text-gray-500">
-                Check your inbox — it may take a minute or two.
+                {m.reset_password_check_inbox()}
                 {#if dev && form.resetLink}
-                    <br />Debug:
+                    <br />{m.reset_password_debug()}
                     <a
                         href="/change-password?token={form.resetLink.split('token=')[1]}"
                         class="text-blue-600 hover:underline">reset link</a
@@ -57,7 +58,7 @@
             <div class="mb-3">
                 <label
                     for="email"
-                    class="block text-sm font-semibold mb-1">Email</label
+                    class="block text-sm font-semibold mb-1">{m.reset_password_email_label()}</label
                 >
                 <!-- svelte-ignore a11y_autofocus -->
                 <input
@@ -76,7 +77,7 @@
                     type="submit"
                     class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold cursor-pointer hover:bg-blue-700 hover:border-blue-700"
                 >
-                    Send reset link
+                    {m.reset_password_send()}
                 </button>
             </div>
         </form>
@@ -85,12 +86,12 @@
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
         <a
             href="/login"
-            class="text-blue-600 hover:underline">Back to sign in</a
+            class="text-blue-600 hover:underline">{m.reset_password_back_signin()}</a
         >
-        ·
+        |
         <a
             href="/"
-            class="text-blue-600 hover:underline">Homepage</a
+            class="text-blue-600 hover:underline">{m.reset_password_homepage()}</a
         >
     </p>
 </main>

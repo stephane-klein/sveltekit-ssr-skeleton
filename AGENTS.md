@@ -89,6 +89,37 @@ The OpenAPI specification is dynamically generated in
 **Any change to request/response schemas in route handlers must be reflected
 here too.** The Scalar API reference UI at `/api/reference` consumes this spec.
 
+## i18n — Paraglide JS
+
+This project uses **Paraglide JS** (`@inlang/paraglide-js`) for
+internationalization.
+
+- Translation files: `messages/en.json` and `messages/fr.json`
+- Usage in Svelte components:
+  ```svelte
+  <script>
+    import { m } from "$lib/paraglide/messages";
+  </script>
+
+  <h1>{m.welcome_title()}</h1>
+  ```
+
+**Whenever you create or modify a page/component with user-facing text:**
+
+1.  Add all new keys to `messages/en.json` (English source) and `messages/fr.json`
+    (French translation)
+2.  Replace hardcoded strings with `{m.key_name()}` calls
+3.  Run `pnpm build` to regenerate the compiled message functions in
+    `src/lib/paraglide/`
+
+Key naming convention: use prefix per page/section (e.g., `login_title`,
+`login_email_label`, `dashboard_welcome`).
+
+**Implementation details** (cookie management, AsyncLocalStorage nesting, httpOnly
+pitfall, email templates, login flows): see `docs/agents/i18n.md`.
+
+**Architecture decision**: see `docs/adr/001-paraglide-i18n.md`.
+
 ## Documentation Maintenance
 
 Remove from this file any section or reference that becomes obsolete after file deletions or structural changes. Keep AGENTS.md up to date.

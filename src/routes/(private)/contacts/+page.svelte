@@ -1,42 +1,44 @@
 <script>
+    import { m } from "$lib/paraglide/messages";
+
     let { data } = $props();
 </script>
 
 <svelte:head>
-    <title>Contacts — my-app</title>
+    <title>{m.contacts_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <main class="page px-5 pt-9 pb-24">
     <div class="flex items-baseline gap-3 mb-6">
-        <h1 class="text-xl font-bold tracking-tight">Contacts</h1>
+        <h1 class="text-xl font-bold tracking-tight">{m.contacts_title()}</h1>
         <a
             href="/contacts/new"
             class="px-3 py-1 rounded-sm text-sm font-semibold no-underline border border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
-            >+ New</a
+            >{m.contacts_new_button()}</a
         >
     </div>
 
     {#if data.contacts.length === 0}
-        <p class="text-sm text-gray-500 italic">No contacts yet.</p>
+        <p class="text-sm text-gray-500 italic">{m.contacts_empty()}</p>
     {:else}
         <table class="w-full text-sm border-collapse">
             <thead>
                 <tr>
                     <th
                         class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 pr-2 border-b-2 border-gray-300"
-                        >ID</th
+                        >{m.contacts_column_id()}</th
                     >
                     <th
                         class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 pr-2 border-b-2 border-gray-300"
-                        >First name</th
+                        >{m.contacts_column_firstname()}</th
                     >
                     <th
                         class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 pr-2 border-b-2 border-gray-300"
-                        >Last name</th
+                        >{m.contacts_column_lastname()}</th
                     >
                     <th
                         class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 pr-2 border-b-2 border-gray-300"
-                        >Created</th
+                        >{m.contacts_column_created()}</th
                     >
                     <th
                         class="text-right text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b-2 border-gray-300"
@@ -57,12 +59,14 @@
                         <td class="py-1.5 border-b border-gray-200 text-right whitespace-nowrap">
                             <a
                                 href="/contacts/{contact.id}/edit"
-                                class="text-xs text-gray-500 no-underline hover:text-blue-600 hover:underline">edit</a
+                                class="text-xs text-gray-500 no-underline hover:text-blue-600 hover:underline"
+                                >{m.contacts_action_edit()}</a
                             >
-                            <span class="text-gray-300 mx-1">·</span>
+                            <span class="text-gray-300 mx-1">|</span>
                             <a
                                 href="/contacts/{contact.id}/delete"
-                                class="text-xs text-red-600 no-underline hover:underline">delete</a
+                                class="text-xs text-red-600 no-underline hover:underline"
+                                >{m.contacts_action_delete()}</a
                             >
                         </td>
                     </tr>

@@ -32,7 +32,15 @@ const baseRules = {
 
 export default [
     {
-        ignores: ["**/build", "**/dist", "**/.secrets", "**/.svelte-kit", "**/node_modules", "pnpm-lock.yaml"],
+        ignores: [
+            "**/build",
+            "**/dist",
+            "**/.secrets",
+            "**/.svelte-kit",
+            "**/node_modules",
+            "pnpm-lock.yaml",
+            "src/lib/paraglide/",
+        ],
     },
     js.configs.recommended,
     ...sveltePlugin.configs["flat/recommended"],
@@ -41,7 +49,10 @@ export default [
     {
         files: ["**/*.{js,mjs}"],
         languageOptions: baseLanguageOptions,
-        rules: baseRules,
+        rules: {
+            ...baseRules,
+            "svelte/no-navigation-without-resolve": "off",
+        },
     },
     {
         files: ["**/*.svelte"],

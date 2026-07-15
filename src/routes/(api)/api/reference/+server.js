@@ -54,7 +54,7 @@ export async function GET() {
         .replace('<div id="app">', `<header class="app-header"><a href="/">my-app</a></header>\n<div id="app">`)
         .replace(
             "</body>",
-            `<footer class="app-footer">\n    <a href="/docs">Documentation</a> · <a href="/about">About</a>\n</footer>\n</body>`,
+            `<footer class="app-footer">\n    <a href="/docs">Documentation</a> | <a href="/about">About</a>\n</footer>\n</body>`,
         );
 
     return new Response(modified, {

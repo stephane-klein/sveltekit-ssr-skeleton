@@ -3,6 +3,7 @@ import { createSession, createMagicLoginToken, SESSION_COOKIE_NAME, verifyPasswo
 import { isMailAvailable, sendMail } from "$lib/backend/mailer.js";
 import { logger } from "$lib/backend/logger.js";
 import { sql } from "$lib/backend/pg.js";
+import { renderEmail } from "$lib/backend/email/index.js";
 
 export function load() {
     return {
@@ -20,7 +21,8 @@ export const actions = {
             return fail(400, { error: "Email and password are required." });
         }
 
-        const [user] = await sql`SELECT id, email, display_name, password_hash FROM users WHERE email = ${email}`;
+        const [user] =
+            await sql`SELECT id, email, display_name, password_hash, locale FROM users WHERE email = ${email}`;
 
         if (!user || !user.password_hash) {
             return fail(400, { error: "Invalid email or password." });
@@ -41,6 +43,10 @@ export const actions = {
             secure: process.env.NODE_ENV === "production",
             maxAge: 30 * 24 * 60 * 60,
         });
+
+        if (user.locale) {
+            cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
+        }
 
         throw redirect(302, "/dashboard");
     },
@@ -67,18 +73,12 @@ export const actions = {
         const magicLink = `${origin}/magic-login/callback?token=${raw}`;
 
         try {
-            await sendMail({
-                to: email,
-                subject: "Sign in to my-app",
-                text: [
-                    "Click the link below to sign in.",
-                    "",
-                    magicLink,
-                    "",
-                    "This link expires in 15 minutes.",
-                    "If you didn't request this, you can ignore this email.",
-                ].join("\n"),
+            const [userLocale] = await sql`SELECT locale FROM users WHERE email = ${email}`;
+            const { subject, text } = renderEmail("magic-link", {
+                link: magicLink,
+                locale: userLocale?.locale || "en",
             });
+            await sendMail({ to: email, subject, text });
             logger.info({ email }, "Magic login email sent");
         } catch (err) {
             logger.error({ err, email }, "Failed to send magic login email");

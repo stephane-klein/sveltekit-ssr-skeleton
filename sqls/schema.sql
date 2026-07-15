@@ -13,6 +13,7 @@ CREATE TABLE users (
     password_hash   TEXT,
     oidc_issuer     TEXT,
     oidc_subject    TEXT,
+    locale          TEXT,
     is_active       BOOLEAN                  NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),

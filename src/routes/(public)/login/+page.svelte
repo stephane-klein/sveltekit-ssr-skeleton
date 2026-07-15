@@ -1,21 +1,23 @@
 <script>
+    import { m } from "$lib/paraglide/messages";
+
     let { data, form } = $props();
 </script>
 
 <svelte:head>
-    <title>Sign in — my-app</title>
+    <title>{m.login_title()} — {m.app_name()}</title>
 </svelte:head>
 <header class="border-b border-gray-300">
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">my-app</a
+            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
         >
     </div>
 </header>
 
 <main class="page px-5 pt-9 pb-24">
-    <h1 class="text-xl font-bold mb-6 tracking-tight">Sign in</h1>
+    <h1 class="text-xl font-bold mb-6 tracking-tight">{m.login_title()}</h1>
 
     {#if form?.error}
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
@@ -27,8 +29,8 @@
 
     {#if form?.magicLinkUnavailable}
         <div class="max-w-sm mb-5">
-            <p class="text-sm text-red-600 mb-1">Email service is not configured.</p>
-            <p class="text-xs text-gray-500">The magic link feature is currently unavailable.</p>
+            <p class="text-sm text-red-600 mb-1">{m.login_mail_unavailable_title()}</p>
+            <p class="text-xs text-gray-500">{m.login_mail_unavailable_desc()}</p>
         </div>
     {/if}
 
@@ -37,7 +39,7 @@
             href="/login/oidc/authorize"
             class="block max-w-sm text-center px-4 py-1.5 border border-gray-300 rounded-sm text-sm font-semibold mb-5 hover:bg-gray-50"
         >
-            Sign in with Authelia
+            {m.login_authelia()}
         </a>
 
         <hr class="max-w-sm mb-5 border-gray-300" />
@@ -52,7 +54,7 @@
         <div class="mb-3">
             <label
                 for="email"
-                class="block text-sm font-semibold mb-1">Email</label
+                class="block text-sm font-semibold mb-1">{m.login_email_label()}</label
             >
             <!-- svelte-ignore a11y_autofocus -->
             <input
@@ -69,7 +71,7 @@
         <div class="mb-3">
             <label
                 for="password"
-                class="block text-sm font-semibold mb-1">Password</label
+                class="block text-sm font-semibold mb-1">{m.login_password_label()}</label
             >
             <input
                 type="password"
@@ -86,32 +88,32 @@
                 type="submit"
                 class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold cursor-pointer hover:bg-blue-700 hover:border-blue-700"
             >
-                Sign in
+                {m.sign_in()}
             </button>
             <button
                 type="submit"
                 formaction="?/magicLink"
                 class="px-4 py-1.5 border border-gray-300 rounded-sm text-sm font-semibold cursor-pointer hover:bg-gray-50"
             >
-                Send magic link
+                {m.login_magic_link()}
             </button>
             <a
                 href="/reset-password"
-                class="text-sm text-blue-600 hover:underline">Forgot password?</a
+                class="text-sm text-blue-600 hover:underline">{m.login_forgot_password()}</a
             >
         </div>
     </form>
 
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
-        No account?
+        {m.login_no_account()}
         <a
             href="/signup"
-            class="text-blue-600 hover:underline">Create one</a
+            class="text-blue-600 hover:underline">{m.login_create_one()}</a
         >
-        ·
+        |
         <a
             href="/"
-            class="text-blue-600 hover:underline">Back to homepage</a
+            class="text-blue-600 hover:underline">{m.login_back_home()}</a
         >
     </p>
 </main>

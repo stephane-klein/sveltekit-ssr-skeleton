@@ -74,7 +74,7 @@ export async function GET({ url: reqUrl, cookies }) {
     logger.info({ email: userinfo.email }, "Userinfo fetched");
 
     const [user] = await sql`
-        SELECT id, email, display_name FROM users
+        SELECT id, email, display_name, locale FROM users
         WHERE email = ${userinfo.email} AND oidc_issuer = ${issuer}
     `;
 
@@ -94,6 +94,10 @@ export async function GET({ url: reqUrl, cookies }) {
         secure: process.env.NODE_ENV === "production",
         maxAge: 30 * 24 * 60 * 60,
     });
+
+    if (user.locale) {
+        cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
+    }
 
     logger.info({ userId: user.id }, "Session created, redirecting to dashboard");
 

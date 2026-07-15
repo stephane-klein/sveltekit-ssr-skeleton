@@ -27,6 +27,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 - Tooling: mise
 - Lint/Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
+- i18n: Paraglide JS (cookie-based, no URL prefix) with `messages/{en,fr}.json` — email templates in YAML at `src/lib/backend/email/`
 - Helm chart: Kubernetes deployment
   - Prometheus auto-scraping via `prometheus.io/*` pod annotations
   - Grafana dashboard deployed as ConfigMap (`grafana_dashboard: "1"` sidecar pattern)

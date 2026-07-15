@@ -1,13 +1,15 @@
 <script>
+    import { m } from "$lib/paraglide/messages";
+
     let { form, data } = $props();
 </script>
 
 <svelte:head>
-    <title>Edit contact — my-app</title>
+    <title>{m.contact_edit_title()} — {m.app_name()}</title>
 </svelte:head>
 
 <main class="page px-5 pt-9 pb-24">
-    <h1 class="text-xl font-bold mb-6 tracking-tight">Edit contact</h1>
+    <h1 class="text-xl font-bold mb-6 tracking-tight">{m.contact_edit_title()}</h1>
 
     {#if form?.error}
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
@@ -20,7 +22,7 @@
         <div class="mb-3">
             <label
                 for="firstname"
-                class="block text-sm font-semibold mb-1">First name</label
+                class="block text-sm font-semibold mb-1">{m.contact_edit_firstname_label()}</label
             >
             <!-- svelte-ignore a11y_autofocus -->
             <input
@@ -38,7 +40,7 @@
         <div class="mb-3">
             <label
                 for="lastname"
-                class="block text-sm font-semibold mb-1">Last name</label
+                class="block text-sm font-semibold mb-1">{m.contact_edit_lastname_label()}</label
             >
             <input
                 type="text"
@@ -56,11 +58,11 @@
                 type="submit"
                 class="px-4 py-1.5 rounded-sm text-sm font-semibold cursor-pointer border border-blue-600 bg-blue-600 text-white hover:bg-blue-700 hover:border-blue-700"
             >
-                Save
+                {m.contact_edit_save()}
             </button>
             <a
                 href="/contacts"
-                class="text-sm text-blue-600 hover:underline">Cancel</a
+                class="text-sm text-blue-600 hover:underline">{m.contact_edit_cancel()}</a
             >
         </div>
     </form>
