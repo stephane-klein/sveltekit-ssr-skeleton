@@ -17,7 +17,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Email testing: [Mailpit](https://github.com/axllent/mailpit) (dev SMTP server with web UI)
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
-- Authentication: sessions & API tokens following [Lucia recommendations](https://lucia-auth.com/sessions/overview)
+- Authentication: sessions, API tokens, password reset & magic link login following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations
 - OIDC client: [Arctic](https://arcticjs.dev/)
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - API docs: [Scalar](https://scalar.com/) (interactive reference at `/api/reference`)
@@ -43,7 +43,8 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
   - [x] API tokens for programmatic access
   - [x] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
 - [x] Add Prometheus metrics export endpoint with `prom-client` (`/-/metrics`)
-- [ ] Email sending support: password reset, account validation
+- [x] Password reset flow (email via nodemailer)
+- [x] Magic link login (passwordless email sign-in)
 - [x] Container option to optionally load seed SQL data
 
 ## AI-Assisted Development

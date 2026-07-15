@@ -21,6 +21,17 @@
         <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
     {/if}
 
+    {#if form?.magicLinkError}
+        <p class="text-sm text-red-600 mb-3.5">{form.magicLinkError}</p>
+    {/if}
+
+    {#if form?.magicLinkUnavailable}
+        <div class="max-w-sm mb-5">
+            <p class="text-sm text-red-600 mb-1">Email service is not configured.</p>
+            <p class="text-xs text-gray-500">The magic link feature is currently unavailable.</p>
+        </div>
+    {/if}
+
     {#if data.autheliaIssuer}
         <a
             href="/login/oidc/authorize"
@@ -34,6 +45,7 @@
 
     <form
         method="POST"
+        action="?/signIn"
         class="max-w-sm"
         novalidate
     >
@@ -69,12 +81,19 @@
             />
         </div>
 
-        <div class="mt-4 flex items-center gap-3.5">
+        <div class="mt-4 flex flex-wrap items-center gap-3.5">
             <button
                 type="submit"
                 class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold cursor-pointer hover:bg-blue-700 hover:border-blue-700"
             >
                 Sign in
+            </button>
+            <button
+                type="submit"
+                formaction="?/magicLink"
+                class="px-4 py-1.5 border border-gray-300 rounded-sm text-sm font-semibold cursor-pointer hover:bg-gray-50"
+            >
+                Send magic link
             </button>
             <a
                 href="/reset-password"

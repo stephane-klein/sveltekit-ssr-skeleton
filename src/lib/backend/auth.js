@@ -138,3 +138,35 @@ export async function usePasswordResetToken(tokenId, userId, newPasswordHash) {
     await sql`UPDATE password_reset_tokens SET used = TRUE WHERE id = ${tokenId}`;
     await invalidateAllUserSessions(userId);
 }
+
+export async function createMagicLoginToken(email) {
+    const [user] = await sql`SELECT id FROM users WHERE email = ${email}`;
+    if (!user) return null;
+
+    const raw = nanoid(48);
+    const tokenHash = await hashToken(raw);
+    const expiresAt = new Date(now().getTime() + 1000 * 60 * 15);
+
+    await sql`INSERT INTO magic_link_tokens (id, user_id, token_hash, expires_at)
+              VALUES (${generateId()}, ${user.id}, ${tokenHash}, ${expiresAt})`;
+
+    return raw;
+}
+
+export async function validateMagicLoginToken(raw) {
+    const tokenHash = await hashToken(raw);
+
+    const [token] = await sql`
+        SELECT t.id, t.user_id
+        FROM magic_link_tokens t
+        WHERE t.token_hash = ${tokenHash}
+          AND t.used = FALSE
+          AND t.expires_at > ${now()}
+    `;
+
+    if (!token) return null;
+
+    await sql`UPDATE magic_link_tokens SET used = TRUE WHERE id = ${token.id}`;
+
+    return { userId: token.user_id };
+}
