@@ -136,4 +136,5 @@ export async function validatePasswordResetToken(raw) {
 export async function usePasswordResetToken(tokenId, userId, newPasswordHash) {
     await sql`UPDATE users SET password_hash = ${newPasswordHash}, updated_at = ${now()} WHERE id = ${userId}`;
     await sql`UPDATE password_reset_tokens SET used = TRUE WHERE id = ${tokenId}`;
+    await invalidateAllUserSessions(userId);
 }

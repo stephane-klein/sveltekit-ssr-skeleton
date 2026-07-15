@@ -3,6 +3,10 @@
 </script>
 
 <svelte:head>
+    <meta
+        name="referrer"
+        content="strict-origin"
+    />
     <title>Change password — my-app</title>
 </svelte:head>
 

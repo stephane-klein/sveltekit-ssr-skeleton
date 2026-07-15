@@ -1,4 +1,6 @@
 <script>
+    import { dev } from "$app/environment";
+
     let { form } = $props();
 </script>
 
@@ -21,12 +23,19 @@
         Enter your email and we'll send you a link to reset your password.
     </p>
 
-    {#if form?.sent}
+    {#if form?.mail_unavailable}
+        <div class="max-w-sm">
+            <p class="text-sm text-red-600 mb-2">Email service is not configured.</p>
+            <p class="text-xs text-gray-500">
+                The forgot password feature is currently unavailable. Contact the administrator.
+            </p>
+        </div>
+    {:else if form?.sent}
         <div class="max-w-sm">
             <p class="text-sm mb-2">We sent a reset link to <strong class="font-mono">{form.email}</strong>.</p>
             <p class="text-xs text-gray-500">
                 Check your inbox — it may take a minute or two.
-                {#if form.resetLink}
+                {#if dev && form.resetLink}
                     <br />Debug:
                     <a
                         href="/change-password?token={form.resetLink.split('token=')[1]}"
