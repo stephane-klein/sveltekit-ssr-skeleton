@@ -140,10 +140,7 @@ run = "scripts/destroy-helm-test.sh"
 
 [tasks.publish-chart]
 description = "Package and push Helm chart to OCI registry (ghcr.io)"
-run = """
-helm package helm/my-app -d /tmp && \
-helm push /tmp/my-app-*.tgz oci://ghcr.io/stephane-klein/charts
-"""
+run = "scripts/publish-chart.sh"
 
 [tasks.make-packages-public]
 description = "Print instructions to make GHCR packages publicly readable (no API available)"
