@@ -43,7 +43,7 @@ export async function POST(event) {
 
     const body = await event.request.json();
     const { email, display_name, password } = body;
-    const oidc_issuer = body.oidc_issuer?.replace(/\/$/, '');
+    const oidc_issuer = body.oidc_issuer?.replace(/\/$/, "");
     const oidc_subject = body.oidc_subject;
 
     const hasOidc = oidc_issuer !== undefined || oidc_subject !== undefined;

@@ -32,7 +32,7 @@ export async function GET({ url: reqUrl, cookies }) {
 
     logger.info("OIDC callback received, validating authorization code");
 
-    const issuer = (process.env.AUTHELIA_ISSUER || '').replace(/\/$/, '');
+    const issuer = (process.env.AUTHELIA_ISSUER || "").replace(/\/$/, "");
     let tokens;
 
     try {

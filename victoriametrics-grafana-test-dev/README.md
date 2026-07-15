@@ -36,9 +36,9 @@ Prod dashboard in Grafana: **SvelteKit App Metrics Prod**
 
 ## Scrape targets
 
-| Job | Endpoint |
-|---|---|
-| `sveltekit-app-dev` | `host.containers.internal:5173` |
+| Job                  | Endpoint                        |
+| -------------------- | ------------------------------- |
+| `sveltekit-app-dev`  | `host.containers.internal:5173` |
 | `sveltekit-app-prod` | `host.containers.internal:3000` |
 
 ## Teardown

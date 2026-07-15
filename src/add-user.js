@@ -80,7 +80,7 @@ const displayName = argv["display-name"] || argv.email;
 logger.info({ email: argv.email, displayName }, "Creating user…");
 
 await sql`INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
-          VALUES (${id}, ${argv.email}, ${displayName}, ${passwordHash}, ${(argv["oidc-issuer"] || '').replace(/\/$/, '') || null}, ${argv["oidc-subject"] || null})`;
+          VALUES (${id}, ${argv.email}, ${displayName}, ${passwordHash}, ${(argv["oidc-issuer"] || "").replace(/\/$/, "") || null}, ${argv["oidc-subject"] || null})`;
 
 logger.info({ id, email: argv.email }, "User created");
 

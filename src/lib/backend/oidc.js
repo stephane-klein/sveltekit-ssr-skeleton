@@ -23,7 +23,10 @@ async function discoverEndpoints() {
     }
 
     if (!res.ok) {
-        logger.error({ discoveryUrl, status: res.status, statusText: res.statusText }, "OIDC discovery returned non-OK status");
+        logger.error(
+            { discoveryUrl, status: res.status, statusText: res.statusText },
+            "OIDC discovery returned non-OK status",
+        );
         throw new Error(`Failed to fetch OpenID configuration: ${res.status}`);
     }
 
@@ -41,12 +44,15 @@ async function discoverEndpoints() {
         userinfoEndpoint: config.userinfo_endpoint,
     };
 
-    logger.info({
-        authorizationEndpoint: config.authorization_endpoint,
-        tokenEndpoint: config.token_endpoint,
-        userinfoEndpoint: config.userinfo_endpoint,
-        issuer: config.issuer,
-    }, "OIDC endpoints discovered");
+    logger.info(
+        {
+            authorizationEndpoint: config.authorization_endpoint,
+            tokenEndpoint: config.token_endpoint,
+            userinfoEndpoint: config.userinfo_endpoint,
+            issuer: config.issuer,
+        },
+        "OIDC endpoints discovered",
+    );
 
     return endpointsCache;
 }

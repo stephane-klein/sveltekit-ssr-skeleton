@@ -65,7 +65,7 @@ export async function PATCH(event) {
             return problem(422, "Both oidc_issuer and oidc_subject must be provided together", event.request.url);
         }
 
-        const oidcIssuer = body.oidc_issuer.replace(/\/$/, '');
+        const oidcIssuer = body.oidc_issuer.replace(/\/$/, "");
         const conflict = await sql`
             SELECT id FROM users
             WHERE oidc_issuer = ${oidcIssuer.trim()} AND oidc_subject = ${body.oidc_subject.trim()}
@@ -93,7 +93,7 @@ export async function PATCH(event) {
             email         = COALESCE(${body.email?.trim() || null}, email),
             display_name  = COALESCE(${body.display_name?.trim() || null}, display_name),
             password_hash = CASE WHEN ${!!body.password} THEN ${passwordHash} ELSE password_hash END,
-            oidc_issuer   = COALESCE(${body.oidc_issuer?.replace(/\/$/, '').trim() || null}, oidc_issuer),
+            oidc_issuer   = COALESCE(${body.oidc_issuer?.replace(/\/$/, "").trim() || null}, oidc_issuer),
             oidc_subject  = COALESCE(${body.oidc_subject?.trim() || null}, oidc_subject),
             is_active     = COALESCE(${body.is_active !== undefined ? body.is_active : null}, is_active),
             updated_at    = ${now}

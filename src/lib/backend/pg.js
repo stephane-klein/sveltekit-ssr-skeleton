@@ -18,7 +18,7 @@ const INSTRUMENTED = Symbol("instrumented");
 function wrapQuery(query, sqlStr) {
     const end = sqlDuration.startTimer({ query: sqlStr });
     const originalHandle = query.handle;
-    query.handle = function() {
+    query.handle = function () {
         try {
             return originalHandle.apply(this, arguments);
         } finally {
@@ -45,7 +45,7 @@ function instrumentSql(instance) {
             if (typeof value !== "function") return value;
 
             if (prop === "unsafe" || prop === "file") {
-                return function(...args) {
+                return function (...args) {
                     const sqlStr = String(args[0] ?? "").slice(0, 50);
                     const query = value.apply(target, args);
                     return wrapQuery(query, sqlStr);
@@ -53,7 +53,7 @@ function instrumentSql(instance) {
             }
 
             if (prop === "begin") {
-                return function(callback, ...rest) {
+                return function (callback, ...rest) {
                     return value.call(
                         target,
                         (scopedSql, ...cbArgs) => callback(instrumentSql(scopedSql), ...cbArgs),
@@ -63,7 +63,7 @@ function instrumentSql(instance) {
             }
 
             if (prop === "reserve") {
-                return async function(...args) {
+                return async function (...args) {
                     const reserved = await value.apply(target, args);
                     reserved.sql = instrumentSql(reserved.sql);
                     return reserved;
