@@ -14,6 +14,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Bundler: Vite
 - Adapter: @sveltejs/adapter-node
 - Database: PostgreSQL 18
+- Email testing: [Mailpit](https://github.com/axllent/mailpit) (dev SMTP server with web UI)
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
 - Authentication: sessions & API tokens following [Lucia recommendations](https://lucia-auth.com/sessions/overview)
@@ -78,6 +79,20 @@ $ mise run preview-prod-build # build and run production server on http://localh
 ```
 
 Open http://localhost:5173 in your browser.
+
+### Accessing test emails
+
+Mailpit is available at http://localhost:8025 — it captures all emails sent by
+the application (via SMTP on `localhost:1025`).
+
+### Sending a test email
+
+```bash
+$ mise run send-test-mail
+```
+
+This sends an email to the address configured in `TEST_EMAIL_TO`
+(`john.doe@example.com` by default). Open http://localhost:8025 to view it.
 
 ## Authentication
 

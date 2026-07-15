@@ -149,6 +149,15 @@ run = "scripts/destroy-helm-test.sh"
 description = "Package and push Helm chart to OCI registry (ghcr.io)"
 run = "scripts/publish-chart.sh"
 
+[tasks.send-test-mail]
+description = "Send a test email via POST /api/v1/admin/send-test-mail (uses TEST_EMAIL_TO)"
+run = """
+curl -s -X POST http://localhost:5173/api/v1/admin/send-test-mail \
+  -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{}' | jq
+"""
+
 [tasks.make-packages-public]
 description = "Print instructions to make GHCR packages publicly readable (no API available)"
 run = """

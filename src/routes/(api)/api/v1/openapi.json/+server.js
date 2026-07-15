@@ -184,6 +184,53 @@ export function GET() {
                     },
                 },
             },
+            "/api/v1/admin/send-test-mail": {
+                post: {
+                    summary: "Send a test email (admin)",
+                    security: [{ adminBearer: [] }],
+                    requestBody: {
+                        required: false,
+                        content: {
+                            "application/json": {
+                                schema: {
+                                    type: "object",
+                                    properties: {
+                                        to: { type: "string", format: "email", example: "user@example.com" },
+                                        subject: { type: "string", example: "Test email from my-app" },
+                                        text: { type: "string", example: "This is a test email sent from my-app." },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                    responses: {
+                        200: {
+                            description: "Email sent",
+                            content: {
+                                "application/json": {
+                                    schema: {
+                                        type: "object",
+                                        properties: {
+                                            data: {
+                                                type: "object",
+                                                properties: {
+                                                    messageId: { type: "string", example: "<abc123@localhost>" },
+                                                    to: { type: "string", format: "email" },
+                                                    subject: { type: "string" },
+                                                },
+                                            },
+                                            _links: { $ref: "#/components/schemas/Links" },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                        400: { $ref: "#/components/responses/BadRequest" },
+                        401: { $ref: "#/components/responses/Unauthorized" },
+                        500: { $ref: "#/components/responses/InternalError" },
+                    },
+                },
+            },
             "/api/v1/contacts": {
                 get: {
                     summary: "List contacts",

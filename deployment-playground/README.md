@@ -26,6 +26,11 @@ $ mise show-url
 Open your browser on https://app.127.0.0.1.sslip.io
 ```
 
+### Email testing with Mailpit
+
+Mailpit is available at https://mailpit.127.0.0.1.sslip.io — it captures all
+outgoing emails sent by the application (SMTP on `mailpit:1025`).
+
 ### OpenID Connect with Authelia
 
 After starting the playground, create an OIDC user:

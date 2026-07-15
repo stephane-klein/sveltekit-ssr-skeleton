@@ -10,3 +10,8 @@ auth.127.0.0.1.sslip.io {
     tls internal
     reverse_proxy authelia:9091
 }
+
+mailpit.127.0.0.1.sslip.io {
+    tls internal
+    reverse_proxy mailpit:8025
+}

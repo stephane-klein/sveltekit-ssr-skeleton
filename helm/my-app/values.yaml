@@ -40,6 +40,18 @@ ingress:
   annotations: {}
   tls: []
 
+# SMTP configuration for outgoing emails (password reset, notifications, etc.)
+smtp:
+  host: ""
+  port: 587
+  user: ""
+  # SMTP password — passed directly as env var.
+  # In production, consider creating a Secret and referencing it via envFrom.
+  pass: ""
+  from: noreply@example.com
+  # Default recipient for the send-test-mail admin endpoint
+  testTo: ""
+
 # Public origin URL (e.g. https://my-app.example.com).
 # Auto-derived from ingress.host when ingress is enabled.
 # Explicitly set this value to override.
