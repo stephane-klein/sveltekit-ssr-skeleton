@@ -64,6 +64,14 @@ dnsPolicy: ClusterFirst
 # Allow unauthorized TLS connections (e.g. self-signed CA for internal services)
 nodeTLSRejectUnauthorized: false
 
+# Enable V8 memory-size optimization (--optimize-for-size --max-semi-space-size=2).
+# These V8 flags cannot be passed via NODE_OPTIONS so a dedicated env var is used.
+optimizeForMemorySize: false
+
+# Node.js CLI options (e.g. "--max-old-space-size=128") passed via NODE_OPTIONS.
+# Only flags allowed by process.allowedNodeEnvironmentFlags are accepted.
+nodeOptions: ""
+
 # Resource limits
 resources:
   requests:

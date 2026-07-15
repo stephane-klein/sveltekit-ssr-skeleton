@@ -57,6 +57,10 @@ spec:
               value: "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST).{{ .Values.cnpg.namespace }}:$(DB_PORT)/$(DB_NAME)"
             - name: MY_APP_POSTGRES_SCHEMA
               value: {{ .Values.postgresql.schema }}
+            {{- if $.Values.optimizeForMemorySize }}
+            - name: OPTIMIZE_FOR_MEMORY_SIZE
+              value: "true"
+            {{- end }}
       {{- end }}
       containers:
         - name: {{ .Chart.Name }}
@@ -84,6 +88,14 @@ spec:
             {{- if .Values.adminToken }}
             - name: MY_APP_ADMIN_TOKEN
               value: {{ .Values.adminToken }}
+            {{- end }}
+            {{- if .Values.optimizeForMemorySize }}
+            - name: OPTIMIZE_FOR_MEMORY_SIZE
+              value: "true"
+            {{- end }}
+            {{- if .Values.nodeOptions }}
+            - name: NODE_OPTIONS
+              value: {{ .Values.nodeOptions }}
             {{- end }}
             {{- if .Values.nodeTLSRejectUnauthorized }}
             - name: NODE_TLS_REJECT_UNAUTHORIZED

@@ -36,6 +36,7 @@ ENV MY_APP_POSTGRES_URL="postgres://postgres:postgres@postgres:5432/postgres"
 ENV MY_APP_POSTGRES_SCHEMA="public"
 ENV MY_APP_ADMIN_TOKEN=""
 ENV BODY_SIZE_LIMIT=50M
+ENV OPTIMIZE_FOR_MEMORY_SIZE=""
 
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile --prod
