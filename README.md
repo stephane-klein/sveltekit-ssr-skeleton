@@ -61,6 +61,7 @@ This project was developed using:
 
 - Monorepository and monolithic application pattern ([notes](https://notes.sklein.xyz/2025-05-06_2224/zen/))
 - Raw SQL — no ORM
+- UI development follows the conventions in [sklein-utilitarian-ui-skill](https://github.com/stephane-klein/sklein-utilitarian-ui-skill)
 - Trying to embrace [Radical Simplicity](https://www.radicalsimpli.city/): reducing accidental complexity, applying LEAN techniques
 - Vigilance against [cargo cult](https://en.wikipedia.org/wiki/Cargo_cult)
 - Following [YAGNI](https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it)
