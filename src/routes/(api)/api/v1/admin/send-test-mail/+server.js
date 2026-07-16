@@ -4,6 +4,8 @@ import { sendMail } from "$lib/backend/mailer.js";
 import { logger } from "$lib/backend/logger.js";
 
 const TEST_EMAIL_TO = process.env.TEST_EMAIL_TO;
+const SUBJECT = "Test email from my-app";
+const TEXT = "This is a test email sent from my-app.";
 
 export async function POST(event) {
     const authError = requireAdminToken(event);
@@ -20,14 +22,11 @@ export async function POST(event) {
         );
     }
 
-    const subject = body.subject || "Test email from my-app";
-    const text = body.text || "This is a test email sent from my-app.";
-
     try {
-        const info = await sendMail({ to, subject, text });
-        logger.info({ messageId: info.messageId, to, subject }, "Test email sent");
+        const info = await sendMail({ to, subject: SUBJECT, text: TEXT });
+        logger.info({ messageId: info.messageId, to, subject: SUBJECT }, "Test email sent");
         return json({
-            data: { messageId: info.messageId, to, subject },
+            data: { messageId: info.messageId, to, subject: SUBJECT },
             _links: { self: { href: "/api/v1/admin/send-test-mail" } },
         });
     } catch (err) {

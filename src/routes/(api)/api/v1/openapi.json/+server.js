@@ -186,7 +186,8 @@ export function GET() {
             },
             "/api/v1/admin/send-test-mail": {
                 post: {
-                    summary: "Send a test email (admin)",
+                    summary: "Send a test email with hardcoded subject and body (admin)",
+                    description: "Only the recipient address can be set — subject and text are hardcoded to prevent abuse.",
                     security: [{ adminBearer: [] }],
                     requestBody: {
                         required: false,
@@ -196,8 +197,6 @@ export function GET() {
                                     type: "object",
                                     properties: {
                                         to: { type: "string", format: "email", example: "user@example.com" },
-                                        subject: { type: "string", example: "Test email from my-app" },
-                                        text: { type: "string", example: "This is a test email sent from my-app." },
                                     },
                                 },
                             },
