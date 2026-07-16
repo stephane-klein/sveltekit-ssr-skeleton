@@ -187,7 +187,8 @@ export function GET() {
             "/api/v1/admin/send-test-mail": {
                 post: {
                     summary: "Send a test email with hardcoded subject and body (admin)",
-                    description: "Only the recipient address can be set — subject and text are hardcoded to prevent abuse.",
+                    description:
+                        "Only the recipient address can be set — subject and text are hardcoded to prevent abuse.",
                     security: [{ adminBearer: [] }],
                     requestBody: {
                         required: false,
@@ -196,7 +197,11 @@ export function GET() {
                                 schema: {
                                     type: "object",
                                     properties: {
-                                        to: { type: "string", format: "email", example: "user@example.com" },
+                                        to: {
+                                            type: "string",
+                                            format: "email",
+                                            example: process.env.TEST_EMAIL_TO || "user@example.com",
+                                        },
                                     },
                                 },
                             },
