@@ -6,6 +6,7 @@ const {
     SMTP_PORT = "587",
     SMTP_USER = "",
     SMTP_PASS = "",
+    SMTP_SECURE = "",
     EMAIL_FROM = "noreply@example.com",
 } = process.env;
 
@@ -13,7 +14,7 @@ const transporter = SMTP_HOST
     ? nodemailer.createTransport({
           host: SMTP_HOST,
           port: parseInt(SMTP_PORT, 10),
-          secure: false,
+          secure: SMTP_SECURE === "true",
           auth: SMTP_USER ? { user: SMTP_USER, pass: SMTP_PASS } : undefined,
       })
     : null;

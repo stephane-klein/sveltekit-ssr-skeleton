@@ -94,6 +94,8 @@ spec:
               value: {{ .Values.smtp.host }}
             - name: SMTP_PORT
               value: {{ .Values.smtp.port | quote }}
+            - name: SMTP_SECURE
+              value: {{ .Values.smtp.secure | quote }}
             - name: SMTP_USER
               value: {{ .Values.smtp.user }}
             - name: SMTP_PASS

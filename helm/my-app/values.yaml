@@ -44,6 +44,7 @@ ingress:
 smtp:
   host: ""
   port: 587
+  secure: false
   user: ""
   # SMTP password — passed directly as env var.
   # In production, consider creating a Secret and referencing it via envFrom.
