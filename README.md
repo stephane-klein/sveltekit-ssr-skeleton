@@ -14,23 +14,25 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Bundler: Vite
 - Adapter: @sveltejs/adapter-node
 - Database: PostgreSQL 18
-- Email testing: [Mailpit](https://github.com/axllent/mailpit) (dev SMTP server with web UI)
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
-- Authentication: sessions, API tokens, password reset & magic link login following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations
 - OIDC client: [Arctic](https://arcticjs.dev/)
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
-- API docs: [Scalar](https://scalar.com/) (interactive reference at `/api/reference`)
-- OpenAPI spec: served at `/api/v1/openapi.json`
-- Metrics: Prometheus (`prom-client`) at `/-/metrics`
+- i18n: [Paraglide JS](https://inlang.com/paraglide-js) (cookie-based, no URL prefix)
+- Lint / Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
+- Tooling: [mise](https://mise.jdx.dev/)
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
-- Tooling: mise
-- Lint/Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
-- i18n: Paraglide JS (cookie-based, no URL prefix) with `messages/{en,fr}.json` — email templates in YAML at `src/lib/backend/email/`
-- Helm chart: Kubernetes deployment
-  - Prometheus auto-scraping via `prometheus.io/*` pod annotations
-  - Grafana dashboard deployed as ConfigMap (`grafana_dashboard: "1"` sidecar pattern)
+
+## Included Features
+
+- **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations)
+- **OIDC** — external provider authentication via Arctic
+- **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
+- **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
+- **Metrics** — Prometheus endpoint at `/-/metrics` via [`prom-client`](https://github.com/siimon/prom-client)
+- **Email testing** — [Mailpit](https://github.com/axllent/mailpit) dev SMTP server with web UI
+- **Helm chart** — Kubernetes deployment with Prometheus auto-scraping (`prometheus.io/*` pod annotations) and Grafana dashboard (ConfigMap sidecar pattern)
 
 ## Roadmap:
 
