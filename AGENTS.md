@@ -118,7 +118,13 @@ Key naming convention: use prefix per page/section (e.g., `login_title`,
 **Implementation details** (cookie management, AsyncLocalStorage nesting, httpOnly
 pitfall, email templates, login flows): see `docs/agents/i18n.md`.
 
-**Architecture decision**: see `docs/adr/001-paraglide-i18n.md`.
+**Architecture decision**: see [`docs/decisions/2026-07_001-paraglide-i18n.md`](docs/decisions/2026-07_001-paraglide-i18n.md).
+
+## Supplementary Documentation
+
+- [`docs/agents/`](docs/agents/) — operational snapshots of subsystems (loaded on demand by the agent)
+- [`docs/decisions/`](docs/decisions/) — architecture decision records
+- `.opencode/skills/new-decision/` — skill for creating new decision records
 
 ## Documentation Maintenance
 
