@@ -123,5 +123,20 @@
   "my_tokens_column_created": "Created",
   "my_tokens_column_last_used": "Last used",
   "my_tokens_revoke": "revoke",
-  "my_tokens_revoke_confirm": "Revoke this token?"
+  "my_tokens_revoke_confirm": "Revoke this token?",
+  "error_404_title": "Page not found",
+  "error_404_message": "This page doesn't exist or has been moved.",
+  "error_404_cta_home": "Go to homepage",
+  "error_403_title": "Access denied",
+  "error_403_message": "You don't have permission to view this page. If you think this is a mistake, contact your administrator.",
+  "error_403_cta_home": "Go to homepage",
+  "error_403_cta_contact": "Contact admin",
+  "error_503_title": "We'll be right back",
+  "error_503_message": "my-app is down for scheduled maintenance.",
+  "error_generic_title": "Something went wrong",
+  "error_generic_message": "An unexpected error occurred on our end. The issue has been logged. Try again in a moment.",
+  "error_generic_cta_reload": "Try again",
+  "error_generic_cta_home": "Go to homepage",
+  "error_go_back": "Go back",
+  "error_technical_details": "Technical details"
 }

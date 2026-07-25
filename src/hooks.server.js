@@ -1,4 +1,5 @@
 import { sequence } from "@sveltejs/kit/hooks";
+import { dev } from "$app/environment";
 import { getTextDirection, serverAsyncLocalStorage } from "$lib/paraglide/runtime";
 import { paraglideMiddleware } from "$lib/paraglide/server";
 import { SESSION_COOKIE_NAME, validateApiToken, validateSession } from "$lib/backend/auth.js";
@@ -89,8 +90,16 @@ const paraglideHandle = ({ event, resolve }) =>
 
 export const handle = sequence(authHandle, paraglideHandle);
 
-export function handleError({ error, event }) {
-    logger.error({ error, url: event.url.toString() }, "Unhandled error");
+export function handleError({ error, event, status }) {
+    if (!dev && status && status < 500) {
+        return { message: status === 404 ? "Not Found" : "Client Error" };
+    }
 
+    if (dev && status === 404) {
+        logger.warn({ url: event.url.toString() }, "Not found");
+        return { message: "Not Found" };
+    }
+
+    logger.error({ error, url: event.url.toString() }, "Unhandled error");
     return { message: "Internal Error" };
 }

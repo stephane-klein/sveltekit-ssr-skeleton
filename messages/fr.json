@@ -123,5 +123,20 @@
   "my_tokens_column_created": "Créé le",
   "my_tokens_column_last_used": "Dernière utilisation",
   "my_tokens_revoke": "révoquer",
-  "my_tokens_revoke_confirm": "Révoquer ce jeton ?"
+  "my_tokens_revoke_confirm": "Révoquer ce jeton ?",
+  "error_404_title": "Page introuvable",
+  "error_404_message": "Cette page n'existe pas ou a été déplacée.",
+  "error_404_cta_home": "Aller à l'accueil",
+  "error_403_title": "Accès refusé",
+  "error_403_message": "Vous n'avez pas la permission de voir cette page. Si vous pensez qu'il s'agit d'une erreur, contactez votre administrateur.",
+  "error_403_cta_home": "Aller à l'accueil",
+  "error_403_cta_contact": "Contacter l'admin",
+  "error_503_title": "De retour dans un instant",
+  "error_503_message": "my-app est en maintenance programmée.",
+  "error_generic_title": "Une erreur est survenue",
+  "error_generic_message": "Une erreur inattendue s'est produite. Le problème a été enregistré. Réessayez dans un instant.",
+  "error_generic_cta_reload": "Réessayer",
+  "error_generic_cta_home": "Aller à l'accueil",
+  "error_go_back": "Retour",
+  "error_technical_details": "Détails techniques"
 }
