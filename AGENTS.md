@@ -76,6 +76,17 @@ The production image runs `node /app/build/index.js` via the `serve` command in 
   If a step is complex, prefer a comment over a superfluous variable.
 - Avoid mutations: no `.push()` in a loop if `.map()` suffices (_immutability_).
 
+### Import naming
+
+When a module exports generic names (e.g., `runWithMetrics`, `summarize`) that
+only make sense within the module's domain, use `as` at the import site to make
+the domain explicit:
+
+```js
+import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics }
+  from "$lib/server/pg-metrics.js";
+```
+
 ### To avoid
 
 - Tacit programming / point-free style: always explicitly name function arguments.
