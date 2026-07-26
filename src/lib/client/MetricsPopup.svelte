@@ -1,0 +1,283 @@
+<script>
+    import { writable } from "svelte/store";
+    import { onMount, onDestroy, tick } from "svelte";
+    import { beforeNavigate, afterNavigate } from "$app/navigation";
+
+    const pageMetrics = writable({ ssr: null, csr: null });
+
+    let open = $state(false);
+    let navStart = 0;
+    let observer;
+
+    function ms(v) {
+        if (v == null) return "\u2014";
+        return v.toFixed(1);
+    }
+
+    function fromServerTiming(entry, networkMs, prefix) {
+        const st = entry.serverTiming;
+        if (!st?.length) return null;
+        const get = (suffix) => st.find((s) => s.name === `${prefix}-${suffix}`)?.duration ?? 0;
+        return {
+            sqlQueryCount: get("pgcount"),
+            sqlQueryMs: get("pgtime"),
+            processingMs: get("processing"),
+            networkMs,
+            totalMs: get("processing") + networkMs,
+        };
+    }
+
+    function initNavigationMetrics() {
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (!nav) return;
+        const networkMs = nav.responseEnd - nav.requestStart;
+        const ssr = fromServerTiming(nav, networkMs, "ssr");
+        if (ssr) pageMetrics.set({ ssr, csr: null });
+    }
+
+    function initCsrObserver() {
+        const obs = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (!entry.name.includes("__data.json")) continue;
+                const r = entry;
+                const networkMs = r.responseEnd - r.requestStart;
+                const csr = fromServerTiming(r, networkMs, "csr");
+                if (csr) pageMetrics.update((m) => ({ ...m, csr }));
+            }
+        });
+        obs.observe({ entryTypes: ["resource"] });
+        return obs;
+    }
+
+    onMount(() => {
+        initNavigationMetrics();
+        observer = initCsrObserver();
+
+        const nav = performance.getEntriesByType("navigation")[0];
+        if (nav) {
+            const hydrationMs = performance.now() - nav.responseEnd;
+            pageMetrics.update((m) => (m.ssr ? { ...m, ssr: { ...m.ssr, hydrationMs } } : m));
+        }
+    });
+
+    onDestroy(() => {
+        observer?.disconnect();
+    });
+
+    beforeNavigate(() => {
+        performance.mark("nav-start");
+        navStart = performance.now();
+    });
+
+    afterNavigate(async () => {
+        if (performance.getEntriesByName("nav-start").length) {
+            performance.mark("nav-end");
+            performance.measure("CSR Navigation", "nav-start", "nav-end");
+        }
+
+        const clientRenderMs = performance.now() - navStart;
+        await tick();
+        await new Promise((r) => setTimeout(r, 0));
+        pageMetrics.update((m) => (m.csr ? { ...m, csr: { ...m.csr, clientRenderMs } } : m));
+    });
+</script>
+
+<button
+    class="trigger"
+    onclick={() => (open = !open)}>metrics</button
+>
+
+{#if open}
+    <div class="popup">
+        <button
+            class="close"
+            onclick={() => (open = false)}>&#x2715;</button
+        >
+
+        {#if $pageMetrics.ssr}
+            <div class="section">
+                <div class="section-title">
+                    <a
+                        href="https://svelte.dev/docs/kit/glossary#SSR"
+                        target="_blank"
+                        rel="external">SSR</a
+                    >
+                    <span class="desc">— first full page load</span>
+                </div>
+                <div class="row">
+                    total from SSR request to interactive page: <span class="val">{ms($pageMetrics.ssr.totalMs)}ms</span
+                    >
+                </div>
+                <div class="row child">
+                    server processing in SvelteKit (load functions, hooks): <span class="val"
+                        >{ms($pageMetrics.ssr.processingMs)}ms</span
+                    >
+                </div>
+                <div class="row grandchild">
+                    <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span> database queries &mdash;
+                    <span class="val">{ms($pageMetrics.ssr.sqlQueryMs)}ms</span> total in PostgreSQL
+                </div>
+                <div class="row child">
+                    network roundtrip to download the HTML page: <span class="val"
+                        >{ms($pageMetrics.ssr.networkMs)}ms</span
+                    >
+                </div>
+                <div class="row child-last">
+                    client <a
+                        href="https://svelte.dev/docs/kit/glossary#Hydration"
+                        target="_blank"
+                        rel="external">hydration</a
+                    >
+                    of server-rendered HTML: <span class="val">{ms($pageMetrics.ssr.hydrationMs)}ms</span>
+                </div>
+            </div>
+        {:else}
+            <div class="section">
+                <a
+                    href="https://svelte.dev/docs/kit/glossary#SSR"
+                    target="_blank"
+                    rel="external">SSR</a
+                >: pending
+            </div>
+        {/if}
+
+        {#if $pageMetrics.csr}
+            <div class="section">
+                <div class="section-title">
+                    <a
+                        href="https://svelte.dev/docs/kit/glossary#CSR"
+                        target="_blank"
+                        rel="external">CSR</a
+                    >
+                    <span class="desc">— last rendering after client navigation</span>
+                </div>
+                <div class="row">
+                    total from CSR request to updated page: <span class="val">{ms($pageMetrics.csr.totalMs)}ms</span>
+                </div>
+                <div class="row child">
+                    server processing in SvelteKit (load functions, hooks): <span class="val"
+                        >{ms($pageMetrics.csr.processingMs)}ms</span
+                    >
+                </div>
+                <div class="row grandchild">
+                    <span class="val">{$pageMetrics.csr.sqlQueryCount}</span> database queries &mdash;
+                    <span class="val">{ms($pageMetrics.csr.sqlQueryMs)}ms</span> total in PostgreSQL
+                </div>
+                <div class="row child">
+                    network roundtrip to fetch JSON data: <span class="val">{ms($pageMetrics.csr.networkMs)}ms</span>
+                </div>
+                <div class="row child-last">
+                    client rendering of the updated page: <span class="val"
+                        >{ms($pageMetrics.csr.clientRenderMs)}ms</span
+                    >
+                </div>
+            </div>
+        {:else}
+            <div class="section">
+                <a
+                    href="https://svelte.dev/docs/kit/glossary#CSR"
+                    target="_blank"
+                    rel="external">CSR</a
+                >: none
+            </div>
+        {/if}
+    </div>
+{/if}
+
+<style>
+    .trigger {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        background: #f5f5f5;
+        color: #666;
+        border: 1px solid #ddd;
+        font: 11px monospace;
+        padding: 2px 6px;
+        cursor: pointer;
+        opacity: 0.7;
+    }
+
+    .trigger:hover {
+        opacity: 1;
+    }
+
+    .popup {
+        position: absolute;
+        bottom: 28px;
+        right: 8px;
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        padding: 12px 16px;
+        font: 11px monospace;
+        color: #666;
+        min-width: 320px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .close {
+        position: absolute;
+        top: 4px;
+        right: 6px;
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        font: 11px monospace;
+        opacity: 0.5;
+        padding: 0;
+    }
+
+    .close:hover {
+        opacity: 1;
+    }
+
+    .section {
+        margin-top: 8px;
+    }
+
+    .section:first-child {
+        margin-top: 0;
+    }
+
+    .section-title {
+        margin-bottom: 4px;
+    }
+
+    .section a {
+        color: inherit;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 2px;
+    }
+
+    .section-title a {
+        color: #444;
+    }
+
+    .row {
+        white-space: nowrap;
+    }
+
+    .row.child {
+        padding-left: 14px;
+    }
+
+    .row.child-last {
+        padding-left: 14px;
+    }
+
+    .row.grandchild {
+        padding-left: 28px;
+    }
+
+    .val {
+        font-weight: 700;
+    }
+
+    .desc {
+        color: #888;
+        font-style: italic;
+        font-weight: 400;
+    }
+</style>

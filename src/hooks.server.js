@@ -6,6 +6,7 @@ import { SESSION_COOKIE_NAME, validateApiToken, validateSession } from "$lib/bac
 import { sql } from "$lib/backend/pg.js";
 import { logger } from "$lib/backend/logger.js";
 import { renderDuration } from "$lib/backend/metrics.js";
+import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
 
 const LOCALE_COOKIE = "locale";
 const COOKIE_OPTS = { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false };
@@ -88,7 +89,36 @@ const paraglideHandle = ({ event, resolve }) =>
         );
     });
 
-export const handle = sequence(authHandle, paraglideHandle);
+async function metricsHandle({ event, resolve }) {
+    return runWithPgMetrics(async () => {
+        const t0 = performance.now();
+
+        const response = await resolve(event);
+
+        const t1 = performance.now();
+        const metrics = summarizePgMetrics();
+
+        if (metrics) {
+            // Server-Timing header is the transmission channel to MetricsPopup
+            // (not the idiomatic SvelteKit +page.server.js loader approach,
+            // because these metrics belong to the request lifecycle itself,
+            // not to any specific route)
+            const phase = event.isDataRequest ? "csr" : "ssr";
+
+            response.headers.set(
+                "Server-Timing",
+                [
+                    `${phase}-pgcount;dur=${metrics.sqlQueryCount}`,
+                    `${phase}-pgtime;dur=${metrics.totalQueryMs.toFixed(1)}`,
+                    `${phase}-processing;dur=${(t1 - t0).toFixed(1)}`,
+                ].join(", "),
+            );
+        }
+        return response;
+    });
+}
+
+export const handle = sequence(metricsHandle, authHandle, paraglideHandle);
 
 export function handleError({ error, event, status }) {
     if (!dev && status && status < 500) {

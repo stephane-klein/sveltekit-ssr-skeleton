@@ -2,6 +2,7 @@ import postgres from "postgres";
 
 import { logger } from "./logger.js";
 import { sqlDuration } from "./metrics.js";
+import { getMetrics } from "../server/pg-metrics.js";
 
 const POSTGRES_URL = process.env.MY_APP_POSTGRES_URL;
 export const POSTGRES_SCHEMA = process.env.MY_APP_POSTGRES_SCHEMA || "public";
@@ -16,6 +17,7 @@ const raw = postgres(POSTGRES_URL, {
 const INSTRUMENTED = Symbol("instrumented");
 
 function wrapQuery(query, sqlStr) {
+    const startTime = performance.now();
     const end = sqlDuration.startTimer({ query: sqlStr });
     const originalHandle = query.handle;
     query.handle = function () {
@@ -23,6 +25,12 @@ function wrapQuery(query, sqlStr) {
             return originalHandle.apply(this, arguments);
         } finally {
             end();
+            const store = getMetrics();
+            if (store) {
+                store.queries.push({
+                    durationMs: performance.now() - startTime,
+                });
+            }
         }
     };
     return query;
