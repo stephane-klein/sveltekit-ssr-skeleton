@@ -8,13 +8,14 @@
     <title>{m.contacts_title()} — {m.app_name()}</title>
 </svelte:head>
 
-<main class="page px-5 pt-9 pb-24">
-    <div class="flex items-baseline gap-3 mb-6">
-        <h1 class="text-xl font-bold tracking-tight">{m.contacts_title()}</h1>
+<main class="page px-5 pt-7 pb-16">
+    <div class="flex items-baseline gap-3 mb-5">
+        <h1 class="text-xl font-bold">{m.contacts_title()}</h1>
+        <span class="text-sm text-gray-500">{data.totalPages > 0 ? `${data.contacts.length} / 1000` : ""}</span>
+        <div class="flex-1"></div>
         <a
             href="/contacts/new"
-            class="px-3 py-1 rounded-sm text-sm font-semibold no-underline border border-blue-600 bg-blue-600 text-white hover:bg-blue-700"
-            >{m.contacts_new_button()}</a
+            class="text-sm text-blue-600 no-underline hover:underline">{m.contacts_new_button()}</a
         >
     </div>
 
@@ -40,9 +41,7 @@
                         class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 pr-2 border-b-2 border-gray-300"
                         >{m.contacts_column_created()}</th
                     >
-                    <th
-                        class="text-right text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b-2 border-gray-300"
-                    ></th>
+                    <th class="text-right text-xs pb-1.5 border-b-2 border-gray-300"></th>
                 </tr>
             </thead>
             <tbody>
@@ -73,5 +72,37 @@
                 {/each}
             </tbody>
         </table>
+
+        <nav class="pagination flex items-center gap-2 mt-5 text-sm">
+            {#if data.page > 1}
+                <a
+                    href="?page=1"
+                    class="text-blue-600 no-underline hover:underline">« First</a
+                >
+                <a
+                    href="?page={data.page - 1}"
+                    class="text-blue-600 no-underline hover:underline">‹ Prev</a
+                >
+            {:else}
+                <span class="text-gray-400">« First</span>
+                <span class="text-gray-400">‹ Prev</span>
+            {/if}
+            <span class="text-gray-300 mx-1">|</span>
+            <span class="text-gray-500">{m.contacts_page_info({ page: data.page, total: data.totalPages })}</span>
+            <span class="text-gray-300 mx-1">|</span>
+            {#if data.page < data.totalPages}
+                <a
+                    href="?page={data.page + 1}"
+                    class="text-blue-600 no-underline hover:underline">Next ›</a
+                >
+                <a
+                    href="?page={data.totalPages}"
+                    class="text-blue-600 no-underline hover:underline">Last »</a
+                >
+            {:else}
+                <span class="text-gray-400">Next ›</span>
+                <span class="text-gray-400">Last »</span>
+            {/if}
+        </nav>
     {/if}
 </main>

@@ -1,6 +1,4 @@
--- Example fixture data — replace with your actual seed data
 INSERT INTO contacts (firstname, lastname)
-     VALUES ('Alice', 'Martin'),
-            ('Bob', 'Durand'),
-            ('Charlie', 'Petit')
-   ON CONFLICT DO NOTHING;
+SELECT 'John' || n, 'Doe' || n
+  FROM generate_series(1, 1000) AS n
+  ON CONFLICT DO NOTHING;
