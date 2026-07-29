@@ -55,8 +55,8 @@
 
         const nav = performance.getEntriesByType("navigation")[0];
         if (nav) {
-            const hydrationMs = performance.now() - nav.responseEnd;
-            pageMetrics.update((m) => (m.ssr ? { ...m, ssr: { ...m.ssr, hydrationMs } } : m));
+            const clientStartupMs = performance.now() - nav.responseEnd;
+            pageMetrics.update((m) => (m.ssr ? { ...m, ssr: { ...m.ssr, clientStartupMs } } : m));
         }
     });
 
@@ -78,7 +78,7 @@
         const clientRenderMs = performance.now() - navStart;
         await tick();
         await new Promise((r) => setTimeout(r, 0));
-        pageMetrics.update((m) => (m.csr ? { ...m, csr: { ...m.csr, clientRenderMs } } : m));
+        pageMetrics.update((m) => (m.csr ? { ...m, csr: { ...m.csr, clientRenderMs, totalMs: m.csr.totalMs + clientRenderMs } } : m));
     });
 </script>
 
@@ -105,8 +105,7 @@
                     <span class="desc">— first full page load</span>
                 </div>
                 <div class="row">
-                    total from SSR request to interactive page: <span class="val">{ms($pageMetrics.ssr.totalMs)}ms</span
-                    >
+                    total: <span class="val">{ms($pageMetrics.ssr.totalMs)}ms</span> = server + network (page visible)
                 </div>
                 <div class="row child">
                     server processing in SvelteKit (load functions, hooks): <span class="val"
@@ -117,19 +116,15 @@
                     <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span> database queries &mdash;
                     <span class="val">{ms($pageMetrics.ssr.sqlQueryMs)}ms</span> total in PostgreSQL
                 </div>
-                <div class="row child">
+                <div class="row child-last">
                     network roundtrip to download the HTML page: <span class="val"
                         >{ms($pageMetrics.ssr.networkMs)}ms</span
                     >
                 </div>
-                <div class="row child-last">
-                    client <a
-                        href="https://svelte.dev/docs/kit/glossary#Hydration"
-                        target="_blank"
-                        rel="external">hydration</a
-                    >
-                    of server-rendered HTML: <span class="val">{ms($pageMetrics.ssr.hydrationMs)}ms</span>
-                </div>
+            </div>
+            <div class="row client-startup">
+                client startup: <span class="val">{ms($pageMetrics.ssr.clientStartupMs)}ms</span>
+                (page already visible, hydration + resource loading)
             </div>
         {:else}
             <div class="section">
@@ -152,7 +147,7 @@
                     <span class="desc">— last rendering after client navigation</span>
                 </div>
                 <div class="row">
-                    total from CSR request to updated page: <span class="val">{ms($pageMetrics.csr.totalMs)}ms</span>
+                    total: <span class="val">{ms($pageMetrics.csr.totalMs)}ms</span> = server + network + client rendering
                 </div>
                 <div class="row child">
                     server processing in SvelteKit (load functions, hooks): <span class="val"
@@ -167,7 +162,7 @@
                     network roundtrip to fetch JSON data: <span class="val">{ms($pageMetrics.csr.networkMs)}ms</span>
                 </div>
                 <div class="row child-last">
-                    client rendering of the updated page: <span class="val"
+                    client rendering: <span class="val"
                         >{ms($pageMetrics.csr.clientRenderMs)}ms</span
                     >
                 </div>
@@ -279,5 +274,11 @@
         color: #888;
         font-style: italic;
         font-weight: 400;
+    }
+
+    .row.client-startup {
+        margin-top: 4px;
+        padding-top: 4px;
+        border-top: 1px dotted #ddd;
     }
 </style>
