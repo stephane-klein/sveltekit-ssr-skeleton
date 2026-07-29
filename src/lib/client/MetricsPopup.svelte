@@ -14,6 +14,12 @@
         return v.toFixed(1);
     }
 
+    function formatSize(bytes) {
+        if (bytes == null) return "\u2014";
+        if (bytes === 0) return "from browser cache";
+        return `${(bytes / 1024).toFixed(1)} KB`;
+    }
+
     function fromServerTiming(entry, networkMs, prefix) {
         const st = entry.serverTiming;
         if (!st?.length) return null;
@@ -32,7 +38,7 @@
         if (!nav) return;
         const networkMs = nav.responseEnd - nav.requestStart;
         const ssr = fromServerTiming(nav, networkMs, "ssr");
-        if (ssr) pageMetrics.set({ ssr, csr: null });
+        if (ssr) pageMetrics.set({ ssr: { ...ssr, transferSize: nav.transferSize, decodedBodySize: nav.decodedBodySize }, csr: null });
     }
 
     function initCsrObserver() {
@@ -42,7 +48,7 @@
                 const r = entry;
                 const networkMs = r.responseEnd - r.requestStart;
                 const csr = fromServerTiming(r, networkMs, "csr");
-                if (csr) pageMetrics.update((m) => ({ ...m, csr }));
+                if (csr) pageMetrics.update((m) => ({ ...m, csr: { ...csr, transferSize: r.transferSize, decodedBodySize: r.decodedBodySize } }));
             }
         });
         obs.observe({ entryTypes: ["resource"] });
