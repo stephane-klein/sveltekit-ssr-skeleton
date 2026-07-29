@@ -3,6 +3,7 @@
     import { onMount, onDestroy, tick } from "svelte";
     import { beforeNavigate, afterNavigate } from "$app/navigation";
     import { browser } from "$app/environment";
+    import { env } from "$env/dynamic/public";
 
     const pageMetrics = writable({ ssr: null, csr: null });
 
@@ -104,7 +105,7 @@
 
 <button
     class="trigger"
-    onclick={() => (open = !open)}>metrics</button
+    onclick={() => (open = !open)}>tech info</button
 >
 
 {#if open}
@@ -113,6 +114,11 @@
             class="close"
             onclick={() => (open = false)}>&#x2715;</button
         >
+
+        <div class="version">
+            <div>Built at <span class="val">{env.PUBLIC_BUILD_STAMP ?? "—"}</span></div>
+            <div>GitHub SHA1 version : <a href="{env.PUBLIC_REPO_URL}/commit/{env.PUBLIC_GIT_HASH}" target="_blank" rel="external"><span class="val">{env.PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a></div>
+        </div>
 
         {#if $pageMetrics.ssr}
             <div class="section">
@@ -219,6 +225,7 @@
         padding: 2px 6px;
         cursor: pointer;
         opacity: 0.7;
+        white-space: nowrap;
     }
 
     .trigger:hover {
@@ -308,5 +315,10 @@
         margin-top: 4px;
         padding-top: 4px;
         border-top: 1px dotted #ddd;
+    }
+
+    .version {
+        margin-bottom: 6px;
+        line-height: 1.8;
     }
 </style>

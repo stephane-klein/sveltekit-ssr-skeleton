@@ -32,7 +32,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
 - **Metrics** — Prometheus endpoint at `/-/metrics` via [`prom-client`](https://github.com/siimon/prom-client)
 - **Email testing** — [Mailpit](https://github.com/axllent/mailpit) dev SMTP server with web UI
-- **SSR/CSR metrics popup** — performance popup (bottom-right, `metrics` button) showing total time, server processing, PostgreSQL queries, network roundtrip, and hydration/rendering for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
+- **SSR/CSR tech info popup** — performance popup (bottom-right, `tech info` button) showing total time, server processing, PostgreSQL queries, network roundtrip, hydration/rendering, and version info (build timestamp, GitHub commit link) for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
 - **Helm chart** — Kubernetes deployment with Prometheus auto-scraping (`prometheus.io/*` pod annotations) and Grafana dashboard (ConfigMap sidecar pattern)
 
 ## Roadmap:

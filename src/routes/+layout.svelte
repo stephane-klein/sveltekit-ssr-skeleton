@@ -2,7 +2,7 @@
     import { m } from "$lib/paraglide/messages";
     import { locales, getLocale, setLocale } from "$lib/paraglide/runtime";
     import "uno.css";
-    import MetricsPopup from "$lib/client/MetricsPopup.svelte";
+    import TechInfoPopup from "$lib/client/TechInfoPopup.svelte";
 
     let { children } = $props();
 
@@ -54,7 +54,7 @@
     </footer>
 
     <div class="metrics-root">
-        <MetricsPopup />
+        <TechInfoPopup />
     </div>
 </div>
 

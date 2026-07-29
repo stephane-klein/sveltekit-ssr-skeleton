@@ -99,7 +99,7 @@ async function metricsHandle({ event, resolve }) {
         const metrics = summarizePgMetrics();
 
         if (metrics) {
-            // Server-Timing header is the transmission channel to MetricsPopup
+            // Server-Timing header is the transmission channel to TechInfoPopup
             // (not the idiomatic SvelteKit +page.server.js loader approach,
             // because these metrics belong to the request lifecycle itself,
             // not to any specific route)
