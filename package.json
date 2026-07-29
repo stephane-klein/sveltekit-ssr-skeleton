@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "check": "prettier --check . && eslint .",
-    "format": "prettier --write .",
+    "format": "prettier --list-different --write .",
     "lint": "eslint .",
     "lint:pkg": "pnpm npmPkgJsonLint .",
     "dev": "vite dev",
