@@ -3,6 +3,7 @@
   "license": "MIT",
   "author": "Stéphane Klein",
   "type": "module",
+  "repository": "github:stephane-klein/sveltekit-ssr-skeleton",
   "scripts": {
     "check": "prettier --check . && eslint .",
     "format": "prettier --list-different --write .",
