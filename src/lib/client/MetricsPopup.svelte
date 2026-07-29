@@ -2,12 +2,14 @@
     import { writable } from "svelte/store";
     import { onMount, onDestroy, tick } from "svelte";
     import { beforeNavigate, afterNavigate } from "$app/navigation";
+    import { browser } from "$app/environment";
 
     const pageMetrics = writable({ ssr: null, csr: null });
 
     let open = $state(false);
     let navStart = 0;
     let observer;
+    let popupEl = $state(null);
 
     function ms(v) {
         if (v == null) return "\u2014";
@@ -56,6 +58,7 @@
     }
 
     onMount(() => {
+        if (!browser) return;
         initNavigationMetrics();
         observer = initCsrObserver();
 
@@ -64,11 +67,22 @@
             const clientStartupMs = performance.now() - nav.responseEnd;
             pageMetrics.update((m) => (m.ssr ? { ...m, ssr: { ...m.ssr, clientStartupMs } } : m));
         }
+
+        document.addEventListener("click", handleClickOutside);
     });
 
     onDestroy(() => {
         observer?.disconnect();
+        if (!browser) return;
+        document.removeEventListener("click", handleClickOutside);
     });
+
+    function handleClickOutside(event) {
+        if (!popupEl || !open) return;
+        if (popupEl.contains(event.target)) return;
+        if (event.target.closest(".trigger")) return;
+        open = false;
+    }
 
     beforeNavigate(() => {
         performance.mark("nav-start");
@@ -94,7 +108,7 @@
 >
 
 {#if open}
-    <div class="popup">
+    <div class="popup" bind:this={popupEl}>
         <button
             class="close"
             onclick={() => (open = false)}>&#x2715;</button
@@ -122,15 +136,19 @@
                     <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span> database queries &mdash;
                     <span class="val">{ms($pageMetrics.ssr.sqlQueryMs)}ms</span> total in PostgreSQL
                 </div>
-                <div class="row child-last">
+                <div class="row child">
                     network roundtrip to download the HTML page: <span class="val"
                         >{ms($pageMetrics.ssr.networkMs)}ms</span
                     >
                 </div>
+                <div class="row grandchild">
+                    page weight: <span class="val">{formatSize($pageMetrics.ssr.transferSize)}</span>
+                    / <span class="val">{formatSize($pageMetrics.ssr.decodedBodySize)}</span> decoded
+                </div>
             </div>
             <div class="row client-startup">
                 client startup: <span class="val">{ms($pageMetrics.ssr.clientStartupMs)}ms</span>
-                (page already visible, hydration + resource loading)
+                (page already visible, <a href="https://svelte.dev/docs/kit/glossary#Hydration" target="_blank" rel="external">hydration</a> + resource loading)
             </div>
         {:else}
             <div class="section">
@@ -166,6 +184,10 @@
                 </div>
                 <div class="row child">
                     network roundtrip to fetch JSON data: <span class="val">{ms($pageMetrics.csr.networkMs)}ms</span>
+                </div>
+                <div class="row grandchild">
+                    page weight: <span class="val">{formatSize($pageMetrics.csr.transferSize)}</span>
+                    / <span class="val">{formatSize($pageMetrics.csr.decodedBodySize)}</span> decoded
                 </div>
                 <div class="row child-last">
                     client rendering: <span class="val"
@@ -245,7 +267,7 @@
         margin-bottom: 4px;
     }
 
-    .section a {
+    .popup a {
         color: inherit;
         text-decoration: underline;
         text-decoration-style: dotted;
