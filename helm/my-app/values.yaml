@@ -46,8 +46,9 @@ smtp:
   port: 587
   secure: false
   user: ""
-  # SMTP password — passed directly as env var.
-  # In production, consider creating a Secret and referencing it via envFrom.
+  # SMTP password — only used when secrets.existingSecret is NOT set.
+  # When secrets.existingSecret is set, the SMTP_PASS key of that Secret
+  # is injected into the container via envFrom.
   pass: ""
   from: noreply@example.com
   # Default recipient for the send-test-mail admin endpoint
@@ -60,6 +61,8 @@ origin: ""
 
 # Admin API token — Bearer authentication for /api/v1/admin/* endpoints.
 # Must be at least 32 characters long.
+# Only used when secrets.existingSecret is NOT set; otherwise the
+# MY_APP_ADMIN_TOKEN key of that Secret is injected via envFrom.
 adminToken: ""
 
 # OpenID Connect / Authelia configuration
@@ -67,9 +70,19 @@ oidc:
   enabled: false
   issuer: ""
   clientId: ""
-  # AUTHELIA_CLIENT_SECRET — passed directly as env var.
-  # In production, consider creating a Secret and referencing it via envFrom.
+  # AUTHELIA_CLIENT_SECRET — only used when secrets.existingSecret is NOT set.
+  # Otherwise the AUTHELIA_CLIENT_SECRET key of that Secret is injected via envFrom.
   clientSecret: ""
+
+# Secrets injected into the container via envFrom.
+# When set, the three following values are taken from an existing Secret
+# instead of being passed as literal env vars:
+#   - oidc.clientSecret -> AUTHELIA_CLIENT_SECRET
+#   - adminToken        -> MY_APP_ADMIN_TOKEN
+#   - smtp.pass         -> SMTP_PASS
+# The referenced Secret must expose those three keys.
+secrets:
+  existingSecret: ""
 
 # Pod DNS policy — use ClusterFirstWithHostNet to resolve sklein.internal from pods
 dnsPolicy: ClusterFirst

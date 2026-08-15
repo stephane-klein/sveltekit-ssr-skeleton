@@ -66,6 +66,11 @@ spec:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.app.image.repository }}:{{ .Values.app.image.tag }}"
           imagePullPolicy: {{ .Values.app.image.pullPolicy }}
+          {{- if .Values.secrets.existingSecret }}
+          envFrom:
+            - secretRef:
+                name: {{ .Values.secrets.existingSecret }}
+          {{- end }}
           env:
             {{- $origin := .Values.origin }}
             {{- if not $origin }}
@@ -82,10 +87,12 @@ spec:
               value: {{ .Values.oidc.issuer }}
             - name: AUTHELIA_CLIENT_ID
               value: {{ .Values.oidc.clientId }}
+            {{- if (not .Values.secrets.existingSecret) }}
             - name: AUTHELIA_CLIENT_SECRET
               value: {{ .Values.oidc.clientSecret }}
             {{- end }}
-            {{- if .Values.adminToken }}
+            {{- end }}
+            {{- if and .Values.adminToken (not .Values.secrets.existingSecret) }}
             - name: MY_APP_ADMIN_TOKEN
               value: {{ .Values.adminToken }}
             {{- end }}
@@ -98,8 +105,10 @@ spec:
               value: {{ .Values.smtp.secure | quote }}
             - name: SMTP_USER
               value: {{ .Values.smtp.user }}
+            {{- if (not .Values.secrets.existingSecret) }}
             - name: SMTP_PASS
               value: {{ .Values.smtp.pass }}
+            {{- end }}
             - name: EMAIL_FROM
               value: {{ .Values.smtp.from }}
             {{- end }}
