@@ -18,7 +18,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
 - OIDC client: [Arctic](https://arcticjs.dev/)
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
-- i18n: [Paraglide JS](https://inlang.com/paraglide-js) (cookie-based, no URL prefix)
+- i18n: [Paraglide JS](https://paraglidejs.com/) (cookie-based, no URL prefix)
 - Lint / Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
 - Tooling: [mise](https://mise.jdx.dev/)
 - Containers: Podman Compose
