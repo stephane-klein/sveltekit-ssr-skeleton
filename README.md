@@ -30,6 +30,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - **OIDC** — external provider authentication via Arctic
 - **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
+- **Idempotent user provisioning (GitOps)** — admin API `PUT /api/v1/admin/users` and `PUT /api/v1/admin/users/sync` to create/update/delete users from a declared desired state, safe to re-apply in CI/CD or a reconciliation loop
 - **Metrics** — Prometheus endpoint at `/-/metrics` via [`prom-client`](https://github.com/siimon/prom-client)
 - **Email testing** — [Mailpit](https://github.com/axllent/mailpit) dev SMTP server with web UI
 - **SSR/CSR tech info popup** — performance popup (bottom-right, `tech info` button) showing total time, server processing, PostgreSQL queries, network roundtrip, hydration/rendering, and version info (build timestamp, GitHub commit link) for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
@@ -124,6 +125,48 @@ Set the `MY_APP_ADMIN_TOKEN` environment variable, then use the admin API:
 $ curl -s -X POST -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
     -H "Content-Type: application/json" \
     -d '{"email":"api-user@example.com","display_name":"API User","password":"password"}' \
+    http://localhost:5173/api/v1/admin/users | jq
+```
+
+### Provisioning users idempotently (DevOps / GitOps)
+
+The admin API exposes two idempotent operations that let a DevOps / GitOps
+workflow reconcile the set of users with a declared desired state:
+
+- `PUT /api/v1/admin/users` — upsert a single user by `email` (create if absent,
+  fully replace otherwise, `200` either way).
+- `PUT /api/v1/admin/users/sync` — create/update/delete several users in one
+  atomic transaction. Body: `{ "upsert": [...], "delete": [{ "email" }] }`.
+  Deleting a non-existent email is a no-op. Response: `{ created, updated,
+deleted, users }`.
+
+The workflow is declarative: a configuration file (your GitOps source of truth)
+declares the desired users, and a runner applies it to the instance. Because the
+operations are idempotent, re-applying the same payload leaves the final state
+stable and returns no error — so it is safe to run repeatedly, in any order, and
+from a CI/CD pipeline or a reconciliation loop, not just interactively.
+
+A ready-to-use example payload lives in
+[`api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json):
+
+```bash
+$ curl -s -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
+    -H "Content-Type: application/json" \
+    --data @api-payloads-examples/users-sync.json \
+    http://localhost:5173/api/v1/admin/users/sync | jq
+```
+
+The first apply reports `created: 2`; editing `display_name` in the file and
+re-applying reports `updated: 2`; moving an existing email into `delete` reports
+`deleted: 1`. Re-applying the same payload is idempotent — the resulting state
+is stable.
+
+Single-user upsert, e.g. create or update `john.doe@example.com`:
+
+```bash
+$ curl -s -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
+    -H "Content-Type: application/json" \
+    -d '{"email":"john.doe@example.com","display_name":"John Doe","password":"password123"}' \
     http://localhost:5173/api/v1/admin/users | jq
 ```
 

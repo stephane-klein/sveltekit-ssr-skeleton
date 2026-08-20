@@ -81,3 +81,28 @@ $ helm upgrade --install my-app oci://ghcr.io/stephane-klein/charts/my-app \
     --set oidc.clientSecret=...
 ```
 
+## Managing users (idempotent GitOps)
+
+After deploying the chart, provision or reconcile the set of users idempotently
+through the admin API. This is the GitOps pattern: a configuration file declares
+the desired users, and a runner applies it — create/update/delete in one atomic
+`PUT /api/v1/admin/users/sync`, re-applicable without error and with a stable
+final state.
+
+**Prerequisite** — the admin API must be enabled: set `adminToken` at install
+time (at least 32 characters), or use an existing secret exposing the
+`MY_APP_ADMIN_TOKEN` key (`secrets.existingSecret`).
+
+Sync users against the deployed application:
+
+```bash
+$ curl -s -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
+    -H "Content-Type: application/json" \
+    --data @api-payloads-examples/users-sync.json \
+    https://my-app.example.com/api/v1/admin/users/sync | jq
+```
+
+A ready-to-use payload lives in
+[`api-payloads-examples/users-sync.json`](../../api-payloads-examples/users-sync.json)
+at the repository root — see the [root README section](../../README.md) for the
+idempotency details and the single-user `PUT /api/v1/admin/users` variant.
