@@ -42,7 +42,7 @@ export async function GET({ url: reqUrl, cookies }) {
         throw redirect(302, "/login?error=token_exchange_failed");
     }
 
-    const accessToken = tokens.accessToken();
+    const accessToken = tokens.access_token;
 
     logger.info("OIDC authorization code validated, fetching userinfo");
 

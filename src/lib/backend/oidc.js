@@ -1,4 +1,4 @@
-import { OAuth2Client, generateState, generateCodeVerifier, CodeChallengeMethod } from "arctic";
+import { createHash, randomBytes } from "node:crypto";
 import { logger } from "./logger.js";
 
 const issuer = process.env.AUTHELIA_ISSUER;
@@ -8,6 +8,38 @@ const origin = process.env.ORIGIN || "http://localhost:5173";
 const redirectURI = `${origin}/login/oidc/callback`;
 
 let endpointsCache = null;
+
+function assertConfigured() {
+    if (!issuer || !clientId || !clientSecret) {
+        throw new Error("AUTHELIA_ISSUER, AUTHELIA_CLIENT_ID and AUTHELIA_CLIENT_SECRET must be set");
+    }
+}
+
+function generateState() {
+    return randomBytes(32).toString("base64url");
+}
+
+function generateCodeVerifier() {
+    return randomBytes(32).toString("base64url");
+}
+
+function createS256CodeChallenge(codeVerifier) {
+    return createHash("sha256").update(codeVerifier).digest("base64url");
+}
+
+function createAuthorizationURLWithPKCE(authorizationEndpoint, state, codeVerifier, scopes) {
+    const url = new URL(authorizationEndpoint);
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("client_id", clientId);
+    url.searchParams.set("redirect_uri", redirectURI);
+    url.searchParams.set("state", state);
+    url.searchParams.set("code_challenge_method", "S256");
+    url.searchParams.set("code_challenge", createS256CodeChallenge(codeVerifier));
+    if (scopes.length > 0) {
+        url.searchParams.set("scope", scopes.join(" "));
+    }
+    return url;
+}
 
 async function discoverEndpoints() {
     if (endpointsCache) return endpointsCache;
@@ -57,26 +89,16 @@ async function discoverEndpoints() {
     return endpointsCache;
 }
 
-function getClient() {
-    if (!issuer || !clientId || !clientSecret) {
-        throw new Error("AUTHELIA_ISSUER, AUTHELIA_CLIENT_ID and AUTHELIA_CLIENT_SECRET must be set");
-    }
-
-    return new OAuth2Client(clientId, clientSecret, redirectURI);
-}
-
 export async function createAuthorizationURL() {
-    const client = getClient();
+    assertConfigured();
     const { authorizationEndpoint } = await discoverEndpoints();
     const state = generateState();
     const codeVerifier = generateCodeVerifier();
-    const url = client.createAuthorizationURLWithPKCE(
-        authorizationEndpoint,
-        state,
-        CodeChallengeMethod.S256,
-        codeVerifier,
-        ["openid", "profile", "email"],
-    );
+    const url = createAuthorizationURLWithPKCE(authorizationEndpoint, state, codeVerifier, [
+        "openid",
+        "profile",
+        "email",
+    ]);
 
     logger.info({ url: url.toString() }, "OIDC authorization URL created");
 
@@ -84,15 +106,47 @@ export async function createAuthorizationURL() {
 }
 
 export async function validateAuthorizationCode(code, codeVerifier) {
-    const client = getClient();
+    assertConfigured();
     const { tokenEndpoint } = await discoverEndpoints();
+
+    const body = new URLSearchParams();
+    body.set("grant_type", "authorization_code");
+    body.set("code", code);
+    body.set("redirect_uri", redirectURI);
+    body.set("code_verifier", codeVerifier);
+
+    const basicCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
+
+    let res;
+    try {
+        res = await fetch(tokenEndpoint, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                Accept: "application/json",
+                Authorization: `Basic ${basicCredentials}`,
+            },
+            body,
+        });
+    } catch (err) {
+        logger.error({ err, tokenEndpoint }, "OIDC token request failed");
+        throw err;
+    }
+
+    if (!res.ok) {
+        logger.error(
+            { tokenEndpoint, status: res.status, statusText: res.statusText },
+            "OIDC token endpoint returned non-OK status",
+        );
+        throw new Error(`OIDC token request failed: ${res.status}`);
+    }
 
     let tokens;
     try {
-        tokens = await client.validateAuthorizationCode(tokenEndpoint, code, codeVerifier);
+        tokens = await res.json();
     } catch (err) {
-        logger.error({ err, tokenEndpoint }, "OIDC token validation failed");
-        throw err;
+        logger.error({ err, tokenEndpoint }, "OIDC token response was not valid JSON");
+        throw new Error("Failed to parse OIDC token response", { cause: err });
     }
 
     logger.info("OIDC authorization code validated");

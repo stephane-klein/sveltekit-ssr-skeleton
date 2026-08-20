@@ -16,7 +16,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Database: PostgreSQL 18
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
-- OIDC client: [Arctic](https://arcticjs.dev/)
+- OIDC client: native OAuth 2.0 (fetch + node:crypto, PKCE S256)
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - i18n: [Paraglide JS](https://paraglidejs.com/) (cookie-based, no URL prefix)
 - Lint / Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
@@ -27,7 +27,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 ## Included Features
 
 - **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations)
-- **OIDC** — external provider authentication via Arctic
+- **OIDC** — external provider authentication (authorization code flow with PKCE)
 - **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
 - **Idempotent user provisioning (GitOps)** — admin API `PUT /api/v1/admin/users` and `PUT /api/v1/admin/users/sync` to create/update/delete users from a declared desired state, safe to re-apply in CI/CD or a reconciliation loop
@@ -199,7 +199,8 @@ query parameter to `/change-password`.
 ### OpenID Connect
 
 Authentication via an external OIDC provider (like [Authelia](https://www.authelia.com/))
-using the [Arctic](https://arcticjs.dev/) library.
+implemented with native `fetch` and `node:crypto` (authorization code flow with
+PKCE S256).
 
 Create a user linked to an OIDC identity:
 
