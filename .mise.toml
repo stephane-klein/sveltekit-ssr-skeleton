@@ -105,6 +105,12 @@ description = "Login to GitHub Container Registry using gh CLI"
 run = "podman push ghcr.io/stephane-klein/my-app:latest"
 description = "Push the container image to GitHub Container Registry"
 
+[tasks.ci-build-push-image]
+description = "Trigger the build & push image GitHub Action workflow via gh CLI (manual CI)"
+run = """
+gh workflow run build-push-image.yml --ref "main"
+"""
+
 [tasks.build-dev-image]
 quiet = true
 run = """
