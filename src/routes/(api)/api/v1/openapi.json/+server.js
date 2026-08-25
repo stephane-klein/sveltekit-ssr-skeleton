@@ -43,7 +43,8 @@ export function GET() {
                 },
                 post: {
                     summary: "Create a user (admin)",
-                    description: "Either email+display_name+password or oidc_issuer+oidc_subject must be provided",
+                    description:
+                        "email and display_name are required; password is optional (users without one sign in via magic link or reset their password)",
                     security: [{ adminBearer: [] }],
                     requestBody: {
                         required: true,
@@ -59,6 +60,8 @@ export function GET() {
                                             format: "password",
                                             minLength: 6,
                                             example: "s3cur3!",
+                                            description:
+                                                "Optional. Users without a password sign in via magic link or reset their password",
                                         },
                                         oidc_issuer: {
                                             type: "string",

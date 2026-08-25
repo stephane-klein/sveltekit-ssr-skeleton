@@ -115,6 +115,10 @@ $ pnpm add-user \
 
 # Read password from stdin
 $ echo "yourpassword" | pnpm add-user --email=user@example.com --password-stdin
+
+# Password and OIDC are both optional: users without either credential sign in
+# via the magic link or set a password through the reset flow
+$ pnpm add-user --email=jean@example.com --display-name="Jean Dupond"
 ```
 
 ### Creating a user via REST API
