@@ -1,6 +1,6 @@
 FROM node:24-slim AS build
 
-RUN npm install -g pnpm@11.22.0
+RUN npm install -g pnpm@12.0.0
 
 WORKDIR /app/
 
@@ -26,7 +26,7 @@ FROM node:24-slim
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g pnpm@11.22.0
+RUN npm install -g pnpm@12.0.0
 
 WORKDIR /app/
 
