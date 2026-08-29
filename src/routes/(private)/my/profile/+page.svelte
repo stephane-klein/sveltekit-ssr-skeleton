@@ -65,5 +65,12 @@
                 </button>
             </div>
         </form>
+
+        <p class="mt-5 text-sm">
+            <a
+                href="/my/password"
+                class="text-blue-600 hover:underline">{m.my_profile_change_password()}</a
+            >
+        </p>
     </div>
 </main>
