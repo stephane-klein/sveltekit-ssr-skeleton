@@ -75,12 +75,13 @@ Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle ins
 ## Getting Started
 
 ```bash
-$ mise install      # install Node.js and pnpm via mise
+$ mise install                # install Node.js and pnpm via mise
 $ pnpm install
-$ mise run up       # start PostgreSQL container
-$ reload            # load environment variables
-$ mise run migrate  # run database migrations
-$ mise run seed     # populate with demo data
+$ mise run up                 # start PostgreSQL container
+$ reload                      # load environment variables
+$ mise run migrate            # run database migrations
+$ mise run seed               # populate with demo data
+$ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
 $ mise run dev                # start SvelteKit dev server on http://localhost:5173
 $ mise run preview-prod-build # build and run production server on http://localhost:3000
 ```
@@ -151,7 +152,15 @@ stable and returns no error — so it is safe to run repeatedly, in any order, a
 from a CI/CD pipeline or a reconciliation loop, not just interactively.
 
 A ready-to-use example payload lives in
-[`api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json):
+[`api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json).
+Run it with the `sync-users` mise task (dev server on http://localhost:5173 and
+`MY_APP_ADMIN_TOKEN` set):
+
+```bash
+$ mise run sync-users
+```
+
+or call the API directly:
 
 ```bash
 $ curl -fsS -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
