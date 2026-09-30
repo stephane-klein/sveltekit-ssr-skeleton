@@ -20,7 +20,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - i18n: [Paraglide JS](https://paraglidejs.com/) (cookie-based, no URL prefix)
 - Lint / Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
-- Tooling: [mise](https://mise.jdx.dev/)
+- Tooling: [Mise](https://mise.jdx.dev/), [Pitchfork](https://pitchfork.jdx.dev/)
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 
@@ -51,6 +51,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - [x] Password reset flow (email via nodemailer)
 - [x] Magic link login (passwordless email sign-in)
 - [x] Container option to optionally load seed SQL data
+- [x] [Pitchfork](https://pitchfork.jdx.dev/) integration
 
 ## AI-Assisted Development
 
@@ -70,23 +71,59 @@ This project was developed using:
 
 ## Prerequisite
 
-Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle installing Node.js and pnpm for you.
+Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle installing Node.js, pnpm and (optionally) Pitchfork for you.
 
 ## Getting Started
 
+There are two ways to run this project locally. Pick the one that fits your workflow — both start the exact same services.
+
+- **With Pitchfork** — the project author Stéphane Klein uses [Pitchfork](https://pitchfork.jdx.dev/) to run the development stack, because it makes the daily development experience more pleasant: one command starts everything, in dependency order, in the background.
+- **Without Pitchfork** — plain `mise` tasks, if you don't know Pitchfork or prefer not to use it.
+
+### Prerequisites (both paths)
+
 ```bash
-$ mise install                # install Node.js and pnpm via mise
+$ mise install                # install Node.js, pnpm and Pitchfork via mise
 $ pnpm install
-$ mise run up                 # start PostgreSQL container
-$ reload                      # load environment variables
-$ mise run migrate            # run database migrations
-$ mise run seed               # populate with demo data
-$ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
-$ mise run dev                # start SvelteKit dev server on http://localhost:5173
-$ mise run preview-prod-build # build and run production server on http://localhost:3000
+```
+
+### Option A — With Pitchfork
+
+[Pitchfork](https://pitchfork.jdx.dev/) starts the services in order (PostgreSQL + Mailpit, migrations, seed) and only then the dev server, all in the background. Already-running services are left untouched, so the command is safe to rerun.
+
+```bash
+$ pitchfork start webapp      # postgres + mailpit, migrate, seed, then the dev server
+$ pitchfork logs webapp --tail
 ```
 
 Open http://localhost:5173 in your browser.
+
+Stop everything manually (the PostgreSQL volume is preserved):
+
+```bash
+$ pitchfork stop --local
+```
+
+### Option B — Without Pitchfork
+
+If you don't know Pitchfork, or prefer to run each step yourself:
+
+```bash
+$ mise run up                 # start PostgreSQL and Mailpit containers
+$ reload                      # load environment variables
+$ mise run migrate            # run database migrations
+$ mise run seed               # populate with demo data
+$ mise run dev                # start SvelteKit dev server on http://localhost:5173
+```
+
+Open http://localhost:5173 in your browser.
+
+### Extra tasks (both paths)
+
+```bash
+$ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
+$ mise run preview-prod-build # build and run production server on http://localhost:3000
+```
 
 ### Accessing test emails
 

@@ -1,0 +1,33 @@
+#:schema https://pitchfork.jdx.dev/schema.json
+namespace = "sveltekit-ssr-skeleton"
+
+[settings.general]
+mise = true
+
+[daemons.postgres]
+run = "podman compose up -d && exec sleep infinity"
+ready_cmd = "podman compose exec -T postgres pg_isready -U postgres"
+auto = ["stop"]
+
+[daemons.postgres.hooks]
+on_stop = "mise x -- podman compose down"
+
+[daemons.migrate]
+run = "pnpm run migrate"
+oneshot = true
+depends = ["postgres"]
+
+[daemons.seed]
+run = "pnpm run seed"
+oneshot = true
+depends = ["migrate"]
+
+[daemons.webapp]
+run = "exec bash scripts/export-git-env.sh vite dev --port=$PORT"
+stop_signal = { signal = "SIGTERM", timeout = "10s" }
+depends = ["postgres", "seed"]
+auto = ["stop"]
+port = { expect = [5173], bump = true }
+ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/ready", timeout = "5s" }
+health_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/healthy", interval = "200s", timeout = "5s", retries = 3 }
+retry = 3

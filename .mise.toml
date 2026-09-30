@@ -1,3 +1,9 @@
+[settings]
+experimental = true
+
+[deps.pnpm]
+auto = true
+
 [env]
 _.path = './node_modules/.bin'
 _.source = [
@@ -14,6 +20,7 @@ pnpm = "12.11.2"
 usql = "0.21.4"
 "aqua:gitleaks/gitleaks" = "8.30.1"
 helm = "4.2.2"
+pitchfork = "2.30.1"
 
 [tasks.dev]
 run = "pnpm run dev"
