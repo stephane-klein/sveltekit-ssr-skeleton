@@ -7,6 +7,9 @@ import { sql } from "$lib/backend/pg.js";
 import { logger } from "$lib/backend/logger.js";
 import { renderDuration } from "$lib/backend/metrics.js";
 import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
+import { installShutdown } from "$lib/server/lifecycle.js";
+
+export const init = () => installShutdown({ dev });
 
 const LOCALE_COOKIE = "locale";
 const COOKIE_OPTS = { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false };

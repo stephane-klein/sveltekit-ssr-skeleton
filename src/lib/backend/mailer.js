@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { logger } from "./logger.js";
+import { onShutdown } from "../server/lifecycle.js";
 
 const {
     SMTP_HOST = "",
@@ -26,6 +27,8 @@ if (transporter) {
         () => logger.info("SMTP connection verified"),
         (err) => logger.warn({ err }, "SMTP connection failed"),
     );
+
+    onShutdown(() => transporter.close());
 } else {
     logger.warn(
         "SMTP is not configured — set SMTP_HOST environment variable (e.g. SMTP_HOST=localhost with SMTP_PORT=1025 for Mailpit)",
