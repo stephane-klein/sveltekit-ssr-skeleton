@@ -101,11 +101,17 @@ $ mise run dev                # start SvelteKit dev server on http://localhost:5
 
 Open http://localhost:5173 in your browser.
 
-### Extra tasks (both paths)
+### Other commands
 
 ```bash
 $ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
 $ mise run preview-prod-build # build and run production server on http://localhost:3000
+```
+
+### Stopping and cleaning up
+
+```bash
+$ mise run stop               # stop containers (PostgreSQL volume preserved)
 $ mise run teardown           # remove containers and volumes (destructive, deletes PostgreSQL data)
 ```
 
