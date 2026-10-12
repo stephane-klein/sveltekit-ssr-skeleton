@@ -36,23 +36,6 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - **SSR/CSR tech info popup** — performance popup (bottom-right, `tech info` button) showing total time, server processing, PostgreSQL queries, network roundtrip, hydration/rendering, and version info (build timestamp, GitHub commit link) for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
 - **Helm chart** — Kubernetes deployment with Prometheus auto-scraping (`prometheus.io/*` pod annotations) and Grafana dashboard (ConfigMap sidecar pattern)
 
-## Roadmap
-
-- [x] Implement `/version.json` ([see](https://github.com/stephane-klein/toggl-pg-mirror/commit/5e496a884c9165f1dc0ec515afba79c6e38b35cd))
-- [x] Implement a HelmChart package ([see](https://github.com/stephane-klein/toggl-pg-mirror/tree/main/helm/toggl-pg-mirror))
-- [x] Implement authentication system based on [Lucia's recommendations](https://lucia-auth.com/)
-  - [x] Login with email/password
-  - [x] CLI `add-user` for creating users
-  - [x] Session management (cookie-based, rolling expiration)
-  - [x] Password reset flow (token-based)
-  - [x] API tokens for programmatic access
-  - [x] OpenID Connect 1.0 ([Authelia](https://www.authelia.com/overview/authorization/openid-connect-1.0/))
-- [x] Add Prometheus metrics export endpoint with `prom-client` (`/-/metrics`)
-- [x] Password reset flow (email via nodemailer)
-- [x] Magic link login (passwordless email sign-in)
-- [x] Container option to optionally load seed SQL data
-- [x] [Pitchfork](https://pitchfork.jdx.dev/) integration
-
 ## AI-Assisted Development
 
 This project was developed using:
