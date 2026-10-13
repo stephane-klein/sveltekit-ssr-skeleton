@@ -18,7 +18,7 @@ reload = "source scripts/load_postgres_variables.sh && source scripts/load_authe
 [tools]
 node = "24.21.0"
 pnpm = "12.11.2"
-usql = "0.21.4"
+"conda:libpq" = "18.4" # to install PostgreSQL clients: psql, pg_dump, etc
 "aqua:gitleaks/gitleaks" = "8.30.1"
 helm = "4.2.2"
 pitchfork = "2.30.1"
@@ -73,10 +73,10 @@ run = "./scripts/dump-schema.sh"
 run = "podman compose down -v --remove-orphans"
 
 [tasks.clean]
-run = "usql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB} < sqls/clean.sql"
+run = "psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB} < sqls/clean.sql"
 
 [tasks.enter-in-pg]
-run = "usql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB}"
+run = "psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB}"
 
 [tasks.build-image]
 quiet = true
