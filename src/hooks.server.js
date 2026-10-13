@@ -8,8 +8,12 @@ import { logger } from "$lib/backend/logger.js";
 import { renderDuration } from "$lib/backend/metrics.js";
 import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
 import { installShutdown } from "$lib/server/lifecycle.js";
+import { logAutheliaConfig } from "$lib/backend/oidc.js";
 
-export const init = () => installShutdown({ dev });
+export const init = () => {
+    installShutdown({ dev });
+    logAutheliaConfig();
+};
 
 const LOCALE_COOKIE = "locale";
 const COOKIE_OPTS = { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false };

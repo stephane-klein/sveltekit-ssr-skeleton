@@ -34,7 +34,7 @@
         </div>
     {/if}
 
-    {#if data.autheliaIssuer}
+    {#if data.autheliaEnabled}
         <a
             href="/login/oidc/authorize"
             class="block max-w-sm text-center px-4 py-1.5 border border-gray-300 rounded-sm text-sm font-semibold mb-5 hover:bg-gray-50"

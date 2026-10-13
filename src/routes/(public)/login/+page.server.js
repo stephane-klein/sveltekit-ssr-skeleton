@@ -4,10 +4,11 @@ import { isMailAvailable, sendMail } from "$lib/backend/mailer.js";
 import { logger } from "$lib/backend/logger.js";
 import { sql } from "$lib/backend/pg.js";
 import { renderEmail } from "$lib/backend/email/index.js";
+import { isAutheliaConfigured } from "$lib/backend/oidc.js";
 
 export function load() {
     return {
-        autheliaIssuer: process.env.AUTHELIA_ISSUER || null,
+        autheliaEnabled: isAutheliaConfigured,
     };
 }
 

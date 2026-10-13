@@ -9,8 +9,21 @@ const redirectURI = `${origin}/login/oidc/callback`;
 
 let endpointsCache = null;
 
+export const isAutheliaConfigured = Boolean(issuer && clientId && clientSecret);
+
+export function logAutheliaConfig() {
+    if (isAutheliaConfigured) {
+        logger.info({ issuer }, "Authelia sign-in enabled");
+        return;
+    }
+
+    if (!issuer) logger.warn("Authelia sign-in disabled — AUTHELIA_ISSUER is not set");
+    if (!clientId) logger.warn("Authelia sign-in disabled — AUTHELIA_CLIENT_ID is not set");
+    if (!clientSecret) logger.warn("Authelia sign-in disabled — AUTHELIA_CLIENT_SECRET is not set");
+}
+
 function assertConfigured() {
-    if (!issuer || !clientId || !clientSecret) {
+    if (!isAutheliaConfigured) {
         throw new Error("AUTHELIA_ISSUER, AUTHELIA_CLIENT_ID and AUTHELIA_CLIENT_SECRET must be set");
     }
 }
