@@ -8,11 +8,12 @@ auto = true
 _.path = './node_modules/.bin'
 _.source = [
   '.envrc',
-  { path = 'scripts/load_postgres_variables.sh', tools = true, cacheable = false }
+  { path = 'scripts/load_postgres_variables.sh', tools = true, cacheable = false },
+  { path = 'scripts/load_authelia_variables.sh', tools = true, cacheable = false }
 ]
 
 [shell_alias]
-reload = "source scripts/load_postgres_variables.sh"
+reload = "source scripts/load_postgres_variables.sh && source scripts/load_authelia_variables.sh"
 
 [tools]
 node = "24.21.0"
