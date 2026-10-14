@@ -5,6 +5,10 @@ namespace = "sveltekit-ssr-skeleton"
 mise = true
 
 [daemons.postgres]
+# Idiomatic pitchfork hack for Compose: foreground `compose up` risks being
+# SIGKILLed at its 5s stop_timeout before containers stop; `-d` returns at once
+# and `sleep infinity` keeps a PID to supervise, teardown goes through on_stop.
+# https://pitchfork.jdx.dev/guides/lifecycle-hooks#compose-backed-daemons
 run = "podman compose up -d && exec sleep infinity"
 ready_cmd = "podman compose exec -T postgres pg_isready -U postgres"
 auto = ["stop"]
