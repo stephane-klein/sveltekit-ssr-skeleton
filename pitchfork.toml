@@ -26,10 +26,24 @@ run = "pnpm run seed"
 oneshot = true
 depends = ["migrate"]
 
+[daemons.mailpit]
+# Dev SMTP server + web UI from the mise-managed `mailpit` binary.
+# $PORT0 = SMTP, $PORT1 = web UI; both bump together when occupied.
+# The proxy routes to the web UI (`proxy_port`), SMTP is reached directly.
+# Pitchfork rewrites the Host header to `localhost:$PORT` and passes the real
+# one via X-Forwarded-Host, so Mailpit's same-origin CORS check fails. Allow
+# every origin (loopback-only listener) with --api-cors '*'.
+run = "exec mailpit --smtp 127.0.0.1:$PORT0 --listen 127.0.0.1:$PORT1 --api-cors '*'"
+port = { expect = [1025, 8025], bump = true }
+proxy_port = 8025
+ready_cmd = "curl -fsS http://127.0.0.1:$PORT1/readyz"
+auto = ["stop"]
+
 [daemons.webapp]
 run = "exec bash scripts/export-git-env.sh vite dev --port=$PORT"
 stop_signal = { signal = "SIGTERM", timeout = "10s" }
-depends = ["postgres", "seed"]
+depends = ["postgres", "seed", "mailpit"]
+env = { SMTP_PORT = "{{ daemons.mailpit.ports[0] }}" }
 auto = ["stop"]
 port = { expect = [5173], bump = true }
 ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/ready", timeout = "5s" }
