@@ -55,6 +55,18 @@ The Authelia instance is pre-configured with one OIDC client:
 Follow [Getting Started](../README.md#getting-started) to start PostgreSQL and the dev server.
 No additional user creation is needed — `pnpm add-user` during setup already links `john.doe@example.com` to the OIDC identity.
 
+With Pitchfork, start this stack before the webapp, then restart the webapp so
+it picks up the `AUTHELIA_*` variables:
+
+```bash
+$ pitchfork start authelia            # instead of `podman compose up -d`
+$ pitchfork start --force webapp      # start, or restart if already running
+$ reload                              # load AUTHELIA_* into the current shell
+```
+
+The webapp daemon picks up `AUTHELIA_*` automatically (pitchfork runs it through
+`mise x`); `reload` is only needed for your current shell.
+
 Then open <http://localhost:5173/login> and click **Sign in with Authelia**.
 
 ## OIDC issuer metadata

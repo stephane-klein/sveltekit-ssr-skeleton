@@ -1,3 +1,6 @@
+[env]
+COMPOSE_PROJECT_NAME = "authelia-test"
+
 [tasks.up]
 run = "podman compose up -d"
 

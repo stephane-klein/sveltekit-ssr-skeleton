@@ -81,6 +81,18 @@ $ pitchfork logs webapp --tail
 
 Open http://localhost:5173 in your browser.
 
+To exercise the OIDC login flow, start the Authelia test stack first, then
+restart the webapp so it picks up the `AUTHELIA_*` variables:
+
+```bash
+$ pitchfork start authelia            # optional OIDC provider (authelia-test-env/)
+$ pitchfork start --force webapp      # start, or restart if already running
+$ reload                              # load AUTHELIA_* into the current shell
+```
+
+The webapp daemon picks up `AUTHELIA_*` automatically (pitchfork runs it through
+`mise x`); `reload` is only needed for your current shell.
+
 Stop everything manually (the PostgreSQL volume is preserved):
 
 ```bash

@@ -35,3 +35,15 @@ port = { expect = [5173], bump = true }
 ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/ready", timeout = "5s" }
 health_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/healthy", interval = "200s", timeout = "5s", retries = 3 }
 retry = 3
+
+[daemons.authelia]
+# Optional OIDC test stack: not a dependency of webapp. Start on demand with
+# `pitchfork start authelia`. Same Compose hack as postgres (see note above).
+dir = "authelia-test-env"
+run = "podman compose up -d && exec sleep infinity"
+ready_port = 9091
+auto = ["stop"]
+
+[daemons.authelia.hooks]
+# Hooks run in the daemon's `dir` (authelia-test-env/), so no `cd` needed.
+on_stop = "mise x -- podman compose down"
