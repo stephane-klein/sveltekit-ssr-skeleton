@@ -72,7 +72,7 @@ $ pnpm install
 
 ### Option A — With Pitchfork
 
-[Pitchfork](https://pitchfork.jdx.dev/) starts the services in order (PostgreSQL + Mailpit, migrations, seed) and only then the dev server, all in the background. Already-running services are left untouched, so the command is safe to rerun.
+[Pitchfork](https://pitchfork.jdx.dev/) starts the services in order (PostgreSQL container + Mailpit daemon, migrations, seed) and only then the dev server, all in the background. Already-running services are left untouched, so the command is safe to rerun.
 
 ```bash
 $ pitchfork start webapp      # postgres + mailpit, migrate, seed, then the dev server
@@ -104,7 +104,8 @@ $ pitchfork stop --local
 If you don't know Pitchfork, or prefer to run each step yourself:
 
 ```bash
-$ mise run up                 # start PostgreSQL and Mailpit containers
+$ mise run up                 # start the PostgreSQL container
+$ mise run mailpit            # start the Mailpit dev SMTP server + web UI (separate terminal)
 $ reload                      # load environment variables
 $ mise run migrate            # run database migrations
 $ mise run seed               # populate with demo data
@@ -135,8 +136,11 @@ $ mise run teardown           # remove containers and volumes (destructive, dele
 
 ### Accessing test emails
 
-Mailpit is available at http://localhost:8025 — it captures all emails sent by
-the application (via SMTP on `localhost:1025`).
+Mailpit captures all emails sent by the application (SMTP on `127.0.0.1:1025`).
+
+- **With Pitchfork** — the `mailpit` daemon is published by the Pitchfork proxy:
+  run `pitchfork proxy status` to get its URL, `https://mailpit.<project>.<proxy-tld>`.
+- **Without Pitchfork** — run `mise run mailpit`, then open http://localhost:8025.
 
 ### Sending a test email
 
@@ -145,7 +149,7 @@ $ mise run send-test-mail
 ```
 
 This sends an email to the address configured in `TEST_EMAIL_TO`
-(`john.doe@example.com` by default). Open http://localhost:8025 to view it.
+(`john.doe@example.com` by default). Open the Mailpit web UI (see above) to view it.
 
 ## Authentication
 
