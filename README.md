@@ -108,10 +108,16 @@ $ mise run up                 # start PostgreSQL and Mailpit containers
 $ reload                      # load environment variables
 $ mise run migrate            # run database migrations
 $ mise run seed               # populate with demo data
+$ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
 $ mise run dev                # start SvelteKit dev server on http://localhost:5173
 ```
 
 Open http://localhost:5173 in your browser.
+
+Default user (see [`./api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json)):
+
+- email: `alice@example.com`
+- password: `password123`
 
 ### Other commands
 
