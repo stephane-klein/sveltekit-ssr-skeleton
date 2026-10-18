@@ -2,7 +2,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { dev } from "$app/environment";
 import { getTextDirection, serverAsyncLocalStorage } from "$lib/paraglide/runtime";
 import { paraglideMiddleware } from "$lib/paraglide/server";
-import { SESSION_COOKIE_NAME, validateApiToken, validateSession } from "$lib/backend/auth.js";
+import { SESSION_COOKIE_NAME, setSessionCookie, validateApiToken, validateSession } from "$lib/backend/auth.js";
 import { sql } from "$lib/backend/pg.js";
 import { logger } from "$lib/backend/logger.js";
 import { renderDuration } from "$lib/backend/metrics.js";
@@ -27,6 +27,10 @@ async function authHandle({ event, resolve }) {
         const session = await validateSession(sessionId);
 
         if (session) {
+            if (session.renewed) {
+                setSessionCookie(event.cookies, session.id);
+            }
+
             const [user] = await sql`SELECT id, email, display_name, locale FROM users WHERE id = ${session.user_id}`;
 
             if (user) {

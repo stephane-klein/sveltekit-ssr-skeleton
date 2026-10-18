@@ -1,5 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { createSession, createMagicLoginToken, SESSION_COOKIE_NAME, verifyPassword } from "$lib/backend/auth.js";
+import { createSession, createMagicLoginToken, setSessionCookie, verifyPassword } from "$lib/backend/auth.js";
 import { isMailAvailable, sendMail } from "$lib/backend/mailer.js";
 import { logger } from "$lib/backend/logger.js";
 import { sql } from "$lib/backend/pg.js";
@@ -70,13 +70,7 @@ export const actions = {
 
         const session = await createSession(user.id);
 
-        cookies.set(SESSION_COOKIE_NAME, session.id, {
-            path: "/",
-            httpOnly: true,
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 30 * 24 * 60 * 60,
-        });
+        setSessionCookie(cookies, session.id);
 
         if (user.locale) {
             cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });

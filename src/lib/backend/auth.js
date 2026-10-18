@@ -5,6 +5,16 @@ import { sql } from "./pg.js";
 export const SESSION_COOKIE_NAME = "session";
 export const SESSION_EXPIRES_IN_MS = 1000 * 60 * 60 * 24 * 30;
 
+export function setSessionCookie(cookies, sessionId) {
+    cookies.set(SESSION_COOKIE_NAME, sessionId, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: SESSION_EXPIRES_IN_MS / 1000,
+    });
+}
+
 export async function hashPassword(password) {
     return await hash(password, {
         memoryCost: 19456,
@@ -61,6 +71,7 @@ export async function validateSession(sessionId) {
         const newExpiresAt = new Date(nowMs + SESSION_EXPIRES_IN_MS);
         await sql`UPDATE sessions SET expires_at = ${newExpiresAt} WHERE id = ${session.id}`;
         session.expiresAt = newExpiresAt;
+        session.renewed = true;
     }
 
     return session;

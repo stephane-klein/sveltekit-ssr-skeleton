@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { createSession, SESSION_COOKIE_NAME } from "$lib/backend/auth.js";
+import { createSession, setSessionCookie } from "$lib/backend/auth.js";
 import { sql } from "$lib/backend/pg.js";
 import { validateAuthorizationCode, getUserInfoEndpoint } from "$lib/backend/oidc.js";
 import { logger } from "$lib/backend/logger.js";
@@ -92,13 +92,7 @@ export async function GET({ url: reqUrl, cookies }) {
 
     const session = await createSession(user.id);
 
-    cookies.set(SESSION_COOKIE_NAME, session.id, {
-        path: "/",
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        maxAge: 30 * 24 * 60 * 60,
-    });
+    setSessionCookie(cookies, session.id);
 
     if (user.locale) {
         cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
