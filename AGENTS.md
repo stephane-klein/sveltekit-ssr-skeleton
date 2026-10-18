@@ -35,6 +35,12 @@ Migrations are managed by [`postgres-shift`](https://github.com/porsager/postgre
 
 The complete schema (consolidated) is written by hand in `sqls/schema.sql`.
 
+When adding stored functions, prefer pure `LANGUAGE sql` over `LANGUAGE plpgsql`
+whenever the body is declarative (a plain sequence of DML/SELECT statements, no
+control flow). Reserve `LANGUAGE plpgsql` for functions that genuinely need
+procedural features: `IF`, loops, `RAISE EXCEPTION`, dynamic SQL (`EXECUTE`), or
+`SELECT ... INTO` variables.
+
 ## Example / Scaffolding Files
 
 The following files are examples meant to be replaced with your actual project code:
