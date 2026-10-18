@@ -242,11 +242,13 @@ rolling expiration (30 days, refreshed when more than 50% elapsed).
 Generate tokens from the web UI at `/my/tokens` or via CLI:
 
 ```bash
-$ pnpm create-api-token --email=user@example.com --name="CI/CD deploy"
+$ pnpm create-api-token --email=user@example.com --name="CI/CD deploy" --expires-in-days=90
 ```
 
-Tokens are SHA-256 hashed before storage — the raw value is shown only once
-at creation.
+Pass `--expires-in-days` (or fill the expiration field in the UI) to make a
+token expire; omit it for a token that never expires. Tokens are SHA-256
+hashed before storage — the raw value is shown only once at creation. Expired
+tokens are rejected during authentication but remain listed and revocable.
 
 ```bash
 $ curl -H "Authorization: Bearer <token>" https://your-app.example.com/api/v1/contacts

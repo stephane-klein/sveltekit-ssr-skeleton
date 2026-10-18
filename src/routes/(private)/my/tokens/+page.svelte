@@ -3,6 +3,16 @@
 
     let { form, data } = $props();
 
+    function isExpired(token) {
+        return token.expires_at && new Date(token.expires_at).getTime() <= Date.now();
+    }
+
+    function errorMessage(key) {
+        if (key === "name_required") return m.my_tokens_name_required();
+        if (key === "expiration_invalid") return m.my_tokens_expiration_error();
+        return key;
+    }
+
     function confirmRevoke(e) {
         if (!confirm(m.my_tokens_revoke_confirm())) {
             e.preventDefault();
@@ -32,8 +42,8 @@
         <p class="text-sm text-green-700 mb-3.5">{m.my_tokens_deleted()}</p>
     {/if}
 
-    {#if form?.error}
-        <p class="text-sm text-red-600 mb-3.5">{form.error}</p>
+    {#if form?.errorKey}
+        <p class="text-sm text-red-600 mb-3.5">{errorMessage(form.errorKey)}</p>
     {/if}
 
     <div class="mb-9">
@@ -57,6 +67,20 @@
                     name="name"
                     placeholder={m.my_tokens_name_placeholder()}
                     required
+                    class="w-full px-2 py-1.5 border border-gray-300 rounded-sm text-sm text-gray-900 bg-white focus:outline-2 focus:outline-blue-600 focus:border-blue-600"
+                />
+            </div>
+            <div class="mb-3">
+                <label
+                    for="expiresInDays"
+                    class="block text-sm font-semibold mb-1">{m.my_tokens_expiration_label()}</label
+                >
+                <input
+                    type="number"
+                    id="expiresInDays"
+                    name="expiresInDays"
+                    min="1"
+                    placeholder={m.my_tokens_expiration_placeholder()}
                     class="w-full px-2 py-1.5 border border-gray-300 rounded-sm text-sm text-gray-900 bg-white focus:outline-2 focus:outline-blue-600 focus:border-blue-600"
                 />
             </div>
@@ -93,6 +117,10 @@
                             >{m.my_tokens_column_last_used()}</th
                         >
                         <th
+                            class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300 pr-2"
+                            >{m.my_tokens_column_expires()}</th
+                        >
+                        <th
                             class="text-right text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300"
                         ></th>
                     </tr>
@@ -100,13 +128,27 @@
                 <tbody>
                     {#each data.tokens as token (token.id)}
                         <tr>
-                            <td class="py-1.5 pr-2 border-b border-gray-200">{token.name}</td>
+                            <td class="py-1.5 pr-2 border-b border-gray-200 {isExpired(token) ? 'text-gray-400' : ''}"
+                                >{token.name}</td
+                            >
                             <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs"
                                 >{new Date(token.created_at).toLocaleDateString()}</td
                             >
                             <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs"
                                 >{token.last_used ? new Date(token.last_used).toLocaleDateString() : "—"}</td
                             >
+                            <td
+                                class="py-1.5 pr-2 border-b border-gray-200 text-xs {isExpired(token)
+                                    ? 'text-red-600 font-semibold'
+                                    : 'text-gray-500'}"
+                            >
+                                {#if token.expires_at}
+                                    {new Date(token.expires_at).toLocaleDateString()}
+                                    {#if isExpired(token)}· {m.my_tokens_expired()}{/if}
+                                {:else}
+                                    {m.my_tokens_never_expires()}
+                                {/if}
+                            </td>
                             <td class="py-1.5 border-b border-gray-200 text-right">
                                 <form
                                     method="POST"
