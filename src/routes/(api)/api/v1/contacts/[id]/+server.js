@@ -1,25 +1,7 @@
 import { json } from "@sveltejs/kit";
 import { sql } from "$lib/backend/pg.js";
-
-function problem(status, detail, instance) {
-    const titles = {
-        400: "Bad Request",
-        401: "Unauthorized",
-        404: "Not Found",
-        422: "Unprocessable Entity",
-    };
-
-    return json(
-        {
-            type: "about:blank",
-            title: titles[status] || "Error",
-            status,
-            detail,
-            instance,
-        },
-        { status },
-    );
-}
+import { problem } from "$lib/server/problem.js";
+import { requireUser } from "$lib/server/require-user.js";
 
 function contactLinks(id) {
     return {
@@ -29,7 +11,8 @@ function contactLinks(id) {
 }
 
 export async function GET(event) {
-    if (!event.locals.user) return problem(401, "Authentication required", event.request.url);
+    const authError = requireUser(event);
+    if (authError) return authError;
 
     const [contact] = await sql`SELECT id, firstname, lastname, created_at FROM contacts WHERE id = ${event.params.id}`;
 
@@ -42,7 +25,8 @@ export async function GET(event) {
 }
 
 export async function PATCH(event) {
-    if (!event.locals.user) return problem(401, "Authentication required", event.request.url);
+    const authError = requireUser(event);
+    if (authError) return authError;
 
     const [existing] = await sql`SELECT id FROM contacts WHERE id = ${event.params.id}`;
 
@@ -73,7 +57,8 @@ export async function PATCH(event) {
 }
 
 export async function DELETE(event) {
-    if (!event.locals.user) return problem(401, "Authentication required", event.request.url);
+    const authError = requireUser(event);
+    if (authError) return authError;
 
     const [existing] = await sql`SELECT id FROM contacts WHERE id = ${event.params.id}`;
 

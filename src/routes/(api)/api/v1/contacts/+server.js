@@ -1,21 +1,11 @@
 import { json } from "@sveltejs/kit";
 import { sql } from "$lib/backend/pg.js";
-
-function problem(status, detail, instance) {
-    return json(
-        {
-            type: "about:blank",
-            title: [400, "Bad Request", 401, "Unauthorized", 404, "Not Found"][[400, 401, 404].indexOf(status) * 2 + 1],
-            status,
-            detail,
-            instance,
-        },
-        { status },
-    );
-}
+import { problem } from "$lib/server/problem.js";
+import { requireUser } from "$lib/server/require-user.js";
 
 export async function GET(event) {
-    if (!event.locals.user) return problem(401, "Authentication required", "/api/v1/contacts");
+    const authError = requireUser(event);
+    if (authError) return authError;
 
     const contacts = await sql`SELECT id, firstname, lastname, created_at FROM contacts ORDER BY id`;
 
@@ -28,7 +18,8 @@ export async function GET(event) {
 }
 
 export async function POST(event) {
-    if (!event.locals.user) return problem(401, "Authentication required", "/api/v1/contacts");
+    const authError = requireUser(event);
+    if (authError) return authError;
 
     const body = await event.request.json();
     const firstname = body?.firstname;

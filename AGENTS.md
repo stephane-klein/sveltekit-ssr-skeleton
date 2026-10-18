@@ -51,6 +51,22 @@ These files are marked with comments (`-- Example`) at the top. Replace or remov
 
 This project uses **SvelteKit 2** with `@sveltejs/adapter-node` for SSR.
 
+### Standalone endpoints and authentication
+
+Endpoints under `(api)/` — and any other `+server.js` route outside the
+`(private)` group — are **not** covered by the `(private)/+layout.server.js`
+guard. Every handler that requires an authenticated user must call
+`requireUser(event)` from `$lib/server/require-user.js` before doing any work:
+
+```js
+const authError = requireUser(event);
+if (authError) return authError;
+```
+
+`requireUser` returns either a `401` `application/problem+json` response (built
+by `$lib/server/problem.js`) or `null`. Do not hand-roll the `event.locals.user`
+check inline.
+
 ### Container build (multi-stage)
 
 The `Containerfile` uses a two-stage build:
@@ -83,8 +99,7 @@ only make sense within the module's domain, use `as` at the import site to make
 the domain explicit:
 
 ```js
-import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics }
-  from "$lib/server/pg-metrics.js";
+import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
 ```
 
 ### To avoid
