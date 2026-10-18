@@ -52,7 +52,7 @@
   "reset_password_back_signin": "Retour à la connexion",
   "reset_password_homepage": "Accueil",
   "magic_sent_title": "Vérifiez vos e-mails",
-  "magic_sent_desc": "Nous avons envoyé un lien magique à {email}.",
+  "magic_sent_desc": "Si un compte existe pour {email}, nous avons envoyé un lien magique.",
   "magic_sent_hint": "Cliquez sur le lien dans l'e-mail pour vous connecter. Il expire dans 15 minutes.",
   "magic_sent_different_email": "Utiliser un autre e-mail",
   "magic_sent_go_home": "Aller à l'accueil",

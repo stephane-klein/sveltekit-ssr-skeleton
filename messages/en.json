@@ -52,7 +52,7 @@
   "reset_password_back_signin": "Back to sign in",
   "reset_password_homepage": "Homepage",
   "magic_sent_title": "Check your email",
-  "magic_sent_desc": "We sent a magic link to {email}.",
+  "magic_sent_desc": "If an account exists for {email}, we sent a magic link.",
   "magic_sent_hint": "Click the link in the email to sign in. It expires in 15 minutes.",
   "magic_sent_different_email": "Try a different email",
   "magic_sent_go_home": "Go to homepage",

@@ -159,7 +159,7 @@ export async function usePasswordResetToken(tokenId, userId, newPasswordHash) {
 }
 
 export async function createMagicLoginToken(email) {
-    const [user] = await sql`SELECT id FROM users WHERE email = ${email}`;
+    const [user] = await sql`SELECT id FROM users WHERE email = ${email} AND is_active = TRUE`;
     if (!user) return null;
 
     const raw = nanoid(48);

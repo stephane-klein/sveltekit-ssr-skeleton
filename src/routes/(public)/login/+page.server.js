@@ -9,6 +9,12 @@ import { clearLoginAttempts, isLoginThrottled, registerLoginAttempt } from "$lib
 
 const THROTTLE_MESSAGE = "Too many sign-in attempts. Please try again later.";
 
+// Pre-computed argon2id hash of a random throwaway password. Used to equalize
+// the sign-in response time for unknown or deactivated accounts, so an attacker
+// cannot tell them apart from a wrong-password attempt via timing.
+const DUMMY_PASSWORD_HASH =
+    "$argon2id$v=19$m=19456,t=2,p=1$sENEdrILccNy8aqBBjVPJw$kS58d2BzFhnRKMWzNCOEYGNWgHzj5eiUU6glyw58hdg";
+
 export function load() {
     return {
         autheliaEnabled: isAutheliaConfigured,
@@ -34,19 +40,30 @@ export const actions = {
         const [user] =
             await sql`SELECT id, email, display_name, password_hash, locale, is_active FROM users WHERE email = ${email}`;
 
+        // A single generic message for every failure path so attackers cannot
+        // enumerate valid accounts by distinguishing the responses.
+        const GENERIC_ERROR = "Invalid email or password or account deactivated.";
+
         if (!user || !user.password_hash) {
-            return fail(400, { error: "Invalid email or password." });
+            // Equalize response time: run a real argon2 verification against a
+            // dummy hash so unknown accounts are indistinguishable from a
+            // wrong-password attempt on an existing account.
+            await verifyPassword(DUMMY_PASSWORD_HASH, password);
+            await registerLoginAttempt({ ip, email, action: "password", success: false });
+            return fail(400, { error: GENERIC_ERROR });
         }
 
         if (!user.is_active) {
-            return fail(400, { error: "This account is deactivated." });
+            await verifyPassword(DUMMY_PASSWORD_HASH, password);
+            await registerLoginAttempt({ ip, email, action: "password", success: false });
+            return fail(400, { error: GENERIC_ERROR });
         }
 
         const valid = await verifyPassword(user.password_hash, password);
 
         if (!valid) {
             await registerLoginAttempt({ ip, email, action: "password", success: false });
-            return fail(400, { error: "Invalid email or password." });
+            return fail(400, { error: GENERIC_ERROR });
         }
 
         await clearLoginAttempts({ ip, email });
@@ -102,12 +119,22 @@ export const actions = {
                 link: magicLink,
                 locale: userLocale?.locale || "en",
             });
-            await sendMail({ to: email, subject, text });
-            logger.info({ email }, "Magic login email sent");
-            await registerLoginAttempt({ ip, email, action: "magic_link", success: true });
+
+            // Send the email in the background so existing and unknown accounts
+            // get the same response time, and never surface SMTP failures.
+            void (async () => {
+                try {
+                    await sendMail({ to: email, subject, text });
+                    logger.info({ email }, "Magic login email sent");
+                    await registerLoginAttempt({ ip, email, action: "magic_link", success: true });
+                } catch (err) {
+                    logger.error({ err, email }, "Failed to send magic login email");
+                    await registerLoginAttempt({ ip, email, action: "magic_link", success: false });
+                }
+            })();
         } catch (err) {
-            logger.error({ err, email }, "Failed to send magic login email");
-            return fail(500, { magicLinkError: "Failed to send the email. Please try again later." });
+            logger.error({ err, email }, "Failed to prepare magic login email");
+            await registerLoginAttempt({ ip, email, action: "magic_link", success: false });
         }
 
         throw redirect(302, "/magic-link/sent?email=" + encodeURIComponent(email));
