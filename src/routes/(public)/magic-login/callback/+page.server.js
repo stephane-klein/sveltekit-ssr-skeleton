@@ -15,6 +15,12 @@ export async function load({ url, cookies }) {
         return { invalid: true };
     }
 
+    const [user] = await sql`SELECT is_active, locale FROM users WHERE id = ${result.userId}`;
+
+    if (!user?.is_active) {
+        return { invalid: true };
+    }
+
     const session = await createSession(result.userId);
 
     cookies.set(SESSION_COOKIE_NAME, session.id, {
@@ -25,9 +31,7 @@ export async function load({ url, cookies }) {
         maxAge: 30 * 24 * 60 * 60,
     });
 
-    const [user] = await sql`SELECT locale FROM users WHERE id = ${result.userId}`;
-
-    if (user?.locale) {
+    if (user.locale) {
         cookies.set("locale", user.locale, { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false });
     }
 

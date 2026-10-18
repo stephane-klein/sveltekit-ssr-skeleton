@@ -36,13 +36,23 @@ export async function createSession(userId, expiresInMs = SESSION_EXPIRES_IN_MS)
 }
 
 export async function validateSession(sessionId) {
-    const [session] = await sql`SELECT id, user_id, expires_at FROM sessions WHERE id = ${sessionId}`;
+    const [session] = await sql`
+        SELECT s.id, s.user_id, s.expires_at, u.is_active
+        FROM sessions s
+        INNER JOIN users u ON u.id = s.user_id
+        WHERE s.id = ${sessionId}
+    `;
 
     if (!session) return null;
 
     const nowMs = now().getTime();
 
     if (nowMs >= session.expires_at.getTime()) {
+        await sql`DELETE FROM sessions WHERE id = ${session.id}`;
+        return null;
+    }
+
+    if (!session.is_active) {
         await sql`DELETE FROM sessions WHERE id = ${session.id}`;
         return null;
     }
@@ -85,9 +95,15 @@ export async function createApiToken(userId, name) {
 export async function validateApiToken(raw) {
     const tokenHash = await hashToken(raw);
 
-    const [token] = await sql`SELECT id, user_id, name FROM api_tokens WHERE token_hash = ${tokenHash}`;
+    const [token] = await sql`
+        SELECT t.id, t.user_id, u.is_active
+        FROM api_tokens t
+        INNER JOIN users u ON u.id = t.user_id
+        WHERE t.token_hash = ${tokenHash}
+    `;
 
     if (!token) return null;
+    if (!token.is_active) return null;
 
     await sql`UPDATE api_tokens SET last_used = ${now()} WHERE id = ${token.id}`;
 

@@ -23,10 +23,14 @@ export const actions = {
         }
 
         const [user] =
-            await sql`SELECT id, email, display_name, password_hash, locale FROM users WHERE email = ${email}`;
+            await sql`SELECT id, email, display_name, password_hash, locale, is_active FROM users WHERE email = ${email}`;
 
         if (!user || !user.password_hash) {
             return fail(400, { error: "Invalid email or password." });
+        }
+
+        if (!user.is_active) {
+            return fail(400, { error: "This account is deactivated." });
         }
 
         const valid = await verifyPassword(user.password_hash, password);

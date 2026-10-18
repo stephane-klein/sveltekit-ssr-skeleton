@@ -74,13 +74,18 @@ export async function GET({ url: reqUrl, cookies }) {
     logger.info({ email: userinfo.email }, "Userinfo fetched");
 
     const [user] = await sql`
-        SELECT id, email, display_name, locale FROM users
+        SELECT id, email, display_name, locale, is_active FROM users
         WHERE email = ${userinfo.email} AND oidc_issuer = ${issuer}
     `;
 
     if (!user) {
         logger.warn({ email: userinfo.email, issuer }, "No local account found for OIDC user");
         throw redirect(302, "/login?error=no_account");
+    }
+
+    if (!user.is_active) {
+        logger.warn({ email: userinfo.email, issuer }, "Local account is deactivated");
+        throw redirect(302, "/login?error=account_inactive");
     }
 
     logger.info({ userId: user.id }, "OIDC user matched to local account, creating session");
