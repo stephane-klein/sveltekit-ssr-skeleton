@@ -9,10 +9,12 @@ import { renderDuration } from "$lib/backend/metrics.js";
 import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
 import { installShutdown } from "$lib/server/lifecycle.js";
 import { logAutheliaConfig } from "$lib/backend/oidc.js";
+import { verifySmtpConnection } from "$lib/backend/mailer.js";
 
 export const init = () => {
     installShutdown({ dev });
     logAutheliaConfig();
+    verifySmtpConnection();
 };
 
 const LOCALE_COOKIE = "locale";

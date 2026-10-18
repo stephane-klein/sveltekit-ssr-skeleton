@@ -21,22 +21,35 @@ const transporter = SMTP_HOST
     : null;
 
 if (transporter) {
-    logger.info({ smtpHost: SMTP_HOST, smtpPort: SMTP_PORT, emailFrom: EMAIL_FROM }, "SMTP configured");
-
-    transporter.verify().then(
-        () => logger.info("SMTP connection verified"),
-        (err) => logger.warn({ err }, "SMTP connection failed"),
-    );
-
     onShutdown(() => transporter.close());
-} else {
-    logger.warn(
-        "SMTP is not configured — set SMTP_HOST environment variable (e.g. SMTP_HOST=localhost with SMTP_PORT=1025 for Mailpit)",
-    );
 }
 
 export function isMailAvailable() {
     return transporter !== null;
+}
+
+export async function verifySmtpConnection() {
+    if (!transporter) {
+        logger.warn(
+            "SMTP is not configured — set SMTP_HOST environment variable (e.g. SMTP_HOST=localhost with SMTP_PORT=1025 for Mailpit)",
+        );
+        return false;
+    }
+
+    try {
+        await transporter.verify();
+        logger.info(
+            { smtpHost: SMTP_HOST, smtpPort: SMTP_PORT, emailFrom: EMAIL_FROM },
+            "SMTP connection verified at startup",
+        );
+        return true;
+    } catch (err) {
+        logger.error(
+            { err, smtpHost: SMTP_HOST, smtpPort: SMTP_PORT },
+            "SMTP connection failed at startup — email features (send-test-mail) will fail",
+        );
+        return false;
+    }
 }
 
 export async function sendMail({ to, subject, text, html }) {
