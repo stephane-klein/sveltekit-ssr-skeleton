@@ -35,6 +35,11 @@ Migrations are managed by [`postgres-shift`](https://github.com/porsager/postgre
 
 The complete schema (consolidated) is written by hand in `sqls/schema.sql`.
 
+Stored functions live in `sqls/functions.sql`, which is **reloaded in full on every
+`pnpm migrate`** (outside the versioned migration history). Keep it idempotent
+(`DROP FUNCTION IF EXISTS` before each `CREATE FUNCTION`). See
+[`docs/agents/sql-functions.md`](docs/agents/sql-functions.md).
+
 When adding stored functions, prefer pure `LANGUAGE sql` over `LANGUAGE plpgsql`
 whenever the body is declarative (a plain sequence of DML/SELECT statements, no
 control flow). Reserve `LANGUAGE plpgsql` for functions that genuinely need
