@@ -24,7 +24,10 @@
             <p class="text-sm text-green-700 mb-3.5">{m.my_password_updated()}</p>
         {/if}
 
-        <form method="POST">
+        <form
+            method="POST"
+            action="?/changePassword"
+        >
             {#if data.hasPassword}
                 <div class="mb-3.5">
                     <label
@@ -39,6 +42,25 @@
                         required
                         class="w-full max-w-sm px-2 py-1.5 border border-gray-300 rounded-sm text-sm text-gray-900 bg-white focus:outline-2 focus:outline-blue-600 focus:border-blue-600"
                     />
+                    <p class="text-xs text-gray-500 mt-1.5">{m.my_password_forgot_hint()}</p>
+                    {#if form?.resetSent}
+                        <span class="text-xs text-green-600 block mt-1">
+                            {m.my_password_reset_sent({ email: data.email })}
+                        </span>
+                    {:else if form?.resetError}
+                        <span class="text-xs text-red-600 block mt-1">{form.resetError}</span>
+                    {:else if form?.mail_unavailable}
+                        <span class="text-xs text-red-600 block mt-1">{m.my_password_reset_mail_unavailable()}</span>
+                    {:else}
+                        <button
+                            type="submit"
+                            formaction="?/sendResetLink"
+                            formnovalidate
+                            class="text-xs text-blue-600 underline cursor-pointer mt-1"
+                        >
+                            {m.my_password_send_reset_link({ email: data.email })}
+                        </button>
+                    {/if}
                 </div>
             {:else}
                 <p class="text-sm text-gray-700 bg-gray-100 border border-gray-300 rounded-sm px-3 py-2 mb-3.5">
