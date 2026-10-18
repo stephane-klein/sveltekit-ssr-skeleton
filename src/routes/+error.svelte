@@ -1,6 +1,5 @@
 <script>
     import { m } from "$lib/paraglide/messages";
-    // eslint-disable-next-line no-unused-vars — used via $page auto-subscription in template
     import { page } from "$app/stores";
 </script>
 

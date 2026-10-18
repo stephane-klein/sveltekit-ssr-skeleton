@@ -41,7 +41,11 @@
         if (!nav) return;
         const networkMs = nav.responseEnd - nav.requestStart;
         const ssr = fromServerTiming(nav, networkMs, "ssr");
-        if (ssr) pageMetrics.set({ ssr: { ...ssr, transferSize: nav.transferSize, decodedBodySize: nav.decodedBodySize }, csr: null });
+        if (ssr)
+            pageMetrics.set({
+                ssr: { ...ssr, transferSize: nav.transferSize, decodedBodySize: nav.decodedBodySize },
+                csr: null,
+            });
     }
 
     function initCsrObserver() {
@@ -51,7 +55,11 @@
                 const r = entry;
                 const networkMs = r.responseEnd - r.requestStart;
                 const csr = fromServerTiming(r, networkMs, "csr");
-                if (csr) pageMetrics.update((m) => ({ ...m, csr: { ...csr, transferSize: r.transferSize, decodedBodySize: r.decodedBodySize } }));
+                if (csr)
+                    pageMetrics.update((m) => ({
+                        ...m,
+                        csr: { ...csr, transferSize: r.transferSize, decodedBodySize: r.decodedBodySize },
+                    }));
             }
         });
         obs.observe({ entryTypes: ["resource"] });
@@ -99,7 +107,9 @@
         const clientRenderMs = performance.now() - navStart;
         await tick();
         await new Promise((r) => setTimeout(r, 0));
-        pageMetrics.update((m) => (m.csr ? { ...m, csr: { ...m.csr, clientRenderMs, totalMs: m.csr.totalMs + clientRenderMs } } : m));
+        pageMetrics.update((m) =>
+            m.csr ? { ...m, csr: { ...m.csr, clientRenderMs, totalMs: m.csr.totalMs + clientRenderMs } } : m,
+        );
     });
 </script>
 
@@ -109,7 +119,10 @@
 >
 
 {#if open}
-    <div class="popup" bind:this={popupEl}>
+    <div
+        class="popup"
+        bind:this={popupEl}
+    >
         <button
             class="close"
             onclick={() => (open = false)}>&#x2715;</button
@@ -117,7 +130,13 @@
 
         <div class="version">
             <div>Built at <span class="val">{env.PUBLIC_BUILD_STAMP ?? "—"}</span></div>
-            <div>GitHub SHA1 version : <a href="{env.PUBLIC_REPO_URL}/commit/{env.PUBLIC_GIT_HASH}" target="_blank" rel="external"><span class="val">{env.PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a></div>
+            <div>
+                GitHub SHA1 version : <a
+                    href="{env.PUBLIC_REPO_URL}/commit/{env.PUBLIC_GIT_HASH}"
+                    target="_blank"
+                    rel="external"><span class="val">{env.PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a
+                >
+            </div>
         </div>
 
         {#if $pageMetrics.ssr}
@@ -154,7 +173,12 @@
             </div>
             <div class="row client-startup">
                 client startup: <span class="val">{ms($pageMetrics.ssr.clientStartupMs)}ms</span>
-                (page already visible, <a href="https://svelte.dev/docs/kit/glossary#Hydration" target="_blank" rel="external">hydration</a> + resource loading)
+                (page already visible,
+                <a
+                    href="https://svelte.dev/docs/kit/glossary#Hydration"
+                    target="_blank"
+                    rel="external">hydration</a
+                > + resource loading)
             </div>
         {:else}
             <div class="section">
@@ -196,9 +220,7 @@
                     / <span class="val">{formatSize($pageMetrics.csr.decodedBodySize)}</span> decoded
                 </div>
                 <div class="row child-last">
-                    client rendering: <span class="val"
-                        >{ms($pageMetrics.csr.clientRenderMs)}ms</span
-                    >
+                    client rendering: <span class="val">{ms($pageMetrics.csr.clientRenderMs)}ms</span>
                 </div>
             </div>
         {:else}
