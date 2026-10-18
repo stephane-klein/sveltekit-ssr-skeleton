@@ -127,7 +127,18 @@ async function metricsHandle({ event, resolve }) {
     });
 }
 
-export const handle = sequence(metricsHandle, authHandle, paraglideHandle);
+/** @type {import('@sveltejs/kit').Handle} */
+async function requestHandler({ event, resolve }) {
+    const response = await resolve(event);
+
+    // Prevent the one-time magic-login token (carried in the callback URL) from
+    // leaking to third-party sites via the Referer header of subsequent requests.
+    response.headers.set("Referrer-Policy", "no-referrer");
+
+    return response;
+}
+
+export const handle = sequence(requestHandler, metricsHandle, authHandle, paraglideHandle);
 
 export function handleError({ error, event, status }) {
     if (!dev && status && status < 500) {
