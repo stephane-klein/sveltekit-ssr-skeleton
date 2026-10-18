@@ -59,6 +59,13 @@ smtp:
 # Explicitly set this value to override.
 origin: ""
 
+# Header used by adapter-node to resolve the real client IP (SvelteKit
+# getClientAddress()). Required behind a reverse proxy so login rate limiting
+# keys on the client IP instead of the proxy IP.
+# Defaults to "x-forwarded-for" when ingress is enabled. Set explicitly to
+# override, or to "" when the app is exposed without a proxy.
+addressHeader: ""
+
 # Admin API token — Bearer authentication for /api/v1/admin/* endpoints.
 # Must be at least 32 characters long.
 # Only used when secrets.existingSecret is NOT set; otherwise the

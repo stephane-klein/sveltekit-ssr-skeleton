@@ -26,7 +26,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 
 ## Included Features
 
-- **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations)
+- **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations), with login rate limiting to slow down brute-force attacks
 - **OIDC** — external provider authentication (authorization code flow with PKCE)
 - **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
@@ -236,6 +236,26 @@ $ curl -s -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
 
 Users authenticate via the web UI at `/login`. Sessions are stored in PostgreSQL with
 rolling expiration (30 days, refreshed when more than 50% elapsed).
+
+### Login rate limiting
+
+Sign-in attempts (password and magic link) are recorded in the `login_attempts` table.
+Repeated failures are throttled per client IP and per email: once the threshold is
+reached within a sliding window, further attempts on the `/login` page are rejected
+with a `429` until the window slides. A successful password sign-in clears the recorded
+attempts for that IP and email.
+
+Two environment variables tune the behavior:
+
+- `LOGIN_MAX_ATTEMPTS` — failed attempts allowed before throttling (default `5`)
+- `LOGIN_WINDOW_MS` — sliding window in milliseconds (default `900000`, i.e. 15 minutes)
+
+When the application runs behind a reverse proxy (Caddy, an ingress, …), adapter-node
+must be told which header carries the real client IP, otherwise every request appears
+to come from the proxy and a single IP throttle would lock out all users. Set
+`ADDRESS_HEADER=x-forwarded-for` (the proxy must append `X-Forwarded-For`; Caddy and
+common ingresses do this by default). This is already configured in
+`deployment-playground/compose.yml` and the Helm chart.
 
 ### API tokens
 

@@ -5,6 +5,9 @@ import { logger } from "$lib/backend/logger.js";
 import { sql } from "$lib/backend/pg.js";
 import { renderEmail } from "$lib/backend/email/index.js";
 import { isAutheliaConfigured } from "$lib/backend/oidc.js";
+import { clearLoginAttempts, isLoginThrottled, registerLoginAttempt } from "$lib/backend/rate-limit.js";
+
+const THROTTLE_MESSAGE = "Too many sign-in attempts. Please try again later.";
 
 export function load() {
     return {
@@ -13,13 +16,19 @@ export function load() {
 }
 
 export const actions = {
-    signIn: async ({ request, cookies }) => {
+    signIn: async ({ request, cookies, getClientAddress }) => {
         const data = await request.formData();
         const email = data.get("email");
         const password = data.get("password");
 
         if (!email || !password) {
             return fail(400, { error: "Email and password are required." });
+        }
+
+        const ip = getClientAddress();
+
+        if (await isLoginThrottled({ ip, email, action: "password" })) {
+            return fail(429, { error: THROTTLE_MESSAGE });
         }
 
         const [user] =
@@ -36,8 +45,11 @@ export const actions = {
         const valid = await verifyPassword(user.password_hash, password);
 
         if (!valid) {
+            await registerLoginAttempt({ ip, email, action: "password", success: false });
             return fail(400, { error: "Invalid email or password." });
         }
+
+        await clearLoginAttempts({ ip, email });
 
         const session = await createSession(user.id);
 
@@ -56,12 +68,18 @@ export const actions = {
         throw redirect(302, "/dashboard");
     },
 
-    magicLink: async ({ request }) => {
+    magicLink: async ({ request, getClientAddress }) => {
         const data = await request.formData();
         const email = data.get("email");
 
         if (!email) {
             return fail(400, { magicLinkError: "Email is required." });
+        }
+
+        const ip = getClientAddress();
+
+        if (await isLoginThrottled({ ip, email, action: "magic_link" })) {
+            return fail(429, { magicLinkError: THROTTLE_MESSAGE });
         }
 
         if (!isMailAvailable()) {
@@ -71,6 +89,7 @@ export const actions = {
         const raw = await createMagicLoginToken(email);
 
         if (!raw) {
+            await registerLoginAttempt({ ip, email, action: "magic_link", success: false });
             throw redirect(302, "/magic-link/sent?email=" + encodeURIComponent(email));
         }
 
@@ -85,6 +104,7 @@ export const actions = {
             });
             await sendMail({ to: email, subject, text });
             logger.info({ email }, "Magic login email sent");
+            await registerLoginAttempt({ ip, email, action: "magic_link", success: true });
         } catch (err) {
             logger.error({ err, email }, "Failed to send magic login email");
             return fail(500, { magicLinkError: "Failed to send the email. Please try again later." });

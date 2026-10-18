@@ -78,9 +78,17 @@ spec:
                 {{- $origin = printf "https://%s" .Values.ingress.host }}
               {{- end }}
             {{- end }}
+            {{- $addressHeader := .Values.addressHeader }}
+            {{- if and (not $addressHeader) .Values.ingress.enabled }}
+              {{- $addressHeader = "x-forwarded-for" }}
+            {{- end }}
             {{- if $origin }}
             - name: ORIGIN
               value: {{ $origin }}
+            {{- end }}
+            {{- if $addressHeader }}
+            - name: ADDRESS_HEADER
+              value: {{ $addressHeader }}
             {{- end }}
             {{- if .Values.oidc.enabled }}
             - name: AUTHELIA_ISSUER
