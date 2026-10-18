@@ -1,9 +1,9 @@
 import { fail } from "@sveltejs/kit";
-import { createPasswordResetToken } from "$lib/backend/auth.js";
-import { isMailAvailable, sendMail } from "$lib/backend/mailer.js";
-import { logger } from "$lib/backend/logger.js";
-import { sql } from "$lib/backend/pg.js";
-import { renderEmail } from "$lib/backend/email/index.js";
+import { createPasswordResetToken } from "$lib/server/auth.js";
+import { isMailAvailable, sendMail } from "$lib/server/mailer.js";
+import { logger } from "$lib/server/logger.js";
+import { sql } from "$lib/server/pg.js";
+import { renderEmail } from "$lib/server/email/index.js";
 
 export const actions = {
     default: async ({ request }) => {

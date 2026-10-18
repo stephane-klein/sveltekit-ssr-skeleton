@@ -1,11 +1,11 @@
 import { fail, redirect } from "@sveltejs/kit";
-import { createSession, createMagicLoginToken, setSessionCookie, verifyPassword } from "$lib/backend/auth.js";
-import { isMailAvailable, sendMail } from "$lib/backend/mailer.js";
-import { logger } from "$lib/backend/logger.js";
-import { sql } from "$lib/backend/pg.js";
-import { renderEmail } from "$lib/backend/email/index.js";
-import { isAutheliaConfigured } from "$lib/backend/oidc.js";
-import { clearLoginAttempts, isLoginThrottled, registerLoginAttempt } from "$lib/backend/rate-limit.js";
+import { createSession, createMagicLoginToken, setSessionCookie, verifyPassword } from "$lib/server/auth.js";
+import { isMailAvailable, sendMail } from "$lib/server/mailer.js";
+import { logger } from "$lib/server/logger.js";
+import { sql } from "$lib/server/pg.js";
+import { renderEmail } from "$lib/server/email/index.js";
+import { isAutheliaConfigured } from "$lib/server/oidc.js";
+import { clearLoginAttempts, isLoginThrottled, registerLoginAttempt } from "$lib/server/rate-limit.js";
 
 const THROTTLE_MESSAGE = "Too many sign-in attempts. Please try again later.";
 

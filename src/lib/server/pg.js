@@ -2,8 +2,8 @@ import postgres from "postgres";
 
 import { logger } from "./logger.js";
 import { sqlDuration } from "./metrics.js";
-import { getMetrics } from "../server/pg-metrics.js";
-import { onShutdown } from "../server/lifecycle.js";
+import { getMetrics } from "./pg-metrics.js";
+import { onShutdown } from "./lifecycle.js";
 
 const POSTGRES_URL = process.env.MY_APP_POSTGRES_URL;
 export const POSTGRES_SCHEMA = process.env.MY_APP_POSTGRES_SCHEMA || "public";

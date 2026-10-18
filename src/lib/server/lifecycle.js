@@ -1,6 +1,6 @@
 // Graceful shutdown registry: runs teardown callbacks registered via onShutdown() on process exit.
 // State is kept under a process-global key on globalThis (survives HMR); dev owns SIGINT/SIGTERM, prod listens to sveltekit:shutdown.
-import { logger } from "../backend/logger.js";
+import { logger } from "./logger.js";
 
 const TEARDOWN_TIMEOUT_MS = 5000;
 

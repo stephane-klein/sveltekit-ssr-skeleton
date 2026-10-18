@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { invalidateSession, SESSION_COOKIE_NAME } from "$lib/backend/auth.js";
+import { invalidateSession, SESSION_COOKIE_NAME } from "$lib/server/auth.js";
 
 export function load({ cookies }) {
     const sessionId = cookies.get(SESSION_COOKIE_NAME);

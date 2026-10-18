@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
-import { createAuthorizationURL } from "$lib/backend/oidc.js";
-import { logger } from "$lib/backend/logger.js";
+import { createAuthorizationURL } from "$lib/server/oidc.js";
+import { logger } from "$lib/server/logger.js";
 
 export async function GET({ cookies }) {
     let result;

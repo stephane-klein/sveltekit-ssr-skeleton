@@ -3,8 +3,8 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { logger } from "./lib/backend/logger.js";
-import { POSTGRES_SCHEMA, sql, waitForDb } from "./lib/backend/pg.js";
+import { logger } from "./lib/server/logger.js";
+import { POSTGRES_SCHEMA, sql, waitForDb } from "./lib/server/pg.js";
 
 await waitForDb();
 

@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
-import { hashPassword, generateId } from "./lib/backend/auth.js";
-import { logger } from "./lib/backend/logger.js";
-import { sql, waitForDb } from "./lib/backend/pg.js";
+import { hashPassword, generateId } from "./lib/server/auth.js";
+import { logger } from "./lib/server/logger.js";
+import { sql, waitForDb } from "./lib/server/pg.js";
 
 const argv = yargs(hideBin(process.argv))
     .option("email", {

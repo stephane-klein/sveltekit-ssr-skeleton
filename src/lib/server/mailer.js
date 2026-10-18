@@ -1,6 +1,6 @@
 import nodemailer from "nodemailer";
 import { logger } from "./logger.js";
-import { onShutdown } from "../server/lifecycle.js";
+import { onShutdown } from "./lifecycle.js";
 
 const {
     SMTP_HOST = "",

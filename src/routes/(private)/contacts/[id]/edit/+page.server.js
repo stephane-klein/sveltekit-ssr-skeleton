@@ -1,5 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { sql } from "$lib/backend/pg.js";
+import { sql } from "$lib/server/pg.js";
 
 export async function load(event) {
     const id = event.params.id;

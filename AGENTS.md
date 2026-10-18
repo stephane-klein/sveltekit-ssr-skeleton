@@ -67,6 +67,30 @@ if (authError) return authError;
 by `$lib/server/problem.js`) or `null`. Do not hand-roll the `event.locals.user`
 check inline.
 
+### Library code layout
+
+Library code is split by where it is allowed to run:
+
+- `src/lib/server/` — **server-only** code (DB access via `postgres`, auth,
+  mailer, `node:` APIs, `process.env`, secrets, ...), imported via
+  `$lib/server/...`. SvelteKit enforces this at build time: its
+  `vite-plugin-sveltekit-guard` throws
+  `Cannot import $lib/server/... into code that runs in the browser` if a client
+  entrypoint (a Svelte component, a universal `load`, a client/universal hook)
+  imports one. This is a security guarantee — never place server-only code
+  anywhere else.
+- `src/lib/shared/` — **pure / isomorphic** modules (no Node, DB, or environment
+  access) needed from BOTH the server and client Svelte components, imported via
+  `$lib/shared/...`. If a module has to be importable by a client component, it
+  must be pure (no `node:` imports, no DB, no `process.env`) and belong here.
+- `src/lib/client/` — **client-only** Svelte components, imported via
+  `$lib/client/...`.
+
+`src/lib/backend/` is **forbidden**: it no longer exists, never create it and
+never import from it. When adding a new module, decide its home up front:
+server-only → `src/lib/server/`, isomorphic/pure → `src/lib/shared/`,
+client-only component → `src/lib/client/`.
+
 ### Container build (multi-stage)
 
 The `Containerfile` uses a two-stage build:

@@ -1,6 +1,6 @@
 import { json } from "@sveltejs/kit";
-import { sql } from "$lib/backend/pg.js";
-import { isMailAvailable } from "$lib/backend/mailer.js";
+import { sql } from "$lib/server/pg.js";
+import { isMailAvailable } from "$lib/server/mailer.js";
 
 export async function GET() {
     try {

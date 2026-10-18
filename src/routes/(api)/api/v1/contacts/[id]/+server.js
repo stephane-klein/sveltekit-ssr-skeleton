@@ -1,5 +1,5 @@
 import { json } from "@sveltejs/kit";
-import { sql } from "$lib/backend/pg.js";
+import { sql } from "$lib/server/pg.js";
 import { problem } from "$lib/server/problem.js";
 import { requireUser } from "$lib/server/require-user.js";
 

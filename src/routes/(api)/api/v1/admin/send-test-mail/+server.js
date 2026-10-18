@@ -1,8 +1,8 @@
 import { json } from "@sveltejs/kit";
 import { email, pipe, safeParse, string } from "valibot";
 import { problem } from "$lib/server/problem.js";
-import { sendMail } from "$lib/backend/mailer.js";
-import { logger } from "$lib/backend/logger.js";
+import { sendMail } from "$lib/server/mailer.js";
+import { logger } from "$lib/server/logger.js";
 import { requireAdminToken } from "../_helpers.js";
 
 const TEST_EMAIL_TO = process.env.TEST_EMAIL_TO;
