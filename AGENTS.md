@@ -51,8 +51,8 @@ procedural features: `IF`, loops, `RAISE EXCEPTION`, dynamic SQL (`EXECUTE`), or
 The following files are examples meant to be replaced with your actual project code:
 
 - `sqls/migrations/00001_initial/` — example migration (creates a sample `contacts` table)
-- `sqls/fixtures/00001_contacts.sql` — example fixture data
-- `sqls/fixtures/00002_users.sql` — demo account (`alice@example.com` / `password123`)
+- `sqls/seeds/00001_contacts.sql` — example seed data
+- `sqls/seeds/00002_users.sql` — demo account (`alice@example.com` / `password123`)
 - `sqls/schema.sql` — example consolidated schema
 
 These files are marked with comments (`-- Example`) at the top. Replace or remove them as needed.

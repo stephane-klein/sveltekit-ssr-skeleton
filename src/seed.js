@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Utility script — loads and executes all SQL fixture files from sqls/fixtures/
+// Utility script — loads and executes all SQL seed files from sqls/seeds/
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -11,9 +11,9 @@ await waitForDb();
 logger.info({ schema: POSTGRES_SCHEMA }, "Using PostgreSQL schema");
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const fixturesDir = join(__dirname, "..", "sqls/fixtures");
+const seedsDir = join(__dirname, "..", "sqls/seeds");
 
-const files = readdirSync(fixturesDir)
+const files = readdirSync(seedsDir)
     .filter((f) => f.endsWith(".sql"))
     .sort();
 
@@ -22,9 +22,9 @@ for (const file of files) {
         {
             file,
         },
-        "Loading fixture",
+        "Loading seed",
     );
-    const content = readFileSync(join(fixturesDir, file), "utf8");
+    const content = readFileSync(join(seedsDir, file), "utf8");
     await sql.unsafe(content);
 }
 
