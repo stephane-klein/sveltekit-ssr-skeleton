@@ -10,11 +10,11 @@ mise = true
 # and `sleep infinity` keeps a PID to supervise, teardown goes through on_stop.
 # https://pitchfork.jdx.dev/guides/lifecycle-hooks#compose-backed-daemons
 run = "podman compose up -d && exec sleep infinity"
-ready_cmd = "podman compose exec -T postgres pg_isready -U postgres"
+ready_cmd = { run = "mise x -- podman compose exec -T postgres pg_isready -U postgres", timeout = "60s" }
 auto = ["stop"]
 
 [daemons.postgres.hooks]
-on_stop = "mise x -- podman compose down"
+on_stop = "mise x -- podman compose stop"
 
 [daemons.migrate]
 run = "pnpm run migrate"
@@ -36,7 +36,7 @@ depends = ["migrate"]
 run = "exec mailpit --smtp 127.0.0.1:$PORT0 --listen 127.0.0.1:$PORT1 --api-cors '*'"
 port = { expect = [1025, 8025], bump = true }
 proxy_port = 8025
-ready_cmd = "curl -fsS http://127.0.0.1:$PORT1/readyz"
+ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT1/readyz", timeout = "30s" }
 auto = ["stop"]
 
 [daemons.webapp]
