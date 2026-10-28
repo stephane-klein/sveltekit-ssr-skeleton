@@ -5,16 +5,11 @@ namespace = "sveltekit-ssr-skeleton"
 mise = true
 
 [daemons.postgres]
-# Idiomatic pitchfork hack for Compose: foreground `compose up` risks being
-# SIGKILLed at its 5s stop_timeout before containers stop; `-d` returns at once
-# and `sleep infinity` keeps a PID to supervise, teardown goes through on_stop.
-# https://pitchfork.jdx.dev/guides/lifecycle-hooks#compose-backed-daemons
-run = "podman compose up -d && exec sleep infinity"
+# SIGINT: podman-compose only traps that signal (and postgres fast-shutdowns on it).
+run = "podman compose up postgres"
+stop_signal = { signal = "SIGINT", timeout = "30s" }
 ready_cmd = { run = "mise x -- podman compose exec -T postgres pg_isready -U postgres", timeout = "60s" }
 auto = ["stop"]
-
-[daemons.postgres.hooks]
-on_stop = "mise x -- podman compose stop"
 
 [daemons.migrate]
 run = "pnpm run migrate"
@@ -33,14 +28,14 @@ depends = ["migrate"]
 # Pitchfork rewrites the Host header to `localhost:$PORT` and passes the real
 # one via X-Forwarded-Host, so Mailpit's same-origin CORS check fails. Allow
 # every origin (loopback-only listener) with --api-cors '*'.
-run = "exec mailpit --smtp 127.0.0.1:$PORT0 --listen 127.0.0.1:$PORT1 --api-cors '*'"
+run = "mailpit --smtp 127.0.0.1:$PORT0 --listen 127.0.0.1:$PORT1 --api-cors '*'"
 port = { expect = [1025, 8025], bump = true }
 proxy_port = 8025
 ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT1/readyz", timeout = "30s" }
 auto = ["stop"]
 
 [daemons.webapp]
-run = "exec bash scripts/export-git-env.sh vite dev --port=$PORT"
+run = "bash scripts/export-git-env.sh vite dev --port=$PORT"
 stop_signal = { signal = "SIGTERM", timeout = "10s" }
 depends = ["postgres", "seed", "mailpit"]
 env = { SMTP_PORT = "{{ daemons.mailpit.ports[0] }}" }
@@ -51,13 +46,8 @@ health_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/healthy", interval = "2
 retry = 3
 
 [daemons.authelia]
-# Optional OIDC test stack: not a dependency of webapp. Start on demand with
-# `pitchfork start authelia`. Same Compose hack as postgres (see note above).
 dir = "authelia-test-env"
-run = "podman compose up -d && exec sleep infinity"
+run = "podman compose up"
+stop_signal = { signal = "SIGINT", timeout = "30s" }
 ready_port = 9091
 auto = ["stop"]
-
-[daemons.authelia.hooks]
-# Hooks run in the daemon's `dir` (authelia-test-env/), so no `cd` needed.
-on_stop = "mise x -- podman compose down"

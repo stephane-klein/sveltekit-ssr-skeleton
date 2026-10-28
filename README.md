@@ -54,32 +54,38 @@ This project was developed using:
 
 ## Prerequisite
 
-Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle installing Node.js, pnpm and (optionally) Pitchfork for you.
+Install [mise](https://mise.jdx.dev/getting-started.html) — it will handle installing Node.js, pnpm and Pitchfork for you.
 
 ## Getting Started
 
-There are two ways to run this project locally. Pick the one that fits your workflow — both start the exact same services.
-
-- **With Pitchfork** — the project author Stéphane Klein uses [Pitchfork](https://pitchfork.jdx.dev/) to run the development stack, because it makes the daily development experience more pleasant: one command starts everything, in dependency order, in the background.
-- **Without Pitchfork** — plain `mise` tasks, if you don't know Pitchfork or prefer not to use it.
-
-### Prerequisites (both paths)
+The dev-stack services run under [Pitchfork](https://pitchfork.jdx.dev/): one
+command starts PostgreSQL, Mailpit, the migrations, the seed and the dev server,
+in dependency order and in the background. Safe to rerun.
 
 ```bash
 $ mise install                # install Node.js, pnpm and Pitchfork via mise
 $ pnpm install
-```
-
-### Option A — With Pitchfork
-
-[Pitchfork](https://pitchfork.jdx.dev/) starts the services in order (PostgreSQL container + Mailpit daemon, migrations, seed) and only then the dev server, all in the background. Already-running services are left untouched, so the command is safe to rerun.
-
-```bash
-$ pitchfork start webapp      # postgres + mailpit, migrate, seed, then the dev server
+$ pitchfork start webapp      # start postgres and mailpit,
+                              # run migrate and seed,
+                              # then the dev server
 $ pitchfork logs webapp --tail
 ```
 
 Open http://localhost:5173 in your browser.
+
+Default user (see [`./api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json)):
+
+- email: `alice@example.com`
+- password: `password123`
+
+### Pitchfork basics
+
+```bash
+$ pitchfork list                    # what is running, what is available
+$ pitchfork status webapp           # pid, port, proxy URL
+$ pitchfork start --force webapp    # restart after a config change
+$ pitchfork stop --local            # stop this project's daemons (PostgreSQL volume preserved)
+```
 
 To exercise the OIDC login flow, start the Authelia test stack first, then
 restart the webapp so it picks up the `AUTHELIA_*` variables:
@@ -93,33 +99,6 @@ $ reload                              # load AUTHELIA_* into the current shell
 The webapp daemon picks up `AUTHELIA_*` automatically (pitchfork runs it through
 `mise x`); `reload` is only needed for your current shell.
 
-Stop everything manually (the PostgreSQL volume is preserved):
-
-```bash
-$ pitchfork stop --local
-```
-
-### Option B — Without Pitchfork
-
-If you don't know Pitchfork, or prefer to run each step yourself:
-
-```bash
-$ mise run up                 # start the PostgreSQL container
-$ mise run mailpit            # start the Mailpit dev SMTP server + web UI (separate terminal)
-$ reload                      # load environment variables
-$ mise run migrate            # run database migrations
-$ mise run seed               # populate with demo data
-$ mise run sync-users         # create users (see ./api-payloads-examples/users-sync.json)
-$ mise run dev                # start SvelteKit dev server on http://localhost:5173
-```
-
-Open http://localhost:5173 in your browser.
-
-Default user (see [`./api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json)):
-
-- email: `alice@example.com`
-- password: `password123`
-
 ### Other commands
 
 ```bash
@@ -130,17 +109,15 @@ $ mise run preview-prod-build # build and run production server on http://localh
 ### Stopping and cleaning up
 
 ```bash
-$ mise run stop               # stop containers (PostgreSQL volume preserved)
-$ mise run teardown           # remove containers and volumes (destructive, deletes PostgreSQL data)
+$ pitchfork stop --local      # stop the daemons (PostgreSQL volume preserved)
+$ mise run teardown           # stop the daemons, remove containers and volumes (destructive, deletes PostgreSQL data)
 ```
 
 ### Accessing test emails
 
 Mailpit captures all emails sent by the application (SMTP on `127.0.0.1:1025`).
-
-- **With Pitchfork** — the `mailpit` daemon is published by the Pitchfork proxy:
-  run `pitchfork proxy status` to get its URL, `https://mailpit.<project>.<proxy-tld>`.
-- **Without Pitchfork** — run `mise run mailpit`, then open http://localhost:8025.
+The `mailpit` daemon is published by the Pitchfork proxy: run
+`pitchfork proxy status` to get its URL, `https://mailpit.<project>.<proxy-tld>`.
 
 ### Sending a test email
 

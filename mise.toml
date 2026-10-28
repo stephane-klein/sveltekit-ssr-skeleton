@@ -24,9 +24,6 @@ helm = "4.2.2"
 pitchfork = "2.32.1"
 mailpit = "1.31.6"
 
-[tasks.dev]
-run = "pnpm run dev"
-
 [tasks.build]
 run = "pnpm run build"
 
@@ -55,16 +52,6 @@ run = "pnpm run lint:pkg"
 [tasks.lint-helm]
 run = "helm lint helm/my-app"
 
-[tasks.up]
-run = "podman compose up -d"
-
-[tasks.mailpit]
-description = "Run the Mailpit dev SMTP server + web UI (foreground, no Pitchfork)"
-run = "mailpit --smtp 127.0.0.1:1025 --listen 127.0.0.1:8025"
-
-[tasks.stop]
-run = "podman compose stop"
-
 [tasks.migrate]
 run = "node src/migrate.js"
 
@@ -75,7 +62,11 @@ run = "node src/seed.js"
 run = "./scripts/dump-schema.sh"
 
 [tasks.teardown]
-run = "podman compose down -v --remove-orphans"
+description = "Stop the supervised daemons, then remove containers and volumes (destructive)"
+run = """
+pitchfork stop --local
+podman compose down -v --remove-orphans
+"""
 
 [tasks.clean]
 run = "psql postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@127.0.0.1:${POSTGRES_PORT}/${POSTGRES_DB} < sqls/clean.sql"
