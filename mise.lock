@@ -1214,29 +1214,9 @@ checksum = "sha256:158f7685b44de51f6c0df1d153526cbcd3e1bc739a8dfc607721cef75de9e
 url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-win-x64.zip"
 
 [[tools.pitchfork]]
-version = "2.30.1"
+version = "2.32.1"
 backend = "packslip:github.com/jdx/pitchfork"
-specifiers = ["2.30.1"]
-
-[tools.pitchfork."platforms.linux-arm64"]
-checksum = "sha256:b20bdf5bf3e1f5d7ec227e67a493f1966a6f8967e78bbff702c331f77739b2a3"
-url = "https://github.com/jdx/pitchfork/releases/download/v2.30.1/pitchfork-aarch64-unknown-linux-gnu.tar.gz"
-signer = "sigstore-oidc:https://github.com/jdx/pitchfork/.github/workflows/release.yml"
-
-[tools.pitchfork."platforms.linux-x64"]
-checksum = "sha256:cc2aa26c9d3c0833bfa16d79f8ae167bd7d88a708b489322296286517643a1c4"
-url = "https://github.com/jdx/pitchfork/releases/download/v2.30.1/pitchfork-x86_64-unknown-linux-gnu.tar.gz"
-signer = "sigstore-oidc:https://github.com/jdx/pitchfork/.github/workflows/release.yml"
-
-[tools.pitchfork."platforms.macos-arm64"]
-checksum = "sha256:148d3fc64a71245f3752d57e9b8b5e656c4723bc72b2ab4fc61fa883abb46ae7"
-url = "https://github.com/jdx/pitchfork/releases/download/v2.30.1/pitchfork-aarch64-apple-darwin.tar.gz"
-signer = "sigstore-oidc:https://github.com/jdx/pitchfork/.github/workflows/release.yml"
-
-[tools.pitchfork."platforms.windows-x64"]
-checksum = "sha256:860f3f701b9fd027d115fe1f9108f7949c210526e8ec45916417cd97a4c5646e"
-url = "https://github.com/jdx/pitchfork/releases/download/v2.30.1/pitchfork-x86_64-pc-windows-msvc.zip"
-signer = "sigstore-oidc:https://github.com/jdx/pitchfork/.github/workflows/release.yml"
+specifiers = ["2.32.1"]
 
 [[tools.pnpm]]
 version = "12.11.2"
