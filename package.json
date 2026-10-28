@@ -15,7 +15,8 @@
     "migrate": "node src/migrate.js",
     "seed": "node src/seed.js",
     "add-user": "node src/add-user.js",
-    "create-api-token": "node src/create-api-token.js"
+    "create-api-token": "node src/create-api-token.js",
+    "hash-password": "node src/hash-password.js"
   },
   "dependencies": {
     "@node-rs/argon2": "~2.0.2",

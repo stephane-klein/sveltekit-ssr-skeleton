@@ -1,6 +1,7 @@
-import { hash, verify } from "@node-rs/argon2";
 import { nanoid } from "nanoid";
 import { sql } from "./pg.js";
+
+export { hashPassword, verifyPassword } from "./password.js";
 
 export const SESSION_COOKIE_NAME = "session";
 export const SESSION_EXPIRES_IN_MS = 1000 * 60 * 60 * 24 * 30;
@@ -13,19 +14,6 @@ export function setSessionCookie(cookies, sessionId) {
         secure: process.env.NODE_ENV === "production",
         maxAge: SESSION_EXPIRES_IN_MS / 1000,
     });
-}
-
-export async function hashPassword(password) {
-    return await hash(password, {
-        memoryCost: 19456,
-        timeCost: 2,
-        outputLen: 32,
-        parallelism: 1,
-    });
-}
-
-export async function verifyPassword(hash, password) {
-    return await verify(hash, password);
 }
 
 export function generateId() {
