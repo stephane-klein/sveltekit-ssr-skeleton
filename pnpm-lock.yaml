@@ -39,8 +39,8 @@ importers:
         specifier: ~3.4.9
         version: 3.4.9
       postgres-shift:
-        specifier: ~0.1.0
-        version: 0.1.0
+        specifier: ~1.0.2
+        version: 1.0.2
       valibot:
         specifier: ~1.5.0
         version: 1.5.0
@@ -2111,8 +2111,8 @@ packages:
     resolution: {integrity: sha512-LJlKCCAUFKOuZxipUdYw1NzIITEsPcgyOG9LkvRJvuKj/bRzbuRY0ARXvL0pWGpsZvn8jku+LMep2eU0seHp8g==}
     engines: {node: ^10 || ^12 || >=14}
 
-  postgres-shift@0.1.0:
-    resolution: {integrity: sha512-/375iG0Kveh1Spk3kFtaTdGT9FUxtXYDDabGw/9/Jkk3f93dYM2R8ZgQzbknCG+ZpfoR114gZ71oR+lRr6XY3A==}
+  postgres-shift@1.0.2:
+    resolution: {integrity: sha512-b8NiyzsIye1X4mvdt9VLRBkPd1j3R1MkygHPma8CdGeiJAUCll7wWNOmXbNm1jebTcsbXHD3bZoF3/oPwXaGCA==}
 
   postgres@3.4.9:
     resolution: {integrity: sha512-GD3qdB0x1z9xgFI6cdRD6xu2Sp2WCOEoe3mtnyB5Ee0XrrL5Pe+e4CCnJrRMnL1zYtRDZmQQVbvOttLnKDLnaw==}
@@ -4291,7 +4291,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.2
 
-  postgres-shift@0.1.0: {}
+  postgres-shift@1.0.2: {}
 
   postgres@3.4.9: {}
 
