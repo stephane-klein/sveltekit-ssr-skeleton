@@ -51,3 +51,11 @@ run = "podman compose up"
 stop_signal = { signal = "SIGINT", timeout = "30s" }
 ready_port = 9091
 auto = ["stop"]
+
+[daemons.grafana]
+dir = "victoriametrics-grafana-test-dev"
+run = "podman compose up"
+stop_signal = { signal = "SIGINT", timeout = "30s" }
+ready_port = 3001
+port = 3001
+auto = ["stop"]

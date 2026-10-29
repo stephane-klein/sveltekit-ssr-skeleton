@@ -8,7 +8,7 @@ Test monitoring stack for the SvelteKit app.
 $ mise run up
 ```
 
-Open Grafana: <http://localhost:3001> (admin / admin)
+Open Grafana: <http://localhost:3001> (`admin` / `admin123`)
 
 Check scrape targets: <http://localhost:8428/targets>
 

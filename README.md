@@ -316,6 +316,22 @@ $ curl -X POST -H "Authorization: Bearer <token>" \
 
 The [`deployment-playground/`](./deployment-playground/) directory contains a local playground for testing the application in a production-like environment.
 
+## Local monitoring stack (VictoriaMetrics + Grafana)
+
+[`victoriametrics-grafana-test-dev/`](./victoriametrics-grafana-test-dev/)
+contains a Podman Compose stack to test the metrics locally: VictoriaMetrics
+scrapes `/-/metrics` and Grafana shows the result through provisioned dashboards
+(the same ones the Helm chart ships).
+
+```bash
+$ pitchfork start grafana     # VictoriaMetrics + Grafana
+```
+
+Go to grafana: <http://localhost:3001> — `admin` / `admin123`
+
+Everything else (scrape jobs, dashboards, teardown) is in
+[`./victoriametrics-grafana-test-dev/README.md`](./victoriametrics-grafana-test-dev/).
+
 ## Build and push container image
 
 ```bash
