@@ -1,15 +1,15 @@
 import { sequence } from "@sveltejs/kit/hooks";
-import { dev } from "$app/environment";
-import { getTextDirection, serverAsyncLocalStorage } from "$lib/paraglide/runtime";
-import { paraglideMiddleware } from "$lib/paraglide/server";
-import { SESSION_COOKIE_NAME, setSessionCookie, validateApiToken, validateSession } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
-import { logger } from "$lib/server/logger.js";
-import { renderDuration } from "$lib/server/metrics.js";
-import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
-import { installShutdown } from "$lib/server/lifecycle.js";
-import { logAutheliaConfig } from "$lib/server/oidc.js";
-import { verifySmtpConnection } from "$lib/server/mailer.js";
+import { dev } from "$app/env";
+import { getTextDirection, serverAsyncLocalStorage } from "#lib/paraglide/runtime.js";
+import { paraglideMiddleware } from "#lib/paraglide/server.js";
+import { SESSION_COOKIE_NAME, setSessionCookie, validateApiToken, validateSession } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
+import { logger } from "#lib/server/logger.js";
+import { renderDuration } from "#lib/server/metrics.js";
+import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "#lib/server/pg-metrics.js";
+import { installShutdown } from "#lib/server/lifecycle.js";
+import { logAutheliaConfig } from "#lib/server/oidc.js";
+import { verifySmtpConnection } from "#lib/server/mailer.js";
 
 export const init = () => {
     installShutdown({ dev });
@@ -133,7 +133,7 @@ async function metricsHandle({ event, resolve }) {
     });
 }
 
-/** @type {import('@sveltejs/kit').Handle} */
+/** @type {import('@sveltejs/kit/hooks').Handle} */
 async function requestHandler({ event, resolve }) {
     const response = await resolve(event);
 
@@ -146,7 +146,9 @@ async function requestHandler({ event, resolve }) {
 
 export const handle = sequence(requestHandler, metricsHandle, authHandle, paraglideHandle);
 
-export function handleError({ error, event, status }) {
+export function handleError({ kind, error, event }) {
+    const status = kind === "framework" ? error.status : undefined;
+
     if (!dev && status && status < 500) {
         return { message: status === 404 ? "Not Found" : "Client Error" };
     }

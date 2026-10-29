@@ -1,5 +1,5 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { hashPassword, validatePasswordResetToken, usePasswordResetToken } from "$lib/server/auth.js";
+import { hashPassword, validatePasswordResetToken, usePasswordResetToken } from "#lib/server/auth.js";
 
 export async function load(event) {
     const token = event.url.searchParams.get("token");

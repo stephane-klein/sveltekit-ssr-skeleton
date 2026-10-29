@@ -2,8 +2,8 @@
   "name": "my-app",
   "license": "MIT",
   "author": "Stéphane Klein",
-  "type": "module",
   "repository": "github:stephane-klein/sveltekit-ssr-skeleton",
+  "type": "module",
   "scripts": {
     "check": "prettier --check . && eslint .",
     "format": "prettier --list-different --write .",
@@ -18,10 +18,14 @@
     "create-api-token": "node src/create-api-token.js",
     "hash-password": "node src/hash-password.js"
   },
+  "imports": {
+    "#lib": "./src/lib/index.js",
+    "#lib/*": "./src/lib/*"
+  },
   "dependencies": {
     "@node-rs/argon2": "~2.2.2",
     "@prometheus-io/client": "~0.16.1",
-    "@scalar/sveltekit": "~0.3.31",
+    "@scalar/sveltekit": "~0.3.33",
     "@valibot/to-json-schema": "~1.8.0",
     "js-yaml": "~5.5.0",
     "nanoid": "~6.0.2",
@@ -38,8 +42,8 @@
     "@inlang/paraglide-js": "~2.29.3",
     "@inlang/plugin-m-function-matcher": "~2.3.4",
     "@inlang/plugin-message-format": "~4.5.5",
-    "@sveltejs/adapter-node": "~5.5.7",
-    "@sveltejs/kit": "~2.70.1",
+    "@sveltejs/adapter-node": "~6.0.0",
+    "@sveltejs/kit": "~3.1.0",
     "@unocss/extractor-svelte": "~66.12.0",
     "eslint": "~10.13.0",
     "eslint-config-prettier": "~10.1.8",

@@ -31,10 +31,10 @@ run = "pnpm run build"
 run = "pnpm run preview"
 
 [tasks.preview-prod-build]
-description = "Build and run the production server with CSRF origin set to http://localhost:3000"
+description = "Build and run the production server with the OIDC callback origin set to http://localhost:3000"
 run = """
 pnpm run build
-ORIGIN=http://localhost:3000 node build/index.js
+MY_APP_ORIGIN=http://localhost:3000 node build/index.js
 """
 
 [tasks.lint]

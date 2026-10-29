@@ -1,4 +1,4 @@
-import { sql } from "$lib/server/pg.js";
+import { sql } from "#lib/server/pg.js";
 
 const PAGE_SIZE = 25;
 

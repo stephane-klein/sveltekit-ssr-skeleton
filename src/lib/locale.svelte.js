@@ -1,5 +1,5 @@
-import { browser } from "$app/environment";
-import { baseLocale, toLocale, overwriteGetLocale, overwriteSetLocale } from "$lib/paraglide/runtime";
+import { browser } from "$app/env";
+import { baseLocale, toLocale, overwriteGetLocale, overwriteSetLocale } from "#lib/paraglide/runtime.js";
 
 const COOKIE_NAME = "locale";
 

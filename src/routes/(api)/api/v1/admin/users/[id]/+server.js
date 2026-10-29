@@ -1,9 +1,8 @@
-import { json } from "@sveltejs/kit";
 import { safeParse } from "valibot";
-import { hashPassword } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
-import { userPatchSchema } from "$lib/schemas/user.js";
-import { problem } from "$lib/server/problem.js";
+import { hashPassword } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
+import { userPatchSchema } from "#lib/schemas/user.js";
+import { problem } from "#lib/server/problem.js";
 import { requireAdminToken } from "../../_helpers.js";
 
 function userLinks(id) {
@@ -24,7 +23,7 @@ export async function GET(event) {
 
     if (!user) return problem(404, "User not found", event.request.url);
 
-    return json({
+    return Response.json({
         data: user,
         _links: userLinks(user.id),
     });
@@ -96,7 +95,7 @@ export async function PATCH(event) {
         RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
     `;
 
-    return json({
+    return Response.json({
         data: user,
         _links: userLinks(user.id),
     });

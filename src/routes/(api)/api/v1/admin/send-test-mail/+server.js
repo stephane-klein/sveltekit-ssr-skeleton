@@ -1,8 +1,7 @@
-import { json } from "@sveltejs/kit";
 import { email, pipe, safeParse, string } from "valibot";
-import { problem } from "$lib/server/problem.js";
-import { sendMail } from "$lib/server/mailer.js";
-import { logger } from "$lib/server/logger.js";
+import { problem } from "#lib/server/problem.js";
+import { sendMail } from "#lib/server/mailer.js";
+import { logger } from "#lib/server/logger.js";
 import { requireAdminToken } from "../_helpers.js";
 
 const TEST_EMAIL_TO = process.env.TEST_EMAIL_TO;
@@ -27,7 +26,7 @@ export async function POST(event) {
     try {
         const info = await sendMail({ to, subject: SUBJECT, text: TEXT });
         logger.info({ messageId: info.messageId, to, subject: SUBJECT }, "Test email sent");
-        return json({
+        return Response.json({
             data: { messageId: info.messageId, to, subject: SUBJECT },
             _links: { self: { href: "/api/v1/admin/send-test-mail" } },
         });

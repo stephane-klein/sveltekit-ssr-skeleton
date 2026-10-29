@@ -1,6 +1,5 @@
-import { json } from "@sveltejs/kit";
-import { sql } from "$lib/server/pg.js";
-import { isMailAvailable } from "$lib/server/mailer.js";
+import { sql } from "#lib/server/pg.js";
+import { isMailAvailable } from "#lib/server/mailer.js";
 
 export async function GET() {
     try {
@@ -12,7 +11,7 @@ export async function GET() {
         );
     }
 
-    return json({
+    return Response.json({
         status: "ok",
         ready: true,
         checks: { database: "ok", smtp: isMailAvailable() ? "ok" : "unconfigured" },

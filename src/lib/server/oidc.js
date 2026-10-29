@@ -4,7 +4,7 @@ import { logger } from "./logger.js";
 const issuer = process.env.AUTHELIA_ISSUER;
 const clientId = process.env.AUTHELIA_CLIENT_ID;
 const clientSecret = process.env.AUTHELIA_CLIENT_SECRET;
-const origin = process.env.ORIGIN || "http://localhost:5173";
+const origin = process.env.MY_APP_ORIGIN || "http://localhost:5173";
 const redirectURI = `${origin}/login/oidc/callback`;
 
 let endpointsCache = null;

@@ -1,9 +1,8 @@
-import { json } from "@sveltejs/kit";
 import { safeParse } from "valibot";
-import { generateId, hashPassword } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
-import { userFieldsSchema } from "$lib/schemas/user.js";
-import { problem } from "$lib/server/problem.js";
+import { generateId, hashPassword } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
+import { userFieldsSchema } from "#lib/schemas/user.js";
+import { problem } from "#lib/server/problem.js";
 import { generateCursor, requireAdminToken } from "../_helpers.js";
 
 export async function GET(event) {
@@ -31,7 +30,7 @@ export async function GET(event) {
     const hasMore = users.length > pageSize;
     if (hasMore) users.pop();
 
-    return json({
+    return Response.json({
         data: users,
         next_cursor: hasMore ? generateCursor(users[users.length - 1]) : null,
         _links: {
@@ -94,7 +93,7 @@ export async function POST(event) {
         RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
     `;
 
-    return json(
+    return Response.json(
         {
             data: user,
             _links: {
@@ -171,7 +170,7 @@ export async function PUT(event) {
         `;
     }
 
-    return json({
+    return Response.json({
         data: user,
         _links: {
             self: { href: `/api/v1/admin/users/${user.id}` },

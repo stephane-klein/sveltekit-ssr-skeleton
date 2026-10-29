@@ -1,11 +1,10 @@
-import { json } from "@sveltejs/kit";
-import { problem } from "$lib/server/problem.js";
+import { problem } from "#lib/server/problem.js";
 
 const ADMIN_TOKEN = process.env.MY_APP_ADMIN_TOKEN;
 
 export function requireAdminToken(event) {
     if (!ADMIN_TOKEN || ADMIN_TOKEN.length < 32) {
-        return json(
+        return Response.json(
             {
                 type: "about:blank",
                 title: "Configuration Error",

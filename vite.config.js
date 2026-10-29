@@ -1,3 +1,4 @@
+import adapter from "@sveltejs/adapter-node";
 import { paraglideVitePlugin } from "@inlang/paraglide-js";
 import { sveltekit } from "@sveltejs/kit/vite";
 import UnoCSS from "unocss/vite";
@@ -6,7 +7,7 @@ import UnoCSS from "unocss/vite";
 const config = {
     plugins: [
         UnoCSS(),
-        sveltekit(),
+        sveltekit({ adapter: adapter() }),
         paraglideVitePlugin({
             project: "./project.inlang",
             outdir: "./src/lib/paraglide",

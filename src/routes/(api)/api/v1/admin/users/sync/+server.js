@@ -1,9 +1,8 @@
-import { json } from "@sveltejs/kit";
 import { safeParse } from "valibot";
-import { generateId, hashPassword } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
-import { userFieldsSchema } from "$lib/schemas/user.js";
-import { problem } from "$lib/server/problem.js";
+import { generateId, hashPassword } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
+import { userFieldsSchema } from "#lib/schemas/user.js";
+import { problem } from "#lib/server/problem.js";
 import { requireAdminToken } from "../../_helpers.js";
 
 const MAX_BATCH_SIZE = 1000;
@@ -165,7 +164,7 @@ export async function PUT(event) {
             return { created, updated, deleted, users };
         });
 
-        return json({
+        return Response.json({
             data: { created, updated, deleted, users },
             _links: {
                 self: { href: "/api/v1/admin/users/sync" },

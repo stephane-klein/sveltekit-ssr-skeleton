@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { sql } from "$lib/server/pg.js";
+import { sql } from "#lib/server/pg.js";
 
 export function load(event) {
     return {

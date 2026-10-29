@@ -1,6 +1,6 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { hashPassword, generateId } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
+import { hashPassword, generateId } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
 
 export const actions = {
     default: async ({ request }) => {

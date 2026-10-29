@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit";
-import { createAuthorizationURL } from "$lib/server/oidc.js";
-import { logger } from "$lib/server/logger.js";
+import { createAuthorizationURL } from "#lib/server/oidc.js";
+import { logger } from "#lib/server/logger.js";
 
 export async function GET({ cookies }) {
     let result;
@@ -30,5 +30,5 @@ export async function GET({ cookies }) {
 
     logger.info({ redirectUrl: url.toString() }, "Redirecting to OIDC provider");
 
-    throw redirect(302, url.toString());
+    throw redirect(302, url.toString(), { external: true });
 }

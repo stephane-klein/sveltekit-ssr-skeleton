@@ -1,8 +1,8 @@
 <script>
-    import { m } from "$lib/paraglide/messages";
-    import { locales, getLocale, setLocale } from "$lib/paraglide/runtime";
+    import { m } from "#lib/paraglide/messages.js";
+    import { locales, getLocale, setLocale } from "#lib/paraglide/runtime.js";
     import "uno.css";
-    import TechInfoPopup from "$lib/client/TechInfoPopup.svelte";
+    import TechInfoPopup from "#lib/client/TechInfoPopup.svelte";
 
     let { children } = $props();
 

@@ -68,7 +68,7 @@ This project uses **SvelteKit 2** with `@sveltejs/adapter-node` for SSR.
 Endpoints under `(api)/` — and any other `+server.js` route outside the
 `(private)` group — are **not** covered by the `(private)/+layout.server.js`
 guard. Every handler that requires an authenticated user must call
-`requireUser(event)` from `$lib/server/require-user.js` before doing any work:
+`requireUser(event)` from `#lib/server/require-user.js` before doing any work:
 
 ```js
 const authError = requireUser(event);
@@ -76,7 +76,7 @@ if (authError) return authError;
 ```
 
 `requireUser` returns either a `401` `application/problem+json` response (built
-by `$lib/server/problem.js`) or `null`. Do not hand-roll the `event.locals.user`
+by `#lib/server/problem.js`) or `null`. Do not hand-roll the `event.locals.user`
 check inline.
 
 ### Library code layout
@@ -85,7 +85,7 @@ Library code is split by where it is allowed to run:
 
 - `src/lib/server/` — **server-only** code (DB access via `postgres`, auth,
   mailer, `node:` APIs, `process.env`, secrets, ...), imported via
-  `$lib/server/...`. SvelteKit enforces this at build time: its
+  `#lib/server/...`. SvelteKit enforces this at build time: its
   `vite-plugin-sveltekit-guard` throws
   `Cannot import $lib/server/... into code that runs in the browser` if a client
   entrypoint (a Svelte component, a universal `load`, a client/universal hook)
@@ -93,10 +93,10 @@ Library code is split by where it is allowed to run:
   anywhere else.
 - `src/lib/shared/` — **pure / isomorphic** modules (no Node, DB, or environment
   access) needed from BOTH the server and client Svelte components, imported via
-  `$lib/shared/...`. If a module has to be importable by a client component, it
+  `#lib/shared/...`. If a module has to be importable by a client component, it
   must be pure (no `node:` imports, no DB, no `process.env`) and belong here.
 - `src/lib/client/` — **client-only** Svelte components, imported via
-  `$lib/client/...`.
+  `#lib/client/...`.
 
 `src/lib/backend/` is **forbidden**: it no longer exists, never create it and
 never import from it. When adding a new module, decide its home up front:
@@ -135,7 +135,7 @@ only make sense within the module's domain, use `as` at the import site to make
 the domain explicit:
 
 ```js
-import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "$lib/server/pg-metrics.js";
+import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "#lib/server/pg-metrics.js";
 ```
 
 ### To avoid
@@ -160,7 +160,7 @@ internationalization.
 - Usage in Svelte components:
   ```svelte
   <script>
-    import { m } from "$lib/paraglide/messages";
+    import { m } from "#lib/paraglide/messages.js";
   </script>
 
   <h1>{m.welcome_title()}</h1>

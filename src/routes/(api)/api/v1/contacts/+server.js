@@ -1,7 +1,6 @@
-import { json } from "@sveltejs/kit";
-import { sql } from "$lib/server/pg.js";
-import { problem } from "$lib/server/problem.js";
-import { requireUser } from "$lib/server/require-user.js";
+import { sql } from "#lib/server/pg.js";
+import { problem } from "#lib/server/problem.js";
+import { requireUser } from "#lib/server/require-user.js";
 
 export async function GET(event) {
     const authError = requireUser(event);
@@ -9,7 +8,7 @@ export async function GET(event) {
 
     const contacts = await sql`SELECT id, firstname, lastname, created_at FROM contacts ORDER BY id`;
 
-    return json({
+    return Response.json({
         data: contacts,
         _links: {
             self: { href: "/api/v1/contacts" },
@@ -35,7 +34,7 @@ export async function POST(event) {
         RETURNING id, firstname, lastname, created_at
     `;
 
-    return json(
+    return Response.json(
         {
             data: contact,
             _links: {

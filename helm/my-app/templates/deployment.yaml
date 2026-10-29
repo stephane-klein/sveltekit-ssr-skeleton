@@ -83,7 +83,7 @@ spec:
               {{- $addressHeader = "x-forwarded-for" }}
             {{- end }}
             {{- if $origin }}
-            - name: ORIGIN
+            - name: MY_APP_ORIGIN
               value: {{ $origin }}
             {{- end }}
             {{- if $addressHeader }}

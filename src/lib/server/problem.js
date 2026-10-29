@@ -1,5 +1,3 @@
-import { json } from "@sveltejs/kit";
-
 export function problem(status, detail, instance) {
     const titles = {
         400: "Bad Request",
@@ -10,7 +8,7 @@ export function problem(status, detail, instance) {
         422: "Unprocessable Entity",
     };
 
-    return json(
+    return Response.json(
         {
             type: "about:blank",
             title: titles[status] || "Error",

@@ -1,7 +1,6 @@
-import { json } from "@sveltejs/kit";
-import { sql } from "$lib/server/pg.js";
-import { problem } from "$lib/server/problem.js";
-import { requireUser } from "$lib/server/require-user.js";
+import { sql } from "#lib/server/pg.js";
+import { problem } from "#lib/server/problem.js";
+import { requireUser } from "#lib/server/require-user.js";
 
 function contactLinks(id) {
     return {
@@ -18,7 +17,7 @@ export async function GET(event) {
 
     if (!contact) return problem(404, "Contact not found", event.request.url);
 
-    return json({
+    return Response.json({
         data: contact,
         _links: contactLinks(contact.id),
     });
@@ -50,7 +49,7 @@ export async function PATCH(event) {
         RETURNING id, firstname, lastname, created_at
     `;
 
-    return json({
+    return Response.json({
         data: contact,
         _links: contactLinks(contact.id),
     });

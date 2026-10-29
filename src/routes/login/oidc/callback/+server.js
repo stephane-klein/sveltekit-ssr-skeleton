@@ -1,8 +1,8 @@
 import { redirect } from "@sveltejs/kit";
-import { createSession, setSessionCookie } from "$lib/server/auth.js";
-import { sql } from "$lib/server/pg.js";
-import { validateAuthorizationCode, getUserInfoEndpoint } from "$lib/server/oidc.js";
-import { logger } from "$lib/server/logger.js";
+import { createSession, setSessionCookie } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
+import { validateAuthorizationCode, getUserInfoEndpoint } from "#lib/server/oidc.js";
+import { logger } from "#lib/server/logger.js";
 
 export async function GET({ url: reqUrl, cookies }) {
     const code = reqUrl.searchParams.get("code");

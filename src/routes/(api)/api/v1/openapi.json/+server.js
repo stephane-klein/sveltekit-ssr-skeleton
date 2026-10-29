@@ -1,6 +1,5 @@
-import { json } from "@sveltejs/kit";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { userFieldsSchema, userPatchSchema } from "$lib/schemas/user.js";
+import { userFieldsSchema, userPatchSchema } from "#lib/schemas/user.js";
 
 // Request-body schemas are derived from the valibot schemas that actually
 // validate the handlers, so the OpenAPI contract can never drift from the code.
@@ -48,7 +47,7 @@ const userPatchJson = annotate(stripSchemaMeta(toJsonSchema(userPatchSchema)), {
 });
 
 export function GET() {
-    return json({
+    return Response.json({
         openapi: "3.0.0",
         info: {
             title: "my-app API",

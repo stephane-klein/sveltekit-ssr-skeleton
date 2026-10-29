@@ -2,8 +2,8 @@
     import { writable } from "svelte/store";
     import { onMount, onDestroy, tick } from "svelte";
     import { beforeNavigate, afterNavigate } from "$app/navigation";
-    import { browser } from "$app/environment";
-    import { env } from "$env/dynamic/public";
+    import { browser } from "$app/env";
+    import { PUBLIC_BUILD_STAMP, PUBLIC_REPO_URL, PUBLIC_GIT_HASH } from "$app/env/public";
 
     const pageMetrics = writable({ ssr: null, csr: null });
 
@@ -93,12 +93,16 @@
         open = false;
     }
 
-    beforeNavigate(() => {
+    beforeNavigate(({ shallow, type }) => {
+        if (shallow && type === "goto") return;
+
         performance.mark("nav-start");
         navStart = performance.now();
     });
 
-    afterNavigate(async () => {
+    afterNavigate(async ({ shallow, type }) => {
+        if (shallow && type === "goto") return;
+
         if (performance.getEntriesByName("nav-start").length) {
             performance.mark("nav-end");
             performance.measure("CSR Navigation", "nav-start", "nav-end");
@@ -125,16 +129,22 @@
     >
         <button
             class="close"
-            onclick={() => (open = false)}>&#x2715;</button
+            onclick={() => (open = false)}>✕</button
         >
 
         <div class="version">
-            <div>Built at <span class="val">{env.PUBLIC_BUILD_STAMP ?? "—"}</span></div>
             <div>
-                GitHub SHA1 version : <a
-                    href="{env.PUBLIC_REPO_URL}/commit/{env.PUBLIC_GIT_HASH}"
+                Built at
+                <span class="val">{PUBLIC_BUILD_STAMP ?? "—"}</span>
+            </div>
+
+            <div>
+                GitHub SHA1 version :
+
+                <a
+                    href="{PUBLIC_REPO_URL}/commit/{PUBLIC_GIT_HASH}"
                     target="_blank"
-                    rel="external"><span class="val">{env.PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a
+                    rel="external"><span class="val">{PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a
                 >
             </div>
         </div>
@@ -158,8 +168,10 @@
                     >
                 </div>
                 <div class="row grandchild">
-                    <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span> database queries &mdash;
-                    <span class="val">{ms($pageMetrics.ssr.sqlQueryMs)}ms</span> total in PostgreSQL
+                    <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span>
+                    database queries —
+                    <span class="val">{ms($pageMetrics.ssr.sqlQueryMs)}ms</span>
+                    total in PostgreSQL
                 </div>
                 <div class="row child">
                     network roundtrip to download the HTML page: <span class="val"
@@ -209,8 +221,10 @@
                     >
                 </div>
                 <div class="row grandchild">
-                    <span class="val">{$pageMetrics.csr.sqlQueryCount}</span> database queries &mdash;
-                    <span class="val">{ms($pageMetrics.csr.sqlQueryMs)}ms</span> total in PostgreSQL
+                    <span class="val">{$pageMetrics.csr.sqlQueryCount}</span>
+                    database queries —
+                    <span class="val">{ms($pageMetrics.csr.sqlQueryMs)}ms</span>
+                    total in PostgreSQL
                 </div>
                 <div class="row child">
                     network roundtrip to fetch JSON data: <span class="val">{ms($pageMetrics.csr.networkMs)}ms</span>

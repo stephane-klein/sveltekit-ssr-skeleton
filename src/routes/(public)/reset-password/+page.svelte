@@ -1,6 +1,6 @@
 <script>
-    import { dev } from "$app/environment";
-    import { m } from "$lib/paraglide/messages";
+    import { dev } from "$app/env";
+    import { m } from "#lib/paraglide/messages.js";
 
     let { form } = $props();
 </script>

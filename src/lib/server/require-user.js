@@ -1,4 +1,4 @@
-import { problem } from "$lib/server/problem.js";
+import { problem } from "#lib/server/problem.js";
 
 export function requireUser(event) {
     if (!event.locals.user) {

@@ -29,7 +29,7 @@ services:
     environment:
       MY_APP_POSTGRES_URL: postgres://postgres:password@postgres:5432/postgres
       MY_APP_ADMIN_TOKEN: playground-admin-token-change-me-in-prod
-      ORIGIN: https://app.127.0.0.1.sslip.io
+      MY_APP_ORIGIN: https://app.127.0.0.1.sslip.io
       ADDRESS_HEADER: x-forwarded-for
       AUTHELIA_ISSUER: https://auth.127.0.0.1.sslip.io
       AUTHELIA_CLIENT_ID: my-app
