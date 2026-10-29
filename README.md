@@ -33,7 +33,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
 - **Idempotent user provisioning (GitOps)** — admin API `PUT /api/v1/admin/users` and `PUT /api/v1/admin/users/sync` to create/update/delete users from a declared desired state, safe to re-apply in CI/CD or a reconciliation loop
-- **Metrics** — Prometheus endpoint at `/-/metrics` via [`prom-client`](https://github.com/siimon/prom-client)
+- **Metrics** — Prometheus endpoint at `/-/metrics` via [`@prometheus-io/client`](https://github.com/prometheus/client_js)
 - **SSR/CSR tech info popup** — performance popup (bottom-right, `tech info` button) showing total time, server processing, PostgreSQL queries, network roundtrip, hydration/rendering, and version info (build timestamp, GitHub commit link) for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
 - **Helm chart** — Kubernetes deployment with Prometheus auto-scraping (`prometheus.io/*` pod annotations) and Grafana dashboard (ConfigMap sidecar pattern)
 

@@ -1,4 +1,4 @@
-import client from "prom-client";
+import client from "@prometheus-io/client";
 
 export const register = new client.Registry();
 
