@@ -74,7 +74,7 @@ $ pitchfork logs webapp --tail
 
 Open http://localhost:5173 in your browser.
 
-Default user (see [`./api-payloads-examples/users-sync.json`](./api-payloads-examples/users-sync.json)):
+Default user (see [`./sqls/seeds/00002_users.sql`](./sqls/seeds/00002_users.sql)):
 
 - email: `alice@example.com`
 - password: `password123`
