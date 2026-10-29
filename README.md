@@ -17,10 +17,12 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - SQL client: [postgres](https://github.com/porsager/postgres)
 - Migrations: [postgres-shift](https://github.com/porsager/postgres-shift)
 - OIDC client: native OAuth 2.0 (fetch + node:crypto, PKCE S256)
+- Mail: [nodemailer](https://nodemailer.com/) over SMTP
 - CSS: [UnoCSS](https://unocss.dev/) (Tailwind preset)
 - i18n: [Paraglide JS](https://paraglidejs.com/) (cookie-based, no URL prefix)
 - Lint / Format: ESLint + Prettier (eslint-plugin-svelte, prettier-plugin-svelte)
 - Tooling: [Mise](https://mise.jdx.dev/), [Pitchfork](https://pitchfork.jdx.dev/)
+- Dev mail: [Mailpit](https://github.com/axllent/mailpit) (SMTP + web UI)
 - Containers: Podman Compose
 - Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
 
@@ -32,7 +34,6 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
 - **Idempotent user provisioning (GitOps)** — admin API `PUT /api/v1/admin/users` and `PUT /api/v1/admin/users/sync` to create/update/delete users from a declared desired state, safe to re-apply in CI/CD or a reconciliation loop
 - **Metrics** — Prometheus endpoint at `/-/metrics` via [`prom-client`](https://github.com/siimon/prom-client)
-- **Email testing** — [Mailpit](https://github.com/axllent/mailpit) dev SMTP server with web UI
 - **SSR/CSR tech info popup** — performance popup (bottom-right, `tech info` button) showing total time, server processing, PostgreSQL queries, network roundtrip, hydration/rendering, and version info (build timestamp, GitHub commit link) for both SSR (first full page load) and CSR (client navigation). Uses `Server-Timing` header + Performance API — no extra requests.
 - **Helm chart** — Kubernetes deployment with Prometheus auto-scraping (`prometheus.io/*` pod annotations) and Grafana dashboard (ConfigMap sidecar pattern)
 
