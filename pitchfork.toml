@@ -45,6 +45,23 @@ ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/ready", timeout = "5s" }
 health_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/healthy", interval = "200s", timeout = "5s", retries = 3 }
 retry = 3
 
+[daemons.build]
+run = "CSRF_TRUSTED_ORIGINS='*' pnpm run build"
+oneshot = true
+
+[daemons.preview]
+run = "pnpm run preview --port=$PORT"
+stop_signal = { signal = "SIGTERM", timeout = "10s" }
+env = {
+    SMTP_PORT = "{{ daemons.mailpit.ports[0] }}" 
+}
+depends = ["postgres", "seed", "mailpit", "build"]
+port = { expect = [4173], bump = true }
+auto = ["stop"]
+ready_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/ready", timeout = "5s" }
+health_cmd = { run = "curl -fsS http://127.0.0.1:$PORT/-/healthy", interval = "200s", timeout = "5s", retries = 3 }
+retry = 3
+
 [daemons.authelia]
 dir = "authelia-test-env"
 run = "podman compose up"

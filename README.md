@@ -79,6 +79,19 @@ Default user (see [`./sqls/seeds/00002_users.sql`](./sqls/seeds/00002_users.sql)
 - email: `alice@example.com`
 - password: `password123`
 
+### Testing the built version of the webapp locally
+
+```sh
+$ pitchfork start preview
+```
+
+Open http://localhost:4173 in your browser.
+
+Default user (see [`./sqls/seeds/00002_users.sql`](./sqls/seeds/00002_users.sql)):
+
+- email: alice@example.com
+- password: password123
+
 ### Pitchfork basics
 
 ```bash
