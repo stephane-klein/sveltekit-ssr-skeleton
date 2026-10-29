@@ -282,7 +282,7 @@
       "gridPos": { "h": 6, "w": 12, "x": 0, "y": 26 },
       "targets": [
         {
-          "expr": "nodejs_event_loop_lag_seconds{job=\"sveltekit-app-dev\"}",
+          "expr": "nodejs_eventloop_lag_seconds{job=\"sveltekit-app-dev\"}",
           "legendFormat": "lag"
         }
       ],

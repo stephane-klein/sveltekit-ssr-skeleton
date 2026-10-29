@@ -562,7 +562,7 @@
             },
             "targets": [
                 {
-                    "expr": "max by(container) (nodejs_event_loop_lag_seconds{namespace=\"PLACEHOLDER_NAMESPACE\", app_kubernetes_io_name=\"my-app\"})",
+                    "expr": "max by(container) (nodejs_eventloop_lag_seconds{namespace=\"PLACEHOLDER_NAMESPACE\", app_kubernetes_io_name=\"my-app\"})",
                     "legendFormat": "lag"
                 }
             ],
