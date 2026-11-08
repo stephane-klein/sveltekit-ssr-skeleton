@@ -309,13 +309,13 @@ API endpoints accept both session cookies and `Authorization: Bearer <token>` he
 
 ### Endpoints
 
-| Méthode  | Route                   | Description                             |
-| :------- | :---------------------- | :-------------------------------------- |
-| `GET`    | `/api/v1/contacts/`     | List contacts                           |
-| `POST`   | `/api/v1/contacts/`     | Create a contact (`firstname` required) |
-| `GET`    | `/api/v1/contacts/:id/` | Get a contact                           |
-| `PATCH`  | `/api/v1/contacts/:id/` | Update a contact (partial)              |
-| `DELETE` | `/api/v1/contacts/:id/` | Delete a contact                        |
+| Méthode  | Route                       | Description                             |
+| :------- | :-------------------------- | :-------------------------------------- |
+| `GET`    | `/api/v1/contacts/`         | List contacts                           |
+| `POST`   | `/api/v1/contacts/`         | Create a contact (`firstname` required) |
+| `GET`    | `/api/v1/contacts/:nanoid/` | Get a contact                           |
+| `PATCH`  | `/api/v1/contacts/:nanoid/` | Update a contact (partial)              |
+| `DELETE` | `/api/v1/contacts/:nanoid/` | Delete a contact                        |
 
 ```bash
 $ curl -H "Authorization: Bearer <token>" http://localhost:5173/api/v1/contacts/
