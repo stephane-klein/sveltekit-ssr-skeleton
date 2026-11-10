@@ -18,6 +18,20 @@ const raw = postgres(POSTGRES_URL, {
 
 const INSTRUMENTED = Symbol("instrumented");
 
+let nativeCursor = null;
+
+// postgres.js reassigns query.resolve on every cursor next(), which drops the
+// instrumentation. Refuse the async iterator form instead of losing the query
+// from the metrics silently: only the callback form is measured.
+function guardedCursor(...args) {
+    if (typeof args.at(-1) !== "function") {
+        throw new Error(
+            "The async iterator form of cursor() is not measured by pg.js; use forEach() or cursor(rows, fn)",
+        );
+    }
+    return nativeCursor.apply(this, args);
+}
+
 function wrapQuery(query, sqlStr) {
     let startedAt = 0;
     let endTimer = null;
@@ -56,6 +70,9 @@ function wrapQuery(query, sqlStr) {
         record();
         return originalReject.call(this, error);
     };
+
+    nativeCursor ??= query.cursor;
+    query.cursor = guardedCursor;
 
     return query;
 }

@@ -48,6 +48,23 @@ control flow). Reserve `LANGUAGE plpgsql` for functions that genuinely need
 procedural features: `IF`, loops, `RAISE EXCEPTION`, dynamic SQL (`EXECUTE`), or
 `SELECT ... INTO` variables.
 
+### Database cursors
+
+`pg.js` does not measure the async iterator form of `cursor()`
+(``for await (const rows of sql`...`.cursor())``). postgres.js reassigns
+`query.resolve` on every `next()`, so the instrumentation loses the query: no
+duration reaches Prometheus and the request store gets no entry. The `tech info`
+popup therefore undercounts both the query count and the SQL time.
+
+The async iterator form is refused at runtime: `cursor()` throws unless its last
+argument is a function.
+
+Use one of these instead:
+
+- ``sql`...`.forEach((row) => ...)`` for row-by-row processing;
+- ``sql`...`.cursor(rows, async (batch) => ...)`` for batched processing,
+  returning `sql.CLOSE` from the callback to stop early.
+
 ## Example / Scaffolding Files
 
 The following files are examples meant to be replaced with your actual project code:
