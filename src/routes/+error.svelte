@@ -27,13 +27,15 @@
             <a
                 href="/"
                 class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold no-underline hover:bg-blue-700"
-                >{m.error_404_cta_home()}</a
             >
+                {m.error_404_cta_home()}
+            </a>
             <button
                 onclick={() => history.back()}
                 class="px-4 py-1.5 bg-transparent text-gray-500 border border-gray-300 rounded-sm text-sm no-underline hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
-                >{m.error_go_back()}</button
             >
+                {m.error_go_back()}
+            </button>
         </div>
     {:else if page.status === 403}
         <p class="font-mono text-xs font-bold text-red-600 uppercase tracking-wider mb-2">403</p>
@@ -46,13 +48,15 @@
             <a
                 href="/"
                 class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold no-underline hover:bg-blue-700"
-                >{m.error_403_cta_home()}</a
             >
+                {m.error_403_cta_home()}
+            </a>
             <a
                 href="mailto:admin@example.com"
                 class="px-4 py-1.5 bg-transparent text-gray-500 border border-gray-300 rounded-sm text-sm no-underline hover:bg-gray-100 hover:text-gray-900"
-                >{m.error_403_cta_contact()}</a
             >
+                {m.error_403_cta_contact()}
+            </a>
         </div>
     {:else if page.status === 503}
         <p class="font-mono text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">503</p>
@@ -73,20 +77,22 @@
             <button
                 onclick={() => location.reload()}
                 class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold no-underline hover:bg-blue-700 cursor-pointer"
-                >{m.error_generic_cta_reload()}</button
             >
+                {m.error_generic_cta_reload()}
+            </button>
             <a
                 href="/"
                 class="px-4 py-1.5 bg-transparent text-gray-500 border border-gray-300 rounded-sm text-sm no-underline hover:bg-gray-100 hover:text-gray-900"
-                >{m.error_generic_cta_home()}</a
             >
+                {m.error_generic_cta_home()}
+            </a>
         </div>
 
         {#if page.error?.message}
             <details class="mt-7 pt-5 border-t border-gray-300">
-                <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-900 select-none"
-                    >{m.error_technical_details()}</summary
-                >
+                <summary class="text-xs text-gray-500 cursor-pointer hover:text-gray-900 select-none">
+                    {m.error_technical_details()}
+                </summary>
                 <pre
                     class="mt-2.5 font-mono text-xs bg-gray-100 border border-gray-300 rounded-sm p-3 overflow-x-auto text-gray-500 leading-relaxed">{page
                         .error.message}</pre>

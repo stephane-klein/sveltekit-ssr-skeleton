@@ -145,8 +145,10 @@
 
 <button
     class="trigger"
-    onclick={() => (open = !open)}>tech info</button
+    onclick={() => (open = !open)}
 >
+    tech info
+</button>
 
 {#if open}
     <div
@@ -155,8 +157,10 @@
     >
         <button
             class="close"
-            onclick={() => (open = false)}>✕</button
+            onclick={() => (open = false)}
         >
+            ✕
+        </button>
 
         <div class="version">
             <div>
@@ -170,8 +174,10 @@
                 <a
                     href="{PUBLIC_REPO_URL}/commit/{PUBLIC_GIT_HASH}"
                     target="_blank"
-                    rel="external"><span class="val">{PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span></a
+                    rel="external"
                 >
+                    <span class="val">{PUBLIC_GIT_HASH?.slice(0, 7) ?? "—"}</span>
+                </a>
             </div>
         </div>
 
@@ -181,17 +187,19 @@
                     <a
                         href="https://svelte.dev/docs/kit/glossary#SSR"
                         target="_blank"
-                        rel="external">SSR</a
+                        rel="external"
                     >
+                        SSR
+                    </a>
                     <span class="desc">— first full page load</span>
                 </div>
                 <div class="row">
                     total: <span class="val">{ms($pageMetrics.ssr.totalMs)}ms</span> = server + network (page visible)
                 </div>
                 <div class="row child">
-                    server processing in SvelteKit (load functions, hooks): <span class="val"
-                        >{ms($pageMetrics.ssr.processingMs)}ms</span
-                    >
+                    server processing in SvelteKit (load functions, hooks): <span class="val">
+                        {ms($pageMetrics.ssr.processingMs)}ms
+                    </span>
                 </div>
                 <div class="row grandchild">
                     <span class="val">{$pageMetrics.ssr.sqlQueryCount}</span>
@@ -200,9 +208,9 @@
                     total in PostgreSQL
                 </div>
                 <div class="row child">
-                    network roundtrip to download the HTML page: <span class="val"
-                        >{ms($pageMetrics.ssr.networkMs)}ms</span
-                    >
+                    network roundtrip to download the HTML page: <span class="val">
+                        {ms($pageMetrics.ssr.networkMs)}ms
+                    </span>
                 </div>
                 <div class="row grandchild">
                     page weight: <span class="val">{formatSize($pageMetrics.ssr.transferSize)}</span>
@@ -215,16 +223,20 @@
                 <a
                     href="https://svelte.dev/docs/kit/glossary#Hydration"
                     target="_blank"
-                    rel="external">hydration</a
-                > + resource loading)
+                    rel="external"
+                >
+                    hydration
+                </a> + resource loading)
             </div>
         {:else}
             <div class="section">
                 <a
                     href="https://svelte.dev/docs/kit/glossary#SSR"
                     target="_blank"
-                    rel="external">SSR</a
-                >: pending
+                    rel="external"
+                >
+                    SSR
+                </a>: pending
             </div>
         {/if}
 
@@ -234,17 +246,19 @@
                     <a
                         href="https://svelte.dev/docs/kit/glossary#CSR"
                         target="_blank"
-                        rel="external">CSR</a
+                        rel="external"
                     >
+                        CSR
+                    </a>
                     <span class="desc">— last rendering after client navigation</span>
                 </div>
                 <div class="row">
                     total: <span class="val">{ms($pageMetrics.csr.totalMs)}ms</span> = server + network + client rendering
                 </div>
                 <div class="row child">
-                    server processing in SvelteKit (load functions, hooks): <span class="val"
-                        >{ms($pageMetrics.csr.processingMs)}ms</span
-                    >
+                    server processing in SvelteKit (load functions, hooks): <span class="val">
+                        {ms($pageMetrics.csr.processingMs)}ms
+                    </span>
                 </div>
                 <div class="row grandchild">
                     <span class="val">{$pageMetrics.csr.sqlQueryCount}</span>
@@ -268,8 +282,10 @@
                 <a
                     href="https://svelte.dev/docs/kit/glossary#CSR"
                     target="_blank"
-                    rel="external">CSR</a
-                >: none
+                    rel="external"
+                >
+                    CSR
+                </a>: none
             </div>
         {/if}
     </div>

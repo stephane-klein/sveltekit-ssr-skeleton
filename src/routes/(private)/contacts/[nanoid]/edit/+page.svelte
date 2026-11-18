@@ -22,8 +22,10 @@
         <div class="mb-3">
             <label
                 for="firstname"
-                class="block text-sm font-semibold mb-1">{m.contact_edit_firstname_label()}</label
+                class="block text-sm font-semibold mb-1"
             >
+                {m.contact_edit_firstname_label()}
+            </label>
             <!-- svelte-ignore a11y_autofocus -->
             <input
                 type="text"
@@ -40,8 +42,10 @@
         <div class="mb-3">
             <label
                 for="lastname"
-                class="block text-sm font-semibold mb-1">{m.contact_edit_lastname_label()}</label
+                class="block text-sm font-semibold mb-1"
             >
+                {m.contact_edit_lastname_label()}
+            </label>
             <input
                 type="text"
                 id="lastname"
@@ -62,8 +66,10 @@
             </button>
             <a
                 href="/contacts"
-                class="text-sm text-blue-600 hover:underline">{m.contact_edit_cancel()}</a
+                class="text-sm text-blue-600 hover:underline"
             >
+                {m.contact_edit_cancel()}
+            </a>
         </div>
     </form>
 </main>

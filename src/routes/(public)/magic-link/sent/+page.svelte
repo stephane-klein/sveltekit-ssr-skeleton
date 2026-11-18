@@ -12,8 +12,10 @@
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
+            class="font-bold text-base no-underline hover:underline"
         >
+            {m.app_name()}
+        </a>
     </div>
 </header>
 
@@ -29,12 +31,16 @@
     <p class="text-sm text-gray-500">
         <a
             href="/login"
-            class="text-blue-600 hover:underline">{m.magic_sent_different_email()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.magic_sent_different_email()}
+        </a>
         |
         <a
             href="/"
-            class="text-blue-600 hover:underline">{m.magic_sent_go_home()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.magic_sent_go_home()}
+        </a>
     </p>
 </main>

@@ -11,8 +11,10 @@
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
+            class="font-bold text-base no-underline hover:underline"
         >
+            {m.app_name()}
+        </a>
     </div>
 </header>
 
@@ -54,8 +56,10 @@
         <div class="mb-3">
             <label
                 for="email"
-                class="block text-sm font-semibold mb-1">{m.login_email_label()}</label
+                class="block text-sm font-semibold mb-1"
             >
+                {m.login_email_label()}
+            </label>
             <!-- svelte-ignore a11y_autofocus -->
             <input
                 type="email"
@@ -71,8 +75,10 @@
         <div class="mb-3">
             <label
                 for="password"
-                class="block text-sm font-semibold mb-1">{m.login_password_label()}</label
+                class="block text-sm font-semibold mb-1"
             >
+                {m.login_password_label()}
+            </label>
             <input
                 type="password"
                 id="password"
@@ -99,8 +105,10 @@
             </button>
             <a
                 href="/reset-password"
-                class="text-sm text-blue-600 hover:underline">{m.login_forgot_password()}</a
+                class="text-sm text-blue-600 hover:underline"
             >
+                {m.login_forgot_password()}
+            </a>
         </div>
     </form>
 
@@ -108,12 +116,16 @@
         {m.login_no_account()}
         <a
             href="/signup"
-            class="text-blue-600 hover:underline">{m.login_create_one()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.login_create_one()}
+        </a>
         |
         <a
             href="/"
-            class="text-blue-600 hover:underline">{m.login_back_home()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.login_back_home()}
+        </a>
     </p>
 </main>

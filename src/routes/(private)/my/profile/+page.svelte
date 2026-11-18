@@ -28,8 +28,10 @@
             <div class="mb-3.5">
                 <label
                     for="display-name"
-                    class="block text-sm font-semibold mb-1">{m.my_profile_display_name_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_profile_display_name_label()}
+                </label>
                 <input
                     type="text"
                     id="display-name"
@@ -43,8 +45,10 @@
             <div class="mb-3.5">
                 <label
                     for="email"
-                    class="block text-sm font-semibold mb-1">{m.my_profile_email_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_profile_email_label()}
+                </label>
                 <input
                     type="email"
                     id="email"
@@ -69,8 +73,10 @@
         <p class="mt-5 text-sm">
             <a
                 href="/my/password"
-                class="text-blue-600 hover:underline">{m.my_profile_change_password()}</a
+                class="text-blue-600 hover:underline"
             >
+                {m.my_profile_change_password()}
+            </a>
         </p>
     </div>
 </main>

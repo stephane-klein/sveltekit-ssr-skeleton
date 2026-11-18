@@ -10,18 +10,24 @@
     <div class="page px-5 py-2 flex items-center justify-between">
         <a
             href="/"
-            class="font-bold text-base no-underline">{m.app_name()}</a
+            class="font-bold text-base no-underline"
         >
+            {m.app_name()}
+        </a>
         <nav>
             <a
                 href="/login"
-                class="text-sm text-gray-500 no-underline hover:text-blue-600 hover:underline">{m.sign_in()}</a
+                class="text-sm text-gray-500 no-underline hover:text-blue-600 hover:underline"
             >
+                {m.sign_in()}
+            </a>
             |
             <a
                 href="/signup"
-                class="text-sm text-gray-500 no-underline hover:text-blue-600 hover:underline">{m.create_account()}</a
+                class="text-sm text-gray-500 no-underline hover:text-blue-600 hover:underline"
             >
+                {m.create_account()}
+            </a>
         </nav>
     </div>
 </header>
@@ -32,6 +38,7 @@
     <a
         href="/login"
         class="px-4 py-1.5 bg-blue-600 text-white border border-blue-600 rounded-sm text-sm font-semibold no-underline inline-block hover:bg-blue-700"
-        >{m.welcome_cta()}</a
     >
+        {m.welcome_cta()}
+    </a>
 </main>

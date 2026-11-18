@@ -13,8 +13,10 @@
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
+            class="font-bold text-base no-underline hover:underline"
         >
+            {m.app_name()}
+        </a>
     </div>
 </header>
 
@@ -40,8 +42,10 @@
                     <br />{m.reset_password_debug()}
                     <a
                         href="/change-password?token={form.resetLink.split('token=')[1]}"
-                        class="text-blue-600 hover:underline">reset link</a
+                        class="text-blue-600 hover:underline"
                     >
+                        reset link
+                    </a>
                 {/if}
             </p>
         </div>
@@ -58,8 +62,10 @@
             <div class="mb-3">
                 <label
                     for="email"
-                    class="block text-sm font-semibold mb-1">{m.reset_password_email_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.reset_password_email_label()}
+                </label>
                 <!-- svelte-ignore a11y_autofocus -->
                 <input
                     type="email"
@@ -86,12 +92,16 @@
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
         <a
             href="/login"
-            class="text-blue-600 hover:underline">{m.reset_password_back_signin()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.reset_password_back_signin()}
+        </a>
         |
         <a
             href="/"
-            class="text-blue-600 hover:underline">{m.reset_password_homepage()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.reset_password_homepage()}
+        </a>
     </p>
 </main>

@@ -32,8 +32,10 @@
                 <div class="mb-3.5">
                     <label
                         for="current-password"
-                        class="block text-sm font-semibold mb-1">{m.my_password_current_label()}</label
+                        class="block text-sm font-semibold mb-1"
                     >
+                        {m.my_password_current_label()}
+                    </label>
                     <input
                         type="password"
                         id="current-password"
@@ -71,8 +73,10 @@
             <div class="mb-3.5">
                 <label
                     for="new-password"
-                    class="block text-sm font-semibold mb-1">{m.my_password_new_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_password_new_label()}
+                </label>
                 <input
                     type="password"
                     id="new-password"
@@ -87,8 +91,10 @@
             <div class="mb-3.5">
                 <label
                     for="confirm"
-                    class="block text-sm font-semibold mb-1">{m.my_password_confirm_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_password_confirm_label()}
+                </label>
                 <input
                     type="password"
                     id="confirm"

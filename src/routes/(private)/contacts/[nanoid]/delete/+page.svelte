@@ -25,8 +25,10 @@
             </button>
             <a
                 href="/contacts"
-                class="text-sm text-blue-600 hover:underline">{m.contact_delete_cancel()}</a
+                class="text-sm text-blue-600 hover:underline"
             >
+                {m.contact_delete_cancel()}
+            </a>
         </div>
     </form>
 </main>

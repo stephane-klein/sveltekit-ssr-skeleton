@@ -20,18 +20,24 @@
             <nav class="flex items-center gap-1">
                 <a
                     href="/docs"
-                    class="text-gray-500 no-underline hover:underline">{m.footer_docs()}</a
+                    class="text-gray-500 no-underline hover:underline"
                 >
+                    {m.footer_docs()}
+                </a>
                 |
                 <a
                     href="/about"
-                    class="text-gray-500 no-underline hover:underline">{m.footer_about()}</a
+                    class="text-gray-500 no-underline hover:underline"
                 >
+                    {m.footer_about()}
+                </a>
                 |
                 <a
                     href="/api/reference"
-                    class="text-gray-500 no-underline hover:underline">{m.footer_api()}</a
+                    class="text-gray-500 no-underline hover:underline"
                 >
+                    {m.footer_api()}
+                </a>
             </nav>
 
             <nav class="flex text-sm">
@@ -43,8 +49,9 @@
                             onclick={() => setLocale(locale)}
                             title={localeTitles[locale]}
                             class="bg-transparent border-none cursor-pointer p-0 font-inherit text-inherit hover:underline"
-                            >{localeLabels[locale]}</button
                         >
+                            {localeLabels[locale]}
+                        </button>
                     {/if}
                     {#if locale !== locales[locales.length - 1]}<span class="ml-0.5"> |</span>
                     {/if}

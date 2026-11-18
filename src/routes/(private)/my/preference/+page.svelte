@@ -20,8 +20,10 @@
             <div class="mb-3.5">
                 <label
                     for="timezone"
-                    class="block text-sm font-semibold mb-1">{m.my_prefs_timezone_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_prefs_timezone_label()}
+                </label>
                 <select
                     id="timezone"
                     name="timezone"
@@ -30,8 +32,10 @@
                     <option value="UTC">UTC</option>
                     <option
                         value="Europe/Paris"
-                        selected>Europe/Paris</option
+                        selected
                     >
+                        Europe/Paris
+                    </option>
                     <option value="America/New_York">America/New_York</option>
                     <option value="Asia/Tokyo">Asia/Tokyo</option>
                 </select>
@@ -40,8 +44,10 @@
             <div class="mb-3.5">
                 <label
                     for="language"
-                    class="block text-sm font-semibold mb-1">{m.my_prefs_language_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_prefs_language_label()}
+                </label>
                 <select
                     id="language"
                     name="language"
@@ -49,12 +55,16 @@
                 >
                     <option
                         value="en"
-                        selected={data.user.locale === "en"}>English</option
+                        selected={data.user.locale === "en"}
                     >
+                        English
+                    </option>
                     <option
                         value="fr"
-                        selected={data.user.locale === "fr"}>Français</option
+                        selected={data.user.locale === "fr"}
                     >
+                        Français
+                    </option>
                 </select>
             </div>
 

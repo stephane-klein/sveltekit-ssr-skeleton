@@ -59,8 +59,10 @@
             <div class="mb-3">
                 <label
                     for="name"
-                    class="block text-sm font-semibold mb-1">{m.my_tokens_name_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_tokens_name_label()}
+                </label>
                 <input
                     type="text"
                     id="name"
@@ -73,8 +75,10 @@
             <div class="mb-3">
                 <label
                     for="expiresInDays"
-                    class="block text-sm font-semibold mb-1">{m.my_tokens_expiration_label()}</label
+                    class="block text-sm font-semibold mb-1"
                 >
+                    {m.my_tokens_expiration_label()}
+                </label>
                 <input
                     type="number"
                     id="expiresInDays"
@@ -106,20 +110,24 @@
                     <tr>
                         <th
                             class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300 pr-2"
-                            >{m.my_tokens_column_name()}</th
                         >
+                            {m.my_tokens_column_name()}
+                        </th>
                         <th
                             class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300 pr-2"
-                            >{m.my_tokens_column_created()}</th
                         >
+                            {m.my_tokens_column_created()}
+                        </th>
                         <th
                             class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300 pr-2"
-                            >{m.my_tokens_column_last_used()}</th
                         >
+                            {m.my_tokens_column_last_used()}
+                        </th>
                         <th
                             class="text-left text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300 pr-2"
-                            >{m.my_tokens_column_expires()}</th
                         >
+                            {m.my_tokens_column_expires()}
+                        </th>
                         <th
                             class="text-right text-xs font-bold uppercase tracking-wider text-gray-500 pb-1.5 border-b border-gray-300"
                         ></th>
@@ -128,15 +136,15 @@
                 <tbody>
                     {#each data.tokens as token (token.id)}
                         <tr>
-                            <td class="py-1.5 pr-2 border-b border-gray-200 {isExpired(token) ? 'text-gray-400' : ''}"
-                                >{token.name}</td
-                            >
-                            <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs"
-                                >{new Date(token.created_at).toLocaleDateString()}</td
-                            >
-                            <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs"
-                                >{token.last_used ? new Date(token.last_used).toLocaleDateString() : "—"}</td
-                            >
+                            <td class="py-1.5 pr-2 border-b border-gray-200 {isExpired(token) ? 'text-gray-400' : ''}">
+                                {token.name}
+                            </td>
+                            <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs">
+                                {new Date(token.created_at).toLocaleDateString()}
+                            </td>
+                            <td class="py-1.5 pr-2 border-b border-gray-200 text-gray-500 text-xs">
+                                {token.last_used ? new Date(token.last_used).toLocaleDateString() : "—"}
+                            </td>
                             <td
                                 class="py-1.5 pr-2 border-b border-gray-200 text-xs {isExpired(token)
                                     ? 'text-red-600 font-semibold'

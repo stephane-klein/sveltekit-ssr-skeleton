@@ -3,3 +3,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - "@sveltejs/adapter-node@6.0.4"
   - "@sveltejs/kit@3.3.1"
+  - prettier-plugin-svelte@4.2.0

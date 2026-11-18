@@ -16,8 +16,10 @@
     <div class="page px-5 py-2">
         <a
             href="/"
-            class="font-bold text-base no-underline hover:underline">{m.app_name()}</a
+            class="font-bold text-base no-underline hover:underline"
         >
+            {m.app_name()}
+        </a>
     </div>
 </header>
 
@@ -29,8 +31,10 @@
         <p class="text-sm text-gray-500">
             <a
                 href="/reset-password"
-                class="text-blue-600 hover:underline">{m.change_password_request_new()}</a
+                class="text-blue-600 hover:underline"
             >
+                {m.change_password_request_new()}
+            </a>
         </p>
     {:else}
         {#if data?.valid}
@@ -46,8 +50,10 @@
                 <div class="mb-3">
                     <label
                         for="password"
-                        class="block text-sm font-semibold mb-1">{m.change_password_new_label()}</label
+                        class="block text-sm font-semibold mb-1"
                     >
+                        {m.change_password_new_label()}
+                    </label>
                     <!-- svelte-ignore a11y_autofocus -->
                     <input
                         type="password"
@@ -64,8 +70,10 @@
                 <div class="mb-3">
                     <label
                         for="confirm"
-                        class="block text-sm font-semibold mb-1">{m.change_password_confirm_label()}</label
+                        class="block text-sm font-semibold mb-1"
                     >
+                        {m.change_password_confirm_label()}
+                    </label>
                     <input
                         type="password"
                         id="confirm"
@@ -91,7 +99,9 @@
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
         <a
             href="/login"
-            class="text-blue-600 hover:underline">{m.change_password_back_signin()}</a
+            class="text-blue-600 hover:underline"
         >
+            {m.change_password_back_signin()}
+        </a>
     </p>
 </main>
