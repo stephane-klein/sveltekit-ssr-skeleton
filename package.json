@@ -39,9 +39,9 @@
   },
   "devDependencies": {
     "@eslint/js": "~10.0.1",
-    "@inlang/paraglide-js": "~2.29.3",
-    "@inlang/plugin-m-function-matcher": "~2.3.4",
-    "@inlang/plugin-message-format": "~4.5.5",
+    "@inlang/paraglide-js": "~3.2.2",
+    "@inlang/plugin-m-function-matcher": "~2.4.3",
+    "@inlang/plugin-message-format": "~4.6.0",
     "@sveltejs/adapter-node": "~6.0.4",
     "@sveltejs/kit": "~3.3.1",
     "@unocss/extractor-svelte": "~66.13.0",
