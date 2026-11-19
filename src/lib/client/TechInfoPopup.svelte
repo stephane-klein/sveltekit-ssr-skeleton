@@ -107,6 +107,8 @@
         if (!popupEl || !open) return;
         if (popupEl.contains(event.target)) return;
         if (event.target.closest(".trigger")) return;
+        // Following a link is a navigation, not a dismissal.
+        if (event.target.closest("a")) return;
         open = false;
     }
 
