@@ -50,6 +50,7 @@ CREATE TABLE api_tokens (
 );
 
 CREATE INDEX idx_api_tokens_user_id ON api_tokens (user_id);
+CREATE UNIQUE INDEX idx_api_tokens_user_id_name ON api_tokens (user_id, name);
 
 CREATE TABLE password_reset_tokens (
     id         TEXT                     NOT NULL PRIMARY KEY,

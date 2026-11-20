@@ -9,6 +9,7 @@
     "format": "prettier --list-different --write .",
     "lint": "eslint .",
     "lint:pkg": "pnpm npmPkgJsonLint .",
+    "test": "node --test \"test/**/*.test.js\"",
     "dev": "bash scripts/export-git-env.sh vite dev",
     "build": "vite build",
     "preview": "bash scripts/export-git-env.sh vite preview",

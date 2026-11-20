@@ -78,6 +78,7 @@ Default user (see [`./sqls/seeds/00002_users.sql`](./sqls/seeds/00002_users.sql)
 
 - email: `alice@example.com`
 - password: `password123`
+- API token `demo`: `REPLACE_ME_ALICE_API_TOKEN_32_CHARS_MIN`
 
 ### Testing the built version of the webapp locally
 
@@ -91,6 +92,7 @@ Default user (see [`./sqls/seeds/00002_users.sql`](./sqls/seeds/00002_users.sql)
 
 - email: alice@example.com
 - password: password123
+- API token `demo`: `REPLACE_ME_ALICE_API_TOKEN_32_CHARS_MIN`
 
 ### Pitchfork basics
 
@@ -183,7 +185,7 @@ workflow reconcile the set of users with a declared desired state:
 - `PUT /api/v1/admin/users/sync` — create/update/delete several users in one
   atomic transaction. Body: `{ "upsert": [...], "delete": [{ "email" }] }`.
   Deleting a non-existent email is a no-op. Response: `{ created, updated,
-deleted, users }`.
+deleted, tokens, raw_tokens, users }`.
 
 The workflow is declarative: a configuration file (your GitOps source of truth)
 declares the desired users, and a runner applies it to the instance. Because the
@@ -213,6 +215,33 @@ The first apply reports `created: 2`; editing `display_name` in the file and
 re-applying reports `updated: 2`; moving an existing email into `delete` reports
 `deleted: 1`. Re-applying the same payload is idempotent — the resulting state
 is stable.
+
+Each `upsert` item can also declare its API tokens, so user creation and token
+provisioning happen in the same atomic request:
+
+```json
+{
+  "upsert": [
+    {
+      "email": "alice@example.com",
+      "display_name": "Alice Admin",
+      "tokens": {
+        "upsert": [{ "name": "demo", "token": "REPLACE_ME_ALICE_API_TOKEN_32_CHARS_MIN" }],
+        "delete": ["old-token"]
+      }
+    }
+  ]
+}
+```
+
+A token declaration with an explicit `token` sets its value; re-applying the same
+value is a no-op. A declaration without `token` creates the token with a
+generated value and returns it once in `data.raw_tokens`. Tokens are matched by
+name, unique per user, and are reconciled rather than fully replaced: removing a
+declaration does not delete the token, so use `tokens.delete` to prune it. The
+API stores only the SHA-256 hash. See the
+[Helm chart README](./helm/my-app/README.md#managing-api-tokens-in-the-same-payload)
+for the full semantics, including rotation and expiration.
 
 Single-user upsert, e.g. create or update `john.doe@example.com`:
 

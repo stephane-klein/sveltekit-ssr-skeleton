@@ -3,7 +3,15 @@
     {
       "email": "alice@example.com",
       "display_name": "Alice Admin",
-      "password": "password123"
+      "password": "password123",
+      "tokens": {
+        "upsert": [
+          {
+            "name": "demo",
+            "token": "REPLACE_ME_ALICE_API_TOKEN_32_CHARS_MIN"
+          }
+        ]
+      }
     },
     {
       "email": "bob@example.com",
