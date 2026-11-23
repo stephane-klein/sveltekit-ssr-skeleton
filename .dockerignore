@@ -1,0 +1,10 @@
+# Docker/buildx counterpart of .containerignore. Keep both files in sync.
+# Local secrets, never sent to the build context.
+.secret
+
+node_modules/
+.svelte-kit/
+.git/
+.jj/
+deployment-playground/
+build/

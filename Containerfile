@@ -21,6 +21,8 @@ COPY . .
 RUN pnpm build
 
 # ─────────────────────────────────────────────────────
+FROM ghcr.io/gitleaks/gitleaks:v8.30.1 AS gitleaks
+
 FROM node:24-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends curl \
@@ -55,6 +57,11 @@ COPY --from=build /app/build/ ./build/
 COPY src/ ./src/
 COPY sqls/ ./sqls/
 COPY entrypoint.sh /entrypoint.sh
+
+RUN --mount=from=gitleaks,source=/usr/bin/gitleaks,target=/usr/local/bin/gitleaks \
+    --mount=type=bind,source=.gitleaks-image.toml,target=/tmp/.gitleaks.toml \
+    gitleaks dir --no-banner --redact --config /tmp/.gitleaks.toml /app && \
+    gitleaks dir --no-banner --redact --config /tmp/.gitleaks.toml /entrypoint.sh
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:${PORT:-3000}/-/healthy || exit 1

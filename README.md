@@ -413,7 +413,8 @@ reach the remote repository.
 
 - **`git commit`** — the `git-hooks/pre-commit` hook checks staged files.
 
-Configuration is in `.gitleaks.toml`.
+Configuration is in `.gitleaks.toml` for local scans and in
+`.gitleaks-image.toml` for the container image scan.
 
 **One-time setup after clone:**
 
