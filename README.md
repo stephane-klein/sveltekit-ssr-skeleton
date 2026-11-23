@@ -24,7 +24,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 - Tooling: [Mise](https://mise.jdx.dev/), [Pitchfork](https://pitchfork.jdx.dev/)
 - Dev mail: [Mailpit](https://github.com/axllent/mailpit) (SMTP + web UI)
 - Containers: Podman Compose
-- Secret detection: [gitleaks](https://github.com/gitleaks/gitleaks)
+- Secret detection: [betterleaks](https://github.com/betterleaks/betterleaks)
 
 ## Included Features
 
@@ -406,15 +406,15 @@ The chart is published at `oci://ghcr.io/stephane-klein/charts/my-app`.
 
 ## Contribution
 
-### Secret detection with gitleaks
+### Secret detection with betterleaks
 
-[Gitleaks](https://github.com/gitleaks/gitleaks) scans for secrets before they
-reach the remote repository.
+[Betterleaks](https://github.com/betterleaks/betterleaks) scans for secrets before
+they reach the remote repository.
 
 - **`git commit`** — the `git-hooks/pre-commit` hook checks staged files.
 
-Configuration is in `.gitleaks.toml` for local scans and in
-`.gitleaks-image.toml` for the container image scan.
+Configuration is in `.betterleaks.toml` for local scans and in
+`.betterleaks-image.toml` for the container image scan.
 
 **One-time setup after clone:**
 
@@ -426,6 +426,6 @@ $ mise run setup-git-hooks
 **Manual scan** (outside of hooks):
 
 ```bash
-$ mise run gitleaks-scan        # full project scan
-$ mise run gitleaks-check-push  # pre-push scan
+$ mise run betterleaks-scan        # full project scan
+$ mise run betterleaks-check-push  # pre-push scan
 ```

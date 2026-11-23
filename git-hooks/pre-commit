@@ -7,9 +7,9 @@ if ! command -v mise &>/dev/null; then
     exit 1
 fi
 
-echo "Running gitleaks to check for secrets leaks..."
+echo "Running betterleaks to check for secrets leaks..."
 
-mise exec -- gitleaks git --no-banner --pre-commit --staged -v
+mise exec -- betterleaks git --no-banner --pre-commit --staged -v
 
-echo "No leaks detected by gitleaks."
+echo "No leaks detected by betterleaks."
 exit 0

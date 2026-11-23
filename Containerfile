@@ -21,7 +21,7 @@ COPY . .
 RUN pnpm build
 
 # ─────────────────────────────────────────────────────
-FROM ghcr.io/gitleaks/gitleaks:v8.30.1 AS gitleaks
+FROM ghcr.io/betterleaks/betterleaks:v1.10.1 AS betterleaks
 
 FROM node:24-slim
 
@@ -58,10 +58,10 @@ COPY src/ ./src/
 COPY sqls/ ./sqls/
 COPY entrypoint.sh /entrypoint.sh
 
-RUN --mount=from=gitleaks,source=/usr/bin/gitleaks,target=/usr/local/bin/gitleaks \
-    --mount=type=bind,source=.gitleaks-image.toml,target=/tmp/.gitleaks.toml \
-    gitleaks dir --no-banner --redact --config /tmp/.gitleaks.toml /app && \
-    gitleaks dir --no-banner --redact --config /tmp/.gitleaks.toml /entrypoint.sh
+RUN --mount=from=betterleaks,source=/usr/bin/betterleaks,target=/usr/local/bin/betterleaks \
+    --mount=type=bind,source=.betterleaks-image.toml,target=/tmp/.betterleaks.toml \
+    betterleaks dir --no-banner --redact --config /tmp/.betterleaks.toml /app && \
+    betterleaks dir --no-banner --redact --config /tmp/.betterleaks.toml /entrypoint.sh
 
 HEALTHCHECK --interval=15s --timeout=5s --start-period=30s --retries=3 \
   CMD curl -f http://localhost:${PORT:-3000}/-/healthy || exit 1

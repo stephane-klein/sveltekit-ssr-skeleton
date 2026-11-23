@@ -1,10 +1,6 @@
 [extend]
 useDefault = true
 
-[[rules]]
-id = "generic-api-key"
-entropy = 2
-
 [[allowlists]]
 description = "Allow .secret files (local-only, never committed)"
 paths = [
@@ -34,4 +30,14 @@ description = "Throwaway credentials of the local Authelia test environment"
 paths = [
     '''(?:^|/)authelia-test-env/secrets/key\.pem$''',
     '''(?:^|/)authelia-test-env/configuration/configuration\.yml$''',
+]
+
+# Betterleaks reports generic secret rules that Gitleaks did not have. These
+# values are local development placeholders, i18n labels and a package script,
+# never real credentials. The regexes are anchored to avoid hiding a real
+# secret that merely contains one of these words.
+[[allowlists]]
+description = "Local development placeholders and labels, not secrets"
+regexes = [
+    '''^(?:password|password123|admin123|postgres|node src/hash-password\.js|Forgot password\?|Change password|Mot de passe oublié \?|Changer le mot de passe)$''',
 ]
