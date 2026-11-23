@@ -3,7 +3,6 @@ import { dev } from "$app/env";
 import { getTextDirection, serverAsyncLocalStorage } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { SESSION_COOKIE_NAME, setSessionCookie, validateApiToken, validateSession } from "#lib/server/auth.js";
-import { sql } from "#lib/server/pg.js";
 import { logger } from "#lib/server/logger.js";
 import { renderDuration } from "#lib/server/metrics.js";
 import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "#lib/server/pg-metrics.js";
@@ -33,11 +32,7 @@ async function authHandle({ event, resolve }) {
                 setSessionCookie(event.cookies, session.id);
             }
 
-            const [user] = await sql`SELECT id, email, display_name, locale FROM users WHERE id = ${session.user_id}`;
-
-            if (user) {
-                event.locals.user = user;
-            }
+            event.locals.user = session.user;
         } else {
             event.cookies.delete(SESSION_COOKIE_NAME, { path: "/" });
         }
@@ -53,11 +48,7 @@ async function authHandle({ event, resolve }) {
             if (token?.expired) {
                 event.locals.authFailure = "expired";
             } else if (token) {
-                const [user] = await sql`SELECT id, email, display_name, locale FROM users WHERE id = ${token.user_id}`;
-
-                if (user) {
-                    event.locals.user = user;
-                }
+                event.locals.user = token.user;
             }
         }
     }

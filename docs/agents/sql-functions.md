@@ -83,8 +83,56 @@ Do not silence NOTICEs globally: silence the ones you expect, keep the rest.
    `... = notice` when they would emit NOTICEs.
 4. Prefer `LANGUAGE sql` over `LANGUAGE plpgsql` when the body is declarative
    (see `AGENTS.md` → Database).
-5. Add a `COMMENT ON FUNCTION ...` describing the function.
-6. Run `pnpm migrate` twice to confirm it is idempotent and silent.
+5. If the function serves a page render, follow "One stored function per page
+   render" below: one JSONB document, named arguments, and an index that serves
+   the function's order and filters.
+6. Add a `COMMENT ON FUNCTION ...` describing the function.
+7. Run `pnpm migrate` twice to confirm it is idempotent and silent.
+
+## One stored function per page render
+
+Rule and rationale:
+[ADR 002](../decisions/2026-11_002-single-sql-function-per-page-render.md).
+
+A `load` function that needs several values from the database calls **one** stored
+function returning one JSONB document. The JavaScript layer decodes the payload and
+does the presentation work only: page arithmetic, hrefs, formatting.
+
+```js
+const [row] = await sql.unsafe(
+  `SELECT get_contacts_page_data(
+        _limit => $1::int,
+        _offset => $2::int
+    ) AS data`,
+  [PAGE_SIZE, offset],
+);
+
+const total = Number(row.data.total);
+const contacts = row.data.contacts;
+```
+
+`sql.unsafe()` is required because a tagged template cannot write `_limit => $1`.
+All arguments must use the named form: PostgreSQL rejects a positional argument
+that follows a named one.
+
+`sql.unsafe()` also sends an unnamed statement, which PostgreSQL always plans on
+demand with the real parameter values. This matters for a function that branches on
+a parameter (for example direction-guarded `UNION ALL` branches) or that depends on
+an index-only count and an early-exit `LIMIT`. A tagged template is prepared under
+a name by default, and PostgreSQL may switch to a generic plan after a few
+executions.
+
+Keep the JSON contract small and document it with `COMMENT ON FUNCTION`. Cast
+`bigint` columns to text (`id::text`) when the JavaScript layer treats them as
+strings: JSON numbers lose precision above 2^53. `timestamptz` values arrive as
+strings in the server's `DateStyle` output; when a browser will call `new Date()`
+on them, emit an ISO 8601 UTC string with `to_char(created_at AT TIME ZONE 'UTC',
+'YYYY-MM-DD"T"HH24:MI:SS"Z"')`.
+
+Give the function's `ORDER BY` and filters an index that serves them. For the
+contacts list, `ORDER BY id LIMIT/OFFSET` walks the primary key index, so no
+additional index is needed. A paginated view with a filtered or time-ordered
+predicate usually needs a dedicated index.
 
 ## Relationship with schema.sql
 

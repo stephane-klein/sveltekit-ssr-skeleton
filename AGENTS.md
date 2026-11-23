@@ -48,6 +48,27 @@ control flow). Reserve `LANGUAGE plpgsql` for functions that genuinely need
 procedural features: `IF`, loops, `RAISE EXCEPTION`, dynamic SQL (`EXECUTE`), or
 `SELECT ... INTO` variables.
 
+Every page render that needs several values from the database must be served by a
+single stored SQL function returning one JSONB document built with CTEs — one
+round-trip per render. See
+[`docs/decisions/2026-11_002-single-sql-function-per-page-render.md`](docs/decisions/2026-11_002-single-sql-function-per-page-render.md).
+
+Call a stored function with PostgreSQL's named-argument notation:
+
+```sql
+SELECT get_contacts_page_data(
+    _limit => $1::int,
+    _offset => $2::int
+)
+```
+
+All arguments must use the named form — PostgreSQL rejects a positional argument
+that follows a named one. A tagged template cannot express this notation, so these
+calls use `sql.unsafe(sql, params)`. `sql.unsafe()` sends an unnamed statement,
+which PostgreSQL always custom-plans; a function whose body branches on a
+parameter value, or that relies on an index-only count or an early-exit `LIMIT`,
+needs that plan-time visibility.
+
 ### Database cursors
 
 `pg.js` records query durations through the `postgres:query` diagnostics

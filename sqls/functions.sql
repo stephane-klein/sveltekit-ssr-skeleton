@@ -79,3 +79,42 @@ $$;
 
 COMMENT ON FUNCTION generate_nanoid(INT, TEXT)
     IS 'Generates a nanoid from cryptographically secure random bytes.';
+
+-- Returns one contacts page and its total in a single round-trip. The page CTE
+-- walks the primary key index, so `ORDER BY id LIMIT/OFFSET` stops after the
+-- requested rows. The JSON aggregate orders explicitly: the array order is part
+-- of the contract, not a side effect of the plan.
+CREATE OR REPLACE FUNCTION get_contacts_page_data(
+    _limit integer,
+    _offset integer
+) RETURNS jsonb
+LANGUAGE sql
+STABLE
+PARALLEL SAFE
+AS $$
+    WITH page AS (
+        SELECT id, nanoid, firstname, lastname, created_at
+        FROM contacts
+        ORDER BY id
+        LIMIT _limit
+        OFFSET _offset
+    ),
+    total AS (
+        SELECT count(*)::int AS n FROM contacts
+    )
+    SELECT jsonb_build_object(
+        'contacts', COALESCE((
+            SELECT jsonb_agg(jsonb_build_object(
+                'nanoid', nanoid,
+                'firstname', firstname,
+                'lastname', lastname,
+                'created_at', to_char(created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+            ) ORDER BY id)
+            FROM page
+        ), '[]'::jsonb),
+        'total', (SELECT n FROM total)
+    );
+$$;
+
+COMMENT ON FUNCTION get_contacts_page_data(INT, INT)
+    IS 'Returns the contacts page (up to _limit rows from _offset) and the total row count as one JSONB document.';

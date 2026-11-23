@@ -35,7 +35,13 @@ export async function createSession(userId, expiresInMs = SESSION_EXPIRES_IN_MS)
 
 export async function validateSession(sessionId) {
     const [session] = await sql`
-        SELECT s.id, s.user_id, s.expires_at, u.is_active
+        SELECT s.id,
+               s.expires_at,
+               u.id AS user_id,
+               u.email,
+               u.display_name,
+               u.locale,
+               u.is_active
         FROM sessions s
         INNER JOIN users u ON u.id = s.user_id
         WHERE s.id = ${sessionId}
@@ -58,11 +64,19 @@ export async function validateSession(sessionId) {
     if (nowMs >= session.expires_at.getTime() - SESSION_EXPIRES_IN_MS / 2) {
         const newExpiresAt = new Date(nowMs + SESSION_EXPIRES_IN_MS);
         await sql`UPDATE sessions SET expires_at = ${newExpiresAt} WHERE id = ${session.id}`;
-        session.expiresAt = newExpiresAt;
         session.renewed = true;
     }
 
-    return session;
+    return {
+        id: session.id,
+        renewed: session.renewed,
+        user: {
+            id: session.user_id,
+            email: session.email,
+            display_name: session.display_name,
+            locale: session.locale,
+        },
+    };
 }
 
 export async function invalidateSession(sessionId) {
@@ -101,7 +115,8 @@ export async function validateApiToken(raw) {
     const tokenHash = await hashToken(raw);
 
     const [token] = await sql`
-        SELECT t.id, t.user_id, t.expires_at, u.is_active
+        SELECT t.id, t.expires_at,
+               u.id AS user_id, u.email, u.display_name, u.locale, u.is_active
         FROM api_tokens t
         INNER JOIN users u ON u.id = t.user_id
         WHERE t.token_hash = ${tokenHash}
@@ -113,7 +128,14 @@ export async function validateApiToken(raw) {
 
     await sql`UPDATE api_tokens SET last_used = ${now()} WHERE id = ${token.id}`;
 
-    return token;
+    return {
+        user: {
+            id: token.user_id,
+            email: token.email,
+            display_name: token.display_name,
+            locale: token.locale,
+        },
+    };
 }
 
 export async function deleteApiToken(tokenId) {
