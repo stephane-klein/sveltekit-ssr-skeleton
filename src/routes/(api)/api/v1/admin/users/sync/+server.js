@@ -1,20 +1,10 @@
-import { safeParse } from "valibot";
 import { generateApiTokenSecret, generateId, hashPassword, hashToken } from "#lib/server/auth.js";
-import { planApiTokenChange } from "#lib/server/api-token-sync.js";
+import { SyncError, planUserSync, validateUpsertItem } from "#lib/server/user-sync.js";
 import { sql } from "#lib/server/pg.js";
-import { userSyncUpsertSchema } from "#lib/schemas/user.js";
 import { problem } from "#lib/server/problem.js";
 import { requireAdminToken } from "../../_helpers.js";
 
 const MAX_BATCH_SIZE = 1000;
-
-class SyncError extends Error {
-    constructor(status, detail) {
-        super(detail);
-        this.status = status;
-        this.detail = detail;
-    }
-}
 
 function conflictDetail(err) {
     if (err.constraint_name === "users_email_key") return "A user with this email already exists";
@@ -22,82 +12,53 @@ function conflictDetail(err) {
     return "A token with this name or value already exists";
 }
 
-function validateTokenSync(tokens, email) {
-    const tokenUpserts = tokens?.upsert ?? [];
-    const tokenDeletes = tokens?.delete ?? [];
-    const seenUpsert = new Set();
-    const seenDelete = new Set();
-
-    const upsert = tokenUpserts.map((token) => {
-        const name = token.name.trim();
-
-        if (seenUpsert.has(name)) {
-            throw new SyncError(422, `duplicate token name in upsert for ${email}: ${name}`);
-        }
-        seenUpsert.add(name);
-
-        const expiresAt =
-            token.expires_at === undefined ? undefined : token.expires_at === null ? null : new Date(token.expires_at);
-
-        if (expiresAt && expiresAt.getTime() <= Date.now()) {
-            throw new SyncError(422, `expires_at must be in the future for ${email}: ${name}`);
-        }
-
-        return {
-            name,
-            token: token.token ?? null,
-            expiresAt,
-        };
-    });
-
-    const deletes = tokenDeletes.map((rawName) => {
-        const name = rawName.trim();
-
-        if (seenDelete.has(name)) {
-            throw new SyncError(422, `duplicate token name in delete for ${email}: ${name}`);
-        }
-        seenDelete.add(name);
-
-        return name;
-    });
-
-    for (const name of deletes) {
-        if (seenUpsert.has(name)) {
-            throw new SyncError(422, `token name present in both upsert and delete for ${email}: ${name}`);
-        }
+// Applies the plan produced by planUserSync() with SQL only. The sequential
+// loops are the transaction's contract: user rows exist before their tokens
+// are written, and user deletes run last.
+async function applyUserSync(tx, plan, now) {
+    for (const insert of plan.userInserts) {
+        await tx`
+            INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
+            VALUES (${insert.userId}, ${insert.email}, ${insert.displayName}, ${insert.passwordHash},
+                    ${insert.oidcIssuer}, ${insert.oidcSubject})
+        `;
     }
 
-    return { upsert, delete: deletes };
-}
-
-function validateUpsertItem(item) {
-    const fields = safeParse(userSyncUpsertSchema, item);
-    if (!fields.success) {
-        throw new SyncError(400, fields.issues[0].message);
-    }
-    const { email: rawEmail, display_name, password, oidc_issuer, oidc_subject, tokens } = fields.output;
-    const email = rawEmail?.trim();
-    const displayName = display_name?.trim();
-    const oidcIssuer = oidc_issuer?.replace(/\/$/, "").trim();
-    const oidcSubject = oidc_subject?.trim();
-
-    if (!email) throw new SyncError(400, "each upsert item must have a non-empty email");
-    if (!displayName) throw new SyncError(400, "each upsert item must have a non-empty display_name");
-
-    const hasOidc = oidcIssuer !== undefined || oidcSubject !== undefined;
-    if ((oidcIssuer === undefined) !== (oidcSubject === undefined)) {
-        throw new SyncError(422, "Both oidc_issuer and oidc_subject must be provided together");
+    for (const update of plan.userUpdates) {
+        await tx`
+            UPDATE users
+            SET display_name  = ${update.displayName},
+                password_hash = ${update.password ? update.passwordHash : update.existing.password_hash},
+                oidc_issuer   = ${update.oidcIssuer},
+                oidc_subject  = ${update.oidcSubject},
+                updated_at    = ${now}
+            WHERE email = ${update.email}
+        `;
     }
 
-    return {
-        email,
-        displayName,
-        password,
-        oidcIssuer: oidcIssuer || null,
-        oidcSubject: oidcSubject || null,
-        hasOidc,
-        tokens: validateTokenSync(tokens, email),
-    };
+    for (const insert of plan.tokenInserts) {
+        await tx`
+            INSERT INTO api_tokens (id, user_id, name, token_hash, expires_at)
+            VALUES (${generateId()}, ${insert.userId}, ${insert.name}, ${insert.tokenHash},
+                    ${insert.expiresAt})
+        `;
+    }
+
+    for (const update of plan.tokenUpdates) {
+        await tx`
+            UPDATE api_tokens
+            SET token_hash = ${update.tokenHash}, expires_at = ${update.expiresAt}
+            WHERE id = ${update.id}
+        `;
+    }
+
+    for (const tokenId of plan.tokenDeletes) {
+        await tx`DELETE FROM api_tokens WHERE id = ${tokenId}`;
+    }
+
+    for (const email of plan.userDeletes) {
+        await tx`DELETE FROM users WHERE email = ${email}`;
+    }
 }
 
 export async function PUT(event) {
@@ -116,39 +77,36 @@ export async function PUT(event) {
             return problem(422, `batch size must not exceed ${MAX_BATCH_SIZE} items`, event.request.url);
         }
 
-        const upsertItems = [];
-        const deleteEmails = [];
-        const seenUpsert = new Set();
-        const seenDelete = new Set();
-
-        for (const item of upsert) {
+        const seenUpsertEmails = new Set();
+        const upsertItems = upsert.map((item) => {
             if (typeof item !== "object" || item === null) {
-                return problem(422, "each upsert item must be an object", event.request.url);
+                throw new SyncError(422, "each upsert item must be an object");
             }
             const validated = validateUpsertItem(item);
-            if (seenUpsert.has(validated.email)) {
-                return problem(422, `duplicate email in upsert: ${validated.email}`, event.request.url);
+            if (seenUpsertEmails.has(validated.email)) {
+                throw new SyncError(422, `duplicate email in upsert: ${validated.email}`);
             }
-            seenUpsert.add(validated.email);
-            upsertItems.push(validated);
-        }
+            seenUpsertEmails.add(validated.email);
+            return validated;
+        });
 
-        for (const item of deleteTargets) {
+        const seenDeleteEmails = new Set();
+        const deleteEmails = deleteTargets.map((item) => {
             const email = item?.email?.trim();
             if (!email) {
-                return problem(422, "each delete item must be an object with a non-empty email", event.request.url);
+                throw new SyncError(422, "each delete item must be an object with a non-empty email");
             }
-            if (seenDelete.has(email)) {
-                return problem(422, `duplicate email in delete: ${email}`, event.request.url);
+            if (seenDeleteEmails.has(email)) {
+                throw new SyncError(422, `duplicate email in delete: ${email}`);
             }
-            seenDelete.add(email);
-            deleteEmails.push(email);
-        }
+            seenDeleteEmails.add(email);
+            return email;
+        });
 
-        for (const email of deleteEmails) {
-            if (seenUpsert.has(email)) {
-                return problem(422, `email present in both upsert and delete: ${email}`, event.request.url);
-            }
+        const upsertEmailSet = new Set(upsertItems.map((item) => item.email));
+        const conflictEmail = deleteEmails.find((email) => upsertEmailSet.has(email));
+        if (conflictEmail) {
+            throw new SyncError(422, `email present in both upsert and delete: ${conflictEmail}`);
         }
 
         // Hash passwords and token values before opening the transaction, so the
@@ -177,15 +135,8 @@ export async function PUT(event) {
 
         const now = new Date();
 
-        const {
-            created,
-            updated,
-            deleted,
-            tokens: tokenSummary,
-            rawTokens,
-            users,
-        } = await sql.begin(async (tx) => {
-            const emails = [...seenUpsert, ...deleteEmails];
+        const { summary, rawTokens, users } = await sql.begin(async (tx) => {
+            const emails = [...upsertEmailSet, ...deleteEmails];
             const existingRows = await tx`
                 SELECT id, email, password_hash FROM users WHERE email IN ${tx(emails)}
             `;
@@ -220,101 +171,30 @@ export async function PUT(event) {
                 existingTokenRows.map((row) => [`${row.user_id}\u0000${row.name}`, row]),
             );
 
-            let created = 0;
-            let updated = 0;
-            let deleted = 0;
-            const tokenSummary = { created: 0, updated: 0, deleted: 0, unchanged: 0 };
-            const rawTokens = [];
+            const plan = planUserSync({
+                items: preparedUpsertItems,
+                userIdByEmail,
+                deleteEmails,
+                existingUsers: existingByEmail,
+                existingTokens: existingTokenByUserAndName,
+            });
 
-            for (const item of preparedUpsertItems) {
-                const existing = existingByEmail.get(item.email);
-                const userId = userIdByEmail.get(item.email);
-
-                if (!existing) {
-                    await tx`
-                        INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
-                        VALUES (${userId}, ${item.email}, ${item.displayName}, ${item.passwordHash},
-                                ${item.oidcIssuer}, ${item.oidcSubject})
-                    `;
-                    created += 1;
-                } else {
-                    await tx`
-                        UPDATE users
-                        SET display_name  = ${item.displayName},
-                            password_hash = ${item.password ? item.passwordHash : existing.password_hash},
-                            oidc_issuer   = ${item.oidcIssuer},
-                            oidc_subject  = ${item.oidcSubject},
-                            updated_at    = ${now}
-                        WHERE email = ${item.email}
-                    `;
-                    updated += 1;
-                }
-
-                for (const token of item.tokens.upsert) {
-                    const existingToken = existingTokenByUserAndName.get(`${userId}\u0000${token.name}`) ?? null;
-                    const plan = planApiTokenChange({
-                        existing: existingToken,
-                        providedHash: token.providedHash,
-                        generatedHash: token.generatedHash,
-                        expiresAt: token.expiresAt,
-                    });
-
-                    if (plan.action === "created") {
-                        await tx`
-                            INSERT INTO api_tokens (id, user_id, name, token_hash, expires_at)
-                            VALUES (${generateId()}, ${userId}, ${token.name}, ${plan.tokenHash},
-                                    ${plan.expiresAt})
-                        `;
-                    } else if (plan.action === "updated") {
-                        await tx`
-                            UPDATE api_tokens
-                            SET token_hash = ${plan.tokenHash}, expires_at = ${plan.expiresAt}
-                            WHERE id = ${existingToken.id}
-                        `;
-                    }
-
-                    tokenSummary[plan.action] += 1;
-
-                    if (plan.generated && plan.action === "created") {
-                        rawTokens.push({
-                            email: item.email,
-                            name: token.name,
-                            token: token.generatedRaw,
-                        });
-                    }
-                }
-
-                for (const name of item.tokens.delete) {
-                    const existingToken = existingTokenByUserAndName.get(`${userId}\u0000${name}`);
-
-                    if (existingToken) {
-                        await tx`DELETE FROM api_tokens WHERE id = ${existingToken.id}`;
-                        tokenSummary.deleted += 1;
-                    }
-                }
-            }
-
-            for (const email of deleteEmails) {
-                if (existingByEmail.has(email)) {
-                    await tx`DELETE FROM users WHERE email = ${email}`;
-                    deleted += 1;
-                }
-            }
+            await applyUserSync(tx, plan, now);
 
             const users = await tx`
                 SELECT id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
                 FROM users ORDER BY created_at, id
             `;
 
-            return { created, updated, deleted, tokens: tokenSummary, rawTokens, users };
+            return { summary: plan.summary, rawTokens: plan.rawTokens, users };
         });
 
         return Response.json({
             data: {
-                created,
-                updated,
-                deleted,
-                tokens: tokenSummary,
+                created: summary.created,
+                updated: summary.updated,
+                deleted: summary.deleted,
+                tokens: summary.tokens,
                 raw_tokens: rawTokens,
                 users,
             },
