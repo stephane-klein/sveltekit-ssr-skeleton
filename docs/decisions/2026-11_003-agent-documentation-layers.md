@@ -125,8 +125,8 @@ holds the criteria and the trigger rule.
 - Bad, because three places must be maintained, and discipline is required to
   avoid duplication and circular links.
 - Bad, because Claude Code does not discover skills until #31005 is fixed.
-- Bad, because agent prompts are OpenCode-specific, so Claude Code users do not
-  get the `node-refactor` subagent.
+- Bad, because agent prompts are OpenCode-specific: a refactor subagent, if one
+  is ever created, would not be available to Claude Code users.
 - Neutral, because skills are optional: the rules and the reference remain useful
   without them.
 - Neutral, because `AGENTS.md` grows by a few routing lines, not by whole

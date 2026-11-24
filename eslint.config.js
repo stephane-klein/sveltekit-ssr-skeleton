@@ -14,6 +14,7 @@ const baseLanguageOptions = {
 
 const baseRules = {
     semi: "error",
+    "no-param-reassign": ["error", { props: true }],
     "array-callback-return": "error",
     "no-useless-concat": "error",
     "space-before-function-paren": ["error", { anonymous: "always", named: "never", asyncArrow: "always" }],

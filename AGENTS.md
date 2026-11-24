@@ -148,34 +148,48 @@ The production image runs `node /app/build/index.js` via the `serve` command in 
 
 ## Node.js Paradigms
 
-### Code style
+These rules apply to every `.js` file and to the `<script>` blocks of `.svelte`
+files, except where Svelte runes require an assignment.
 
-- Inline simple logic: prefer inline expressions over extracting helper functions for trivial operations (e.g., single `await sql` calls).
-- Extract functions only when code reuse, readability, or testability genuinely benefits.
+Before writing or refactoring JavaScript, read `docs/agents/node-paradigms.md`.
+It holds the before/after examples, the approved exceptions and the review
+questions.
 
-### Functional style
+### Rules
 
-- Prefer chaining `.map()`, `.filter()`, `.reduce()`, `.forEach()` over imperative loops.
-- Avoid intermediate variables without semantic value (_expression-oriented_):
-  prefer `getMonths().map(...)` to `const months = getMonths(); months.map(...)`.
-  Prefer `(await Promise.all(...)).forEach(...)` to `const results = []; for (...)`.
-  If a step is complex, prefer a comment over a superfluous variable.
-- Avoid mutations: no `.push()` in a loop if `.map()` suffices (_immutability_).
+1. **Compose instead of looping.** Use `.map()`, `.filter()`, `.reduce()` or
+   `.flatMap()` when the loop builds a new value. Keep `for` only when the
+   sequence is the point: a retry with early exit, SQL statements inside a
+   transaction, a stream read.
+2. **Do not mutate.** Do not push into an accumulator that `map()` or `flatMap()`
+   can build. Do not reassign a row returned by the database. Do not increment a
+   counter that `filter().length` can derive.
+3. **Name what you bind.** Prefer `getMonths().map(...)` to
+   `const months = getMonths(); months.map(...)`. A binding earns its place when
+   its name carries meaning, not when it shortens a line.
+4. **Name every callback argument.** Write `map((n) => add1(n))`, never
+   `map(add1)`.
+5. **Separate the decision from the effect.** When a function decides and writes
+   in the same place, extract the decision into a pure function and test it.
+   `planApiTokenChange()` in `src/lib/server/api-token-sync.js` is the model.
+6. **Inline trivial logic.** Prefer an inline expression to a helper that wraps
+   one call. Extract a function when it is reused, when it names a step, or when
+   it makes the code testable.
+
+Approved exceptions are listed in `docs/agents/node-paradigms.md`. Do not "fix"
+them.
 
 ### Import naming
 
-When a module exports generic names (e.g., `runWithMetrics`, `summarize`) that
-only make sense within the module's domain, use `as` at the import site to make
-the domain explicit:
+When a module exports a generic name (`runWithMetrics`, `summarize`) that only
+makes sense in its domain, rename it at the import site:
 
-```js
-import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "#lib/server/pg-metrics.js";
-```
+`import { runWithMetrics as runWithPgMetrics } from "#lib/server/pg-metrics.js";`
 
-### To avoid
+### Definition of done
 
-- Tacit programming / point-free style: always explicitly name function arguments.
-  Prefer `[1,2,3].map(n => add1(n))` to `[1,2,3].map(add1)`.
+`pnpm check` and `pnpm test` pass. For a refactor, the diff changes no observable
+behavior.
 
 ## OpenAPI Spec Sync
 

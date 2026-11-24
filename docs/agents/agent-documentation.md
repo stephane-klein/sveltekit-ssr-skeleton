@@ -175,12 +175,16 @@ the procedure; it only names the skill.
 
 This example is illustrative; the skill is not created yet.
 
-- `AGENTS.md` says: ``For multi-file JavaScript refactors, load the `node-refactor` skill.``
-- `.agents/skills/node-refactor/SKILL.md` has
-  `disable-model-invocation: true`, reads `docs/agents/node-paradigms.md`, applies
-  the checklist, and runs `pnpm check:agents`, `pnpm check` and `pnpm test`.
-- `docs/agents/node-paradigms.md` contains the rules, examples, and exceptions.
-  It may say: ``In OpenCode, the procedure is the `node-refactor` skill.``
+- `AGENTS.md` already carries the trigger: ``Before writing or refactoring
+JavaScript, read `docs/agents/node-paradigms.md`.`` It stays in place until a
+  multi-file refactor ignores it.
+- If that happens, `.agents/skills/node-refactor/SKILL.md` is created with
+  `disable-model-invocation: true`, named with its exact ID in `AGENTS.md`; it
+  reads `docs/agents/node-paradigms.md`, applies the review questions, and runs
+  `pnpm check:agents`, `pnpm check` and `pnpm test`.
+- `docs/agents/node-paradigms.md` contains the examples, the exceptions, and the
+  review questions. The rules themselves stay in `AGENTS.md`. It may say:
+  ``In OpenCode, the procedure is the `node-refactor` skill.``
 
-The content lives in the reference document. The skill carries the procedure.
-`AGENTS.md` carries the trigger. None of them duplicates another.
+The content lives in the reference document. The skill would carry the
+procedure. `AGENTS.md` carries the trigger. None of them duplicates another.

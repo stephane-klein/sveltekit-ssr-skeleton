@@ -20,6 +20,7 @@ const LOCALE_COOKIE = "locale";
 const COOKIE_OPTS = { path: "/", maxAge: 34560000, sameSite: "lax", httpOnly: false };
 
 async function authHandle({ event, resolve }) {
+    // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
     event.locals.user = null;
 
     const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
@@ -32,6 +33,7 @@ async function authHandle({ event, resolve }) {
                 setSessionCookie(event.cookies, session.id);
             }
 
+            // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
             event.locals.user = session.user;
         } else {
             event.cookies.delete(SESSION_COOKIE_NAME, { path: "/" });
@@ -46,8 +48,10 @@ async function authHandle({ event, resolve }) {
             const token = await validateApiToken(raw);
 
             if (token?.expired) {
+                // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
                 event.locals.authFailure = "expired";
             } else if (token) {
+                // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
                 event.locals.user = token.user;
             }
         }
@@ -60,6 +64,7 @@ async function authHandle({ event, resolve }) {
     }
 
     if (effectiveLocale) {
+        // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
         event.locals.effectiveLocale = effectiveLocale;
         event.cookies.set(LOCALE_COOKIE, effectiveLocale, COOKIE_OPTS);
     }
@@ -80,6 +85,7 @@ async function authHandle({ event, resolve }) {
 
 const paraglideHandle = ({ event, resolve }) =>
     paraglideMiddleware(event.request, ({ request, locale }) => {
+        // eslint-disable-next-line no-param-reassign -- paraglide replaces the request to attach the locale
         event.request = request;
 
         const effectiveLocale = event.locals.effectiveLocale || locale;
