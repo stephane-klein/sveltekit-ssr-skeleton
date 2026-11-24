@@ -57,11 +57,7 @@ async function authHandle({ event, resolve }) {
         }
     }
 
-    let effectiveLocale = event.cookies.get(LOCALE_COOKIE);
-
-    if (!effectiveLocale && event.locals.user?.locale) {
-        effectiveLocale = event.locals.user.locale;
-    }
+    const effectiveLocale = event.cookies.get(LOCALE_COOKIE) || event.locals.user?.locale;
 
     if (effectiveLocale) {
         // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store

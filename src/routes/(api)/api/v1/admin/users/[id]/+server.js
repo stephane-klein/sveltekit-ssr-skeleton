@@ -42,6 +42,11 @@ export async function PATCH(event) {
     if (!parsed.success) {
         return problem(422, parsed.issues[0].message, event.request.url);
     }
+
+    if (Object.keys(body).length === 0) {
+        return problem(400, "No fields to update", event.request.url);
+    }
+
     const { email, display_name, password, oidc_issuer, oidc_subject, is_active } = parsed.output;
     const emailTrim = email?.trim();
     const displayNameTrim = display_name?.trim();
@@ -70,16 +75,9 @@ export async function PATCH(event) {
         }
     }
 
-    if (Object.keys(body).length === 0) {
-        return problem(400, "No fields to update", event.request.url);
-    }
-
     const now = new Date();
 
-    let passwordHash = null;
-    if (password) {
-        passwordHash = await hashPassword(password);
-    }
+    const passwordHash = password ? await hashPassword(password) : null;
 
     const [user] = await sql`
         UPDATE users

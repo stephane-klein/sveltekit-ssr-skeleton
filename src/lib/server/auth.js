@@ -20,13 +20,9 @@ export function generateId() {
     return nanoid();
 }
 
-function now() {
-    return new Date();
-}
-
 export async function createSession(userId, expiresInMs = SESSION_EXPIRES_IN_MS) {
     const id = generateId();
-    const expiresAt = new Date(now().getTime() + expiresInMs);
+    const expiresAt = new Date(new Date().getTime() + expiresInMs);
 
     await sql`INSERT INTO sessions (id, user_id, expires_at) VALUES (${id}, ${userId}, ${expiresAt})`;
 
@@ -49,7 +45,7 @@ export async function validateSession(sessionId) {
 
     if (!session) return null;
 
-    const nowMs = now().getTime();
+    const nowMs = new Date().getTime();
 
     if (nowMs >= session.expires_at.getTime()) {
         await sql`DELETE FROM sessions WHERE id = ${session.id}`;
@@ -61,15 +57,16 @@ export async function validateSession(sessionId) {
         return null;
     }
 
-    if (nowMs >= session.expires_at.getTime() - SESSION_EXPIRES_IN_MS / 2) {
+    const renewed = nowMs >= session.expires_at.getTime() - SESSION_EXPIRES_IN_MS / 2;
+
+    if (renewed) {
         const newExpiresAt = new Date(nowMs + SESSION_EXPIRES_IN_MS);
         await sql`UPDATE sessions SET expires_at = ${newExpiresAt} WHERE id = ${session.id}`;
-        session.renewed = true;
     }
 
     return {
         id: session.id,
-        renewed: session.renewed,
+        renewed,
         user: {
             id: session.user_id,
             email: session.email,
@@ -88,11 +85,8 @@ export async function invalidateAllUserSessions(userId) {
 }
 
 export async function hashToken(token) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(token);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+    return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export function generateApiTokenSecret() {
@@ -103,7 +97,7 @@ export async function createApiToken(userId, name, expiresInDays = null) {
     const id = generateId();
     const raw = generateApiTokenSecret();
     const tokenHash = await hashToken(raw);
-    const expiresAt = expiresInDays ? new Date(now().getTime() + expiresInDays * 24 * 3600 * 1000) : null;
+    const expiresAt = expiresInDays ? new Date(new Date().getTime() + expiresInDays * 24 * 3600 * 1000) : null;
 
     await sql`INSERT INTO api_tokens (id, user_id, name, token_hash, expires_at)
               VALUES (${id}, ${userId}, ${name}, ${tokenHash}, ${expiresAt})`;
@@ -124,9 +118,9 @@ export async function validateApiToken(raw) {
 
     if (!token) return null;
     if (!token.is_active) return null;
-    if (token.expires_at && now().getTime() >= token.expires_at.getTime()) return { expired: true };
+    if (token.expires_at && new Date().getTime() >= token.expires_at.getTime()) return { expired: true };
 
-    await sql`UPDATE api_tokens SET last_used = ${now()} WHERE id = ${token.id}`;
+    await sql`UPDATE api_tokens SET last_used = ${new Date()} WHERE id = ${token.id}`;
 
     return {
         user: {
@@ -152,7 +146,7 @@ export async function createPasswordResetToken(email) {
 
     const raw = nanoid(48);
     const tokenHash = await hashToken(raw);
-    const expiresAt = new Date(now().getTime() + 1000 * 60 * 30);
+    const expiresAt = new Date(new Date().getTime() + 1000 * 60 * 30);
 
     await sql`INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at)
               VALUES (${generateId()}, ${user.id}, ${tokenHash}, ${expiresAt})`;
@@ -169,7 +163,7 @@ export async function validatePasswordResetToken(raw) {
         INNER JOIN users u ON u.id = t.user_id
         WHERE t.token_hash = ${tokenHash}
           AND t.used = FALSE
-          AND t.expires_at > ${now()}
+          AND t.expires_at > ${new Date()}
     `;
 
     if (!token) return null;
@@ -178,7 +172,7 @@ export async function validatePasswordResetToken(raw) {
 }
 
 export async function usePasswordResetToken(tokenId, userId, newPasswordHash) {
-    await sql`UPDATE users SET password_hash = ${newPasswordHash}, updated_at = ${now()} WHERE id = ${userId}`;
+    await sql`UPDATE users SET password_hash = ${newPasswordHash}, updated_at = ${new Date()} WHERE id = ${userId}`;
     await sql`UPDATE password_reset_tokens SET used = TRUE WHERE id = ${tokenId}`;
     await invalidateAllUserSessions(userId);
 }
@@ -189,7 +183,7 @@ export async function createMagicLoginToken(email) {
 
     const raw = nanoid(48);
     const tokenHash = await hashToken(raw);
-    const expiresAt = new Date(now().getTime() + 1000 * 60 * 15);
+    const expiresAt = new Date(new Date().getTime() + 1000 * 60 * 15);
 
     await sql`INSERT INTO magic_link_tokens (id, user_id, token_hash, expires_at)
               VALUES (${generateId()}, ${user.id}, ${tokenHash}, ${expiresAt})`;
@@ -205,7 +199,7 @@ export async function validateMagicLoginToken(raw) {
         FROM magic_link_tokens t
         WHERE t.token_hash = ${tokenHash}
           AND t.used = FALSE
-          AND t.expires_at > ${now()}
+          AND t.expires_at > ${new Date()}
     `;
 
     if (!token) return null;

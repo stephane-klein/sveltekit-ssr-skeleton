@@ -28,11 +28,11 @@ export async function GET(event) {
           `;
 
     const hasMore = users.length > pageSize;
-    if (hasMore) users.pop();
+    const page = hasMore ? users.slice(0, pageSize) : users;
 
     return Response.json({
-        data: users,
-        next_cursor: hasMore ? generateCursor(users[users.length - 1]) : null,
+        data: page,
+        next_cursor: hasMore ? generateCursor(page[page.length - 1]) : null,
         _links: {
             self: { href: "/api/v1/admin/users" },
         },

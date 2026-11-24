@@ -6,15 +6,13 @@ const templates = import.meta.glob("./*.yaml", {
     eager: true,
 });
 
-const cache = {};
+const cache = new Map();
 
 function load(name) {
-    if (!cache[name]) {
-        const raw = templates[`./${name}.yaml`];
-        if (!raw) throw new Error(`Template not found: ${name}`);
-        cache[name] = yaml.load(raw);
-    }
-    return cache[name];
+    const raw = templates[`./${name}.yaml`];
+    if (!raw) throw new Error(`Template not found: ${name}`);
+
+    return cache.get(name) ?? cache.set(name, yaml.load(raw)).get(name);
 }
 
 export function renderEmail(name, { link, locale }) {
