@@ -21,7 +21,8 @@ This project uses **ESLint** with `eslint-plugin-svelte` for linting and
 
 - `pnpm lint` — check for code issues
 - `pnpm format` — auto-format code
-- `pnpm check` — run both (format check + lint)
+- `pnpm check:agents` — check the agent documentation invariants
+- `pnpm check` — run all checks (agent docs, format, lint)
 
 Configuration: `eslint.config.js`, `prettier.config.js`
 
@@ -83,7 +84,7 @@ to stop early.
 
 The following files are examples meant to be replaced with your actual project code:
 
-- `sqls/migrations/00001_initial/` — example migration (creates a sample `contacts` table)
+- `sqls/migrations/00001_initial.sql` — example migration (creates a sample `contacts` table)
 - `sqls/seeds/00001_contacts.sql` — example seed data
 - `sqls/seeds/00002_users.sql` — demo account (`alice@example.com` / `password123`)
 - `sqls/schema.sql` — example consolidated schema
@@ -141,7 +142,7 @@ client-only component → `src/lib/client/`.
 The `Containerfile` uses a two-stage build:
 
 1. **Stage 1 (`build`)** — installs all deps, runs `pnpm build`
-2. **Stage 2 (production)** — installs only prod deps, copies `build/`, `src/db.js`, `src/logger.js`, `src/migrate.js`, `src/seed.js`, and `sqls/`
+2. **Stage 2 (production)** — installs only prod deps, copies `build/`, `src/`, `sqls/`, and `entrypoint.sh`
 
 The production image runs `node /app/build/index.js` via the `serve` command in `entrypoint.sh` (which also runs migrations before starting the server).
 
@@ -217,9 +218,15 @@ pitfall, email templates, login flows): see `docs/agents/i18n.md`.
 
 ## Supplementary Documentation
 
+Agent knowledge is split into three layers: `AGENTS.md` for always-on rules,
+`.agents/skills/` for procedures, and `docs/agents/` for reference. Architecture
+decisions live in `docs/decisions/`. See
+[`docs/agents/agent-documentation.md`](docs/agents/agent-documentation.md).
+
 - [`docs/agents/`](docs/agents/) — operational snapshots of subsystems (loaded on demand by the agent)
 - [`docs/decisions/`](docs/decisions/) — architecture decision records
-- `.opencode/skills/new-decision/` — skill for creating new decision records
+- [`.agents/skills/new-decision/`](.agents/skills/new-decision/) — skill for creating new decision records
+- To change the agent configuration, load the `agent-config-change` skill.
 
 ## Documentation Maintenance
 

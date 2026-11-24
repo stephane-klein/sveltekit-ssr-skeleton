@@ -5,7 +5,8 @@
   "repository": "github:stephane-klein/sveltekit-ssr-skeleton",
   "type": "module",
   "scripts": {
-    "check": "prettier --check . && eslint .",
+    "check": "node scripts/check-agent-docs.js && prettier --check . && eslint .",
+    "check:agents": "node scripts/check-agent-docs.js",
     "format": "prettier --list-different --write .",
     "lint": "eslint .",
     "lint:pkg": "pnpm npmPkgJsonLint .",

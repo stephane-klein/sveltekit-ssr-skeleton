@@ -47,6 +47,10 @@ run ="pnpm run format"
 [tasks.check]
 run ="pnpm run check"
 
+[tasks.check-agent-docs]
+description = "Check the agent documentation invariants"
+run = "pnpm run check:agents"
+
 [tasks.lint-pkg]
 run = "pnpm run lint:pkg"
 

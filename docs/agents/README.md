@@ -15,5 +15,6 @@ discrepancy, it should flag it.
 
 Files are loaded on demand by the agent toolchain.
 
+- [`agent-documentation.md`](./agent-documentation.md) — where agent rules, skills and reference docs live
 - [`i18n.md`](./i18n.md) — Paraglide JS i18n implementation details
 - [`sql-functions.md`](./sql-functions.md) — stored functions (`sqls/functions.sql`) reloaded on every migrate
