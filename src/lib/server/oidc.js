@@ -54,34 +54,38 @@ function createAuthorizationURLWithPKCE(authorizationEndpoint, state, codeVerifi
     return url;
 }
 
-async function discoverEndpoints() {
-    if (endpointsCache) return endpointsCache;
-
-    const discoveryUrl = `${issuer}/.well-known/openid-configuration`;
-
+// Shared fetch + JSON parse logic for the OIDC HTTP calls. `label` names the
+// exchange ("OpenID configuration", "OIDC token", "OIDC userinfo") in the log
+// and error messages. The caller decides how to react to a throw; this helper
+// only logs the failure with enough context to debug it.
+async function fetchJson(url, { label, init }) {
     let res;
     try {
-        res = await fetch(discoveryUrl);
+        res = await fetch(url, init);
     } catch (err) {
-        logger.error({ err, discoveryUrl }, "OIDC discovery fetch failed");
-        throw new Error(`Failed to fetch OpenID configuration: ${err.message}`, { cause: err });
+        logger.error({ err, url }, `${label} request failed`);
+        throw new Error(`Failed to fetch ${label}: ${err.message}`, { cause: err });
     }
 
     if (!res.ok) {
-        logger.error(
-            { discoveryUrl, status: res.status, statusText: res.statusText },
-            "OIDC discovery returned non-OK status",
-        );
-        throw new Error(`Failed to fetch OpenID configuration: ${res.status}`);
+        logger.error({ url, status: res.status, statusText: res.statusText }, `${label} returned non-OK status`);
+        throw new Error(`Failed to fetch ${label}: ${res.status}`);
     }
 
-    let config;
     try {
-        config = await res.json();
+        return await res.json();
     } catch (err) {
-        logger.error({ err, discoveryUrl }, "OIDC discovery response was not valid JSON");
-        throw new Error("Failed to parse OpenID configuration", { cause: err });
+        logger.error({ err, url }, `${label} response was not valid JSON`);
+        throw new Error(`Failed to parse ${label} response`, { cause: err });
     }
+}
+
+async function discoverEndpoints() {
+    if (endpointsCache) return endpointsCache;
+
+    const config = await fetchJson(`${issuer}/.well-known/openid-configuration`, {
+        label: "OpenID configuration",
+    });
 
     endpointsCache = {
         authorizationEndpoint: config.authorization_endpoint,
@@ -130,9 +134,9 @@ export async function validateAuthorizationCode(code, codeVerifier) {
 
     const basicCredentials = Buffer.from(`${clientId}:${clientSecret}`).toString("base64");
 
-    let res;
-    try {
-        res = await fetch(tokenEndpoint, {
+    const tokens = await fetchJson(tokenEndpoint, {
+        label: "OIDC token",
+        init: {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -140,36 +144,33 @@ export async function validateAuthorizationCode(code, codeVerifier) {
                 Authorization: `Basic ${basicCredentials}`,
             },
             body,
-        });
-    } catch (err) {
-        logger.error({ err, tokenEndpoint }, "OIDC token request failed");
-        throw err;
-    }
-
-    if (!res.ok) {
-        logger.error(
-            { tokenEndpoint, status: res.status, statusText: res.statusText },
-            "OIDC token endpoint returned non-OK status",
-        );
-        throw new Error(`OIDC token request failed: ${res.status}`);
-    }
-
-    let tokens;
-    try {
-        tokens = await res.json();
-    } catch (err) {
-        logger.error({ err, tokenEndpoint }, "OIDC token response was not valid JSON");
-        throw new Error("Failed to parse OIDC token response", { cause: err });
-    }
+        },
+    });
 
     logger.info("OIDC authorization code validated");
 
     return tokens;
 }
 
-export async function getUserInfoEndpoint() {
+async function getUserInfoEndpoint() {
     const { userinfoEndpoint } = await discoverEndpoints();
     return userinfoEndpoint;
+}
+
+// Fetches the userinfo document an access token gives access to. The OIDC
+// callback route used to inline this fetch, its status check, its parse and
+// its error mapping.
+export async function fetchUserInfo(accessToken) {
+    const userinfoEndpoint = await getUserInfoEndpoint();
+
+    const userinfo = await fetchJson(userinfoEndpoint, {
+        label: "OIDC userinfo",
+        init: { headers: { Authorization: `Bearer ${accessToken}` } },
+    });
+
+    logger.info({ email: userinfo.email }, "Userinfo fetched");
+
+    return userinfo;
 }
 
 export function extractClaims(idToken) {

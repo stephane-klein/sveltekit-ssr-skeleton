@@ -2,8 +2,33 @@ import { safeParse } from "valibot";
 import { generateId, hashPassword } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
 import { userFieldsSchema } from "#lib/schemas/user.js";
+import { normalizeUserFields } from "#lib/shared/user-fields.js";
 import { problem } from "#lib/server/problem.js";
 import { generateCursor, requireAdminToken } from "../_helpers.js";
+
+async function insertUser({ email, displayName, passwordHash, oidcIssuer, oidcSubject }) {
+    const [user] = await sql`
+        INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
+        VALUES (${generateId()}, ${email || null}, ${displayName || null}, ${passwordHash},
+                ${oidcIssuer || null}, ${oidcSubject || null})
+        RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
+    `;
+    return user;
+}
+
+async function updateUser({ email, displayName, password, passwordHash, oidcIssuer, oidcSubject, existing }) {
+    const [user] = await sql`
+        UPDATE users
+        SET display_name  = ${displayName},
+            password_hash = ${password ? passwordHash : existing.password_hash},
+            oidc_issuer   = ${oidcIssuer || null},
+            oidc_subject  = ${oidcSubject || null},
+            updated_at    = ${new Date()}
+        WHERE email = ${email}
+        RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
+    `;
+    return user;
+}
 
 export async function GET(event) {
     const authError = requireAdminToken(event);
@@ -49,11 +74,8 @@ export async function POST(event) {
     if (!parsed.success) {
         return problem(400, parsed.issues[0].message, event.request.url);
     }
-    const { email, display_name, password, oidc_issuer, oidc_subject } = parsed.output;
-    const emailTrim = email?.trim();
-    const displayNameTrim = display_name?.trim();
-    const oidcIssuer = oidc_issuer?.replace(/\/$/, "").trim();
-    const oidcSubject = oidc_subject?.trim();
+    const { email, displayName, oidcIssuer, oidcSubject } = normalizeUserFields(parsed.output);
+    const { password } = parsed.output;
 
     const hasOidc = oidcIssuer !== undefined || oidcSubject !== undefined;
 
@@ -62,12 +84,12 @@ export async function POST(event) {
     }
 
     if (!hasOidc) {
-        if (!emailTrim) return problem(400, "email is required", event.request.url);
-        if (!displayNameTrim) return problem(400, "display_name is required", event.request.url);
+        if (!email) return problem(400, "email is required", event.request.url);
+        if (!displayName) return problem(400, "display_name is required", event.request.url);
     }
 
-    if (emailTrim) {
-        const existing = await sql`SELECT id FROM users WHERE email = ${emailTrim}`;
+    if (email) {
+        const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
         if (existing.length > 0) {
             return problem(409, "A user with this email already exists", event.request.url);
         }
@@ -82,16 +104,9 @@ export async function POST(event) {
         }
     }
 
-    const id = generateId();
     const passwordHash = password ? await hashPassword(password) : null;
-    const displayName = displayNameTrim || null;
 
-    const [user] = await sql`
-        INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
-        VALUES (${id}, ${emailTrim || null}, ${displayName}, ${passwordHash},
-                ${oidcIssuer || null}, ${oidcSubject || null})
-        RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
-    `;
+    const user = await insertUser({ email, displayName, passwordHash, oidcIssuer, oidcSubject });
 
     return Response.json(
         {
@@ -118,11 +133,8 @@ export async function PUT(event) {
     if (!parsed.success) {
         return problem(400, parsed.issues[0].message, event.request.url);
     }
-    const { email: rawEmail, display_name, password, oidc_issuer, oidc_subject } = parsed.output;
-    const email = rawEmail?.trim();
-    const displayName = display_name?.trim();
-    const oidcIssuer = oidc_issuer?.replace(/\/$/, "").trim();
-    const oidcSubject = oidc_subject?.trim();
+    const { email, displayName, oidcIssuer, oidcSubject } = normalizeUserFields(parsed.output);
+    const { password } = parsed.output;
 
     if (!email) return problem(400, "email is required", event.request.url);
     if (!displayName) return problem(400, "display_name is required", event.request.url);
@@ -146,29 +158,10 @@ export async function PUT(event) {
     }
 
     const passwordHash = password ? await hashPassword(password) : null;
-    const now = new Date();
 
-    let user;
-    if (!existing) {
-        const id = generateId();
-        [user] = await sql`
-            INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
-            VALUES (${id}, ${email}, ${displayName}, ${passwordHash},
-                    ${oidcIssuer || null}, ${oidcSubject || null})
-            RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
-        `;
-    } else {
-        [user] = await sql`
-            UPDATE users
-            SET display_name  = ${displayName},
-                password_hash = ${password ? passwordHash : existing.password_hash},
-                oidc_issuer   = ${oidcIssuer || null},
-                oidc_subject  = ${oidcSubject || null},
-                updated_at    = ${now}
-            WHERE email = ${email}
-            RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
-        `;
-    }
+    const user = existing
+        ? await updateUser({ email, displayName, password, passwordHash, oidcIssuer, oidcSubject, existing })
+        : await insertUser({ email, displayName, passwordHash, oidcIssuer, oidcSubject });
 
     return Response.json({
         data: user,

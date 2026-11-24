@@ -2,6 +2,7 @@ import { safeParse } from "valibot";
 import { hashPassword } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
 import { userPatchSchema } from "#lib/schemas/user.js";
+import { normalizeUserFields } from "#lib/shared/user-fields.js";
 import { problem } from "#lib/server/problem.js";
 import { requireAdminToken } from "../../_helpers.js";
 
@@ -47,14 +48,11 @@ export async function PATCH(event) {
         return problem(400, "No fields to update", event.request.url);
     }
 
-    const { email, display_name, password, oidc_issuer, oidc_subject, is_active } = parsed.output;
-    const emailTrim = email?.trim();
-    const displayNameTrim = display_name?.trim();
-    const oidcIssuer = oidc_issuer?.replace(/\/$/, "").trim();
-    const oidcSubject = oidc_subject?.trim();
+    const { password, is_active } = parsed.output;
+    const { email, displayName, oidcIssuer, oidcSubject } = normalizeUserFields(parsed.output);
 
-    if (emailTrim !== undefined) {
-        const conflict = await sql`SELECT id FROM users WHERE email = ${emailTrim} AND id != ${event.params.id}`;
+    if (email !== undefined) {
+        const conflict = await sql`SELECT id FROM users WHERE email = ${email} AND id != ${event.params.id}`;
         if (conflict.length > 0) {
             return problem(409, "A user with this email already exists", event.request.url);
         }
@@ -82,8 +80,8 @@ export async function PATCH(event) {
     const [user] = await sql`
         UPDATE users
         SET
-            email         = COALESCE(${emailTrim || null}, email),
-            display_name  = COALESCE(${displayNameTrim || null}, display_name),
+            email         = COALESCE(${email || null}, email),
+            display_name  = COALESCE(${displayName || null}, display_name),
             password_hash = CASE WHEN ${!!password} THEN ${passwordHash} ELSE password_hash END,
             oidc_issuer   = COALESCE(${oidcIssuer || null}, oidc_issuer),
             oidc_subject  = COALESCE(${oidcSubject || null}, oidc_subject),

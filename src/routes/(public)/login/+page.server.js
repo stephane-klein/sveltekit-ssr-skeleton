@@ -8,6 +8,9 @@ import { isAutheliaConfigured } from "#lib/server/oidc.js";
 import { clearLoginAttempts, isLoginThrottled, registerLoginAttempt } from "#lib/server/rate-limit.js";
 
 const THROTTLE_MESSAGE = "Too many sign-in attempts. Please try again later.";
+// A single generic message for every failure path so attackers cannot
+// enumerate valid accounts by distinguishing the responses.
+const GENERIC_ERROR = "Invalid email or password or account deactivated.";
 
 // Pre-computed argon2id hash of a random throwaway password. Used to equalize
 // the sign-in response time for unknown or deactivated accounts, so an attacker
@@ -40,26 +43,11 @@ export const actions = {
         const [user] =
             await sql`SELECT id, email, display_name, password_hash, locale, is_active FROM users WHERE email = ${email}`;
 
-        // A single generic message for every failure path so attackers cannot
-        // enumerate valid accounts by distinguishing the responses.
-        const GENERIC_ERROR = "Invalid email or password or account deactivated.";
-
-        if (!user || !user.password_hash) {
-            // Equalize response time: run a real argon2 verification against a
-            // dummy hash so unknown accounts are indistinguishable from a
-            // wrong-password attempt on an existing account.
-            await verifyPassword(DUMMY_PASSWORD_HASH, password);
-            await registerLoginAttempt({ ip, email, action: "password", success: false });
-            return fail(400, { error: GENERIC_ERROR });
-        }
-
-        if (!user.is_active) {
-            await verifyPassword(DUMMY_PASSWORD_HASH, password);
-            await registerLoginAttempt({ ip, email, action: "password", success: false });
-            return fail(400, { error: GENERIC_ERROR });
-        }
-
-        const valid = await verifyPassword(user.password_hash, password);
+        // Unknown and deactivated accounts are verified against the dummy hash
+        // so they are indistinguishable from a wrong-password attempt on an
+        // existing account; active accounts verify against the stored hash.
+        const storedHash = user?.password_hash && user.is_active ? user.password_hash : null;
+        const valid = await verifyPassword(storedHash ?? DUMMY_PASSWORD_HASH, password);
 
         if (!valid) {
             await registerLoginAttempt({ ip, email, action: "password", success: false });

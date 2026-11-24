@@ -6,6 +6,7 @@
 import { safeParse } from "valibot";
 import { planApiTokenChange } from "./api-token-sync.js";
 import { userSyncUpsertSchema } from "#lib/schemas/user.js";
+import { normalizeUserFields } from "#lib/shared/user-fields.js";
 
 export class SyncError extends Error {
     constructor(status, detail) {
@@ -66,11 +67,8 @@ export function validateUpsertItem(item) {
     if (!fields.success) {
         throw new SyncError(400, fields.issues[0].message);
     }
-    const { email: rawEmail, display_name, password, oidc_issuer, oidc_subject, tokens } = fields.output;
-    const email = rawEmail?.trim();
-    const displayName = display_name?.trim();
-    const oidcIssuer = oidc_issuer?.replace(/\/$/, "").trim();
-    const oidcSubject = oidc_subject?.trim();
+    const { password, tokens } = fields.output;
+    const { email, displayName, oidcIssuer, oidcSubject } = normalizeUserFields(fields.output);
 
     if (!email) throw new SyncError(400, "each upsert item must have a non-empty email");
     if (!displayName) throw new SyncError(400, "each upsert item must have a non-empty display_name");

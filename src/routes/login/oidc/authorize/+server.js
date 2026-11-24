@@ -3,14 +3,12 @@ import { createAuthorizationURL } from "#lib/server/oidc.js";
 import { logger } from "#lib/server/logger.js";
 
 export async function GET({ cookies }) {
-    let result;
-
-    try {
-        result = await createAuthorizationURL();
-    } catch (err) {
+    const result = await createAuthorizationURL().catch((err) => {
         logger.error({ err }, "Failed to create OIDC authorization URL");
-        throw redirect(302, "/login?error=oidc_init_failed");
-    }
+        return null;
+    });
+
+    if (!result) throw redirect(302, "/login?error=oidc_init_failed");
 
     const { url, state, codeVerifier } = result;
 

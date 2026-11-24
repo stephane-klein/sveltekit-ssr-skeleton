@@ -1,7 +1,7 @@
 import { redirect } from "@sveltejs/kit";
 import { createSession, setSessionCookie } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
-import { validateAuthorizationCode, getUserInfoEndpoint } from "#lib/server/oidc.js";
+import { validateAuthorizationCode, fetchUserInfo } from "#lib/server/oidc.js";
 import { logger } from "#lib/server/logger.js";
 
 export async function GET({ url: reqUrl, cookies }) {
@@ -33,43 +33,16 @@ export async function GET({ url: reqUrl, cookies }) {
     logger.info("OIDC callback received, validating authorization code");
 
     const issuer = (process.env.AUTHELIA_ISSUER || "").replace(/\/$/, "");
-    let tokens;
 
-    try {
-        tokens = await validateAuthorizationCode(code, storedCodeVerifier);
-    } catch (err) {
-        logger.error({ err }, "OIDC authorization code validation failed");
-        throw redirect(302, "/login?error=token_exchange_failed");
-    }
+    const tokens = await validateAuthorizationCode(code, storedCodeVerifier).catch(() => null);
+    if (!tokens) throw redirect(302, "/login?error=token_exchange_failed");
 
     const accessToken = tokens.access_token;
 
     logger.info("OIDC authorization code validated, fetching userinfo");
 
-    const userinfoEndpoint = await getUserInfoEndpoint();
-
-    let res;
-    try {
-        res = await fetch(userinfoEndpoint, {
-            headers: { Authorization: `Bearer ${accessToken}` },
-        });
-    } catch (err) {
-        logger.error({ err, userinfoEndpoint }, "Userinfo fetch failed");
-        throw redirect(302, "/login?error=userinfo_failed");
-    }
-
-    if (!res.ok) {
-        logger.error({ userinfoEndpoint, status: res.status }, "Userinfo returned non-OK status");
-        throw redirect(302, "/login?error=userinfo_failed");
-    }
-
-    let userinfo;
-    try {
-        userinfo = await res.json();
-    } catch (err) {
-        logger.error({ err }, "Failed to parse userinfo response");
-        throw redirect(302, "/login?error=userinfo_failed");
-    }
+    const userinfo = await fetchUserInfo(accessToken).catch(() => null);
+    if (!userinfo) throw redirect(302, "/login?error=userinfo_failed");
 
     logger.info({ email: userinfo.email }, "Userinfo fetched");
 
