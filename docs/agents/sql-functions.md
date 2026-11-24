@@ -86,8 +86,68 @@ Do not silence NOTICEs globally: silence the ones you expect, keep the rest.
 5. If the function serves a page render, follow "One stored function per page
    render" below: one JSONB document, named arguments, and an index that serves
    the function's order and filters.
-6. Add a `COMMENT ON FUNCTION ...` describing the function.
-7. Run `pnpm migrate` twice to confirm it is idempotent and silent.
+6. When a route calls the function directly, add the repository-relative path
+   of every calling file immediately above the definition, as the last comment
+   lines:
+
+   ```sql
+   -- Used by route: src/routes/(private)/contacts/+page.server.js
+   -- Used by route: src/routes/(private)/contacts/[nanoid]/edit/+page.server.js
+   CREATE OR REPLACE FUNCTION get_contacts_page_data(
+   ```
+
+   List every route file that calls the function: an incomplete list is a
+   defect. Write each file as it sits on disk, route group and dynamic segments
+   included. Do not add the comment to an internal function: a trigger
+   function, a helper called by another function, and a function that no route
+   renders. The route comment says who calls the function;
+   `COMMENT ON FUNCTION` says what it promises.
+
+7. Add a `COMMENT ON FUNCTION ...` describing the function.
+8. Run `pnpm migrate` twice to confirm it is idempotent and silent.
+
+The SQL layout in [`node-paradigms.md`](node-paradigms.md#sql-layout) applies to
+the functions in this file too.
+
+## Trigger functions
+
+Prefix a trigger function with `trigger_`, then name the table, the timing and
+the event, then the action: `trigger_users_before_update_set_updated_at()`. The
+function lives here; the trigger that calls it is created by a migration. The
+function name carries the timing and the event, so `COMMENT ON FUNCTION` is not
+needed; `COMMENT ON TRIGGER` explains why the trigger exists.
+
+## When a write becomes a function
+
+Rule and rationale:
+[ADR 004](../decisions/2026-11_004-application-architecture.md) → "The write path".
+
+A write stays in the route handler when it is one statement with one caller. It
+moves here when it removes work from the caller:
+
+- a protocol: several statements that must commit together, or a branch that
+  signals a business error;
+- a document: several queries assembled into the JSON a page render needs;
+- a shared statement: several callers, or another SQL function;
+- a measured cost: the statement is large or hot enough that parsing and
+  transferring it on every call shows up in a measurement.
+
+A single statement that touches several tables is still one statement:
+data-modifying CTEs run in the statement's transaction, so the write is atomic.
+Counting tables is the wrong proxy. The test is the number of statements and the
+number of callers.
+
+An inline statement has no named arguments, so send it with a tagged template.
+postgres.js prepares it, which caches the parse and the plan. Reserve
+`sql.unsafe` for the named-argument call of a stored function.
+
+When the order or the content of the statements depends on a decision computed
+in JavaScript, the write may stay in the handler inside `sql.begin()`, with the
+decision extracted into a pure function (`planUserSync` in
+`src/lib/server/user-sync.js` is the model). The plan is applied with one
+set-based statement per write category, sent as an ordered `tx.batch`. A plan
+built in JavaScript does not by itself justify a stored function: the four
+criteria above decide that.
 
 ## One stored function per page render
 

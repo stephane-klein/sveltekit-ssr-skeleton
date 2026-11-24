@@ -16,15 +16,39 @@ Skeleton gathering standard components configuration for SvelteKit web applicati
 
 ## Code Quality
 
-This project uses **ESLint** with `eslint-plugin-svelte` for linting and
-**Prettier** with `prettier-plugin-svelte` for formatting:
+ESLint (`eslint.config.js`) and Prettier (`prettier.config.js`) own style.
+`pnpm lint` checks, `pnpm format` rewrites, `pnpm check:agents` checks the agent
+documentation invariants, and `pnpm check` runs all three.
 
-- `pnpm lint` — check for code issues
-- `pnpm format` — auto-format code
-- `pnpm check:agents` — check the agent documentation invariants
-- `pnpm check` — run all checks (agent docs, format, lint)
+## Application Architecture
 
-Configuration: `eslint.config.js`, `prettier.config.js`
+**The label must be true.** The URL names a page, the route directory mirrors the
+URL, the table names the data, the function names the operation. A label that
+promises something the code does not do is a defect, even when the code works.
+
+- Organize by visible feature, never by technical layer. A page owns its
+  components and helpers: they live in `_components/` next to the route, not in
+  `src/lib/`. `src/lib/` is for what several pages share.
+- No Clean Architecture, no hexagonal architecture, no tactical DDD, no ORM, no
+  service layer, no repository, no DTO, no mapper, no dependency injection, no
+  database mock. An interface with one implementation is the alarm signal.
+- A focused external library or service is not a framework: accept it when it
+  solves one problem, lives in its own repository and is well documented.
+- A write stays in the route handler when it is one statement with one caller. It
+  becomes a stored function when it needs several statements that must commit
+  together, when several callers share it, or when it builds a page render's
+  document. A single statement with data-modifying CTEs touches several tables and
+  is still atomic. An effect the database cannot perform may stay in JavaScript.
+- Declare every side effect in the schema: a cascade, a trigger, a generated
+  column. An undeclared side effect is the defect.
+- Keep table and column names literal. A query builder may assemble filter
+  clauses; never build an identifier from data.
+- A name and its signature must let you list the tables the function may modify.
+  `process`, `handle`, `manage` and `check` are forbidden: a vague name cannot be
+  contradicted.
+
+Read `docs/agents/application-architecture.md` before changing the database, the
+route layout or the write path. Rationale: [ADR 004](docs/decisions/2026-11_004-application-architecture.md).
 
 ## Database
 
@@ -201,34 +225,12 @@ here too.** The Scalar API reference UI at `/api/reference` consumes this spec.
 
 ## i18n — Paraglide JS
 
-This project uses **Paraglide JS** (`@inlang/paraglide-js`) for
-internationalization.
-
-- Translation files: `messages/en.json` and `messages/fr.json`
-- Usage in Svelte components:
-  ```svelte
-  <script>
-    import { m } from "#lib/paraglide/messages.js";
-  </script>
-
-  <h1>{m.welcome_title()}</h1>
-  ```
-
-**Whenever you create or modify a page/component with user-facing text:**
-
-1.  Add all new keys to `messages/en.json` (English source) and `messages/fr.json`
-    (French translation)
-2.  Replace hardcoded strings with `{m.key_name()}` calls
-3.  Run `pnpm build` to regenerate the compiled message functions in
-    `src/lib/paraglide/`
-
-Key naming convention: use prefix per page/section (e.g., `login_title`,
-`login_email_label`, `dashboard_welcome`).
-
-**Implementation details** (cookie management, AsyncLocalStorage nesting, httpOnly
-pitfall, email templates, login flows): see `docs/agents/i18n.md`.
-
-**Architecture decision**: see [`docs/decisions/2026-07_001-paraglide-i18n.md`](docs/decisions/2026-07_001-paraglide-i18n.md).
+User-facing text goes through Paraglide JS (`@inlang/paraglide-js`); never hardcode
+a string in a page or component. Add every new key to `messages/en.json` and
+`messages/fr.json`, call it with `m.key_name()`, then run `pnpm build` to
+regenerate `src/lib/paraglide/`. Prefix keys per page or section (`login_title`).
+Implementation details: [`docs/agents/i18n.md`](docs/agents/i18n.md). Decision:
+[ADR 001](docs/decisions/2026-07_001-paraglide-i18n.md).
 
 ## Supplementary Documentation
 

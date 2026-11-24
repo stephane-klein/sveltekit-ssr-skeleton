@@ -1,8 +1,8 @@
 # Agent Instructions
 
 Detailed implementation notes for AI coding agents (OpenCode, Claude Code,
-etc.). Each file focuses on a specific subsystem — maintenance workflows,
-gotchas, edge cases, and context that doesn't fit in
+etc.). Each file focuses on a specific subsystem or a cross-cutting invariant —
+maintenance workflows, gotchas, edge cases, and context that doesn't fit in
 [`AGENTS.md`](../../AGENTS.md).
 
 Unlike the files under [`docs/decisions/`](../decisions/README.md), these
@@ -16,6 +16,7 @@ discrepancy, it should flag it.
 Files are loaded on demand by the agent toolchain.
 
 - [`agent-documentation.md`](./agent-documentation.md) — where agent rules, skills and reference docs live
+- [`application-architecture.md`](./application-architecture.md) — the application architecture: label truth, the graph, writes, database schema, naming
 - [`i18n.md`](./i18n.md) — Paraglide JS i18n implementation details
 - [`node-paradigms.md`](./node-paradigms.md) — JavaScript style in practice, approved exceptions and review questions
 - [`sql-functions.md`](./sql-functions.md) — stored functions (`sqls/functions.sql`) reloaded on every migrate

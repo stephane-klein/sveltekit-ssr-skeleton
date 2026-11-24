@@ -9,9 +9,10 @@ makes it safe to import from a client component as well as from server code.
 
 Layout rules (see AGENTS.md):
 
-- server-only code → `src/lib/server/` (`#lib/server/...`)
-- pure / isomorphic code → `src/lib/shared/` (`#lib/shared/...`)
-- client-only Svelte components → `src/lib/client/` (`#lib/client/...`)
+- code used by one page → that page's `_components/` directory
+- server-only code shared by several pages → `src/lib/server/` (`#lib/server/...`)
+- pure / isomorphic code shared by several pages → `src/lib/shared/` (`#lib/shared/...`)
+- client-only Svelte components shared by several pages → `src/lib/client/` (`#lib/client/...`)
 - `src/lib/backend/` is forbidden
 
 The directory currently holds `locale-labels.js`, the language autonyms used by

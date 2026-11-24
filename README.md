@@ -48,6 +48,18 @@ This project was developed using:
 
 - Monorepository and monolithic application pattern ([notes](https://notes.sklein.xyz/2025-05-06_2224/zen/))
 - Raw SQL — no ORM
+- Application architecture structured around the URL routes and the database
+  schema: the file tree mirrors the URLs, each page owns its components, and the
+  schema carries the constraints
+  ([read the application architecture](docs/agents/application-architecture.md))
+- Server-informed UI: the server sends each page the data it needs in one
+  page-specific payload; the frontend is not a generic API client
+  ([read the rationale](https://max.engineer/server-informed-ui))
+- No layered, hexagonal or DDD architecture: the page, the SQL function and the
+  database schema are the whole structure
+- External libraries are welcome when they solve one precise problem, live in
+  their own repository and are well documented; generic frameworks that impose
+  an architecture are not.
 - UI development follows the conventions in [sklein-utilitarian-ui-skill](https://github.com/stephane-klein/sklein-utilitarian-ui-skill)
 - Trying to embrace [Radical Simplicity](https://www.radicalsimpli.city/): reducing accidental complexity, applying LEAN techniques
 - Vigilance against [cargo cult](https://en.wikipedia.org/wiki/Cargo_cult)
@@ -348,6 +360,10 @@ API endpoints accept both session cookies and `Authorization: Bearer <token>` he
 
 `PATCH` accepts a partial body. A field that is present must be a non-empty
 string; `null` is rejected.
+
+These endpoints are an example of a public API. The application's own pages do
+not consume them: the contacts page reads its data through the
+`get_contacts_page_data` stored function.
 
 ```bash
 $ curl -H "Authorization: Bearer <token>" http://localhost:5173/api/v1/contacts/
