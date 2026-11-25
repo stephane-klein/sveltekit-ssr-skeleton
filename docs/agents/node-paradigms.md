@@ -163,9 +163,8 @@ values.filter((value) => Boolean(value));
 
 ## Deciding and writing
 
-This is the rule that the `sync` handler missed. A function that validates,
-hashes, writes and counts in one block cannot be tested without a database, and
-its counters force mutable state.
+A function that validates, hashes, writes and counts in one block cannot be
+tested without a database, and its counters force mutable state.
 
 `planApiTokenChange()` in `src/lib/server/api-token-sync.js` shows the shape:
 
@@ -177,12 +176,14 @@ For a new importer or a batch endpoint, follow the same split:
 
 1. normalize the input and hash what must be hashed, before the transaction;
 2. plan the changes from the rows already loaded;
-3. apply the plan inside `sql.begin()`, in the order the transaction requires;
+3. apply the plan inside `sql.begin()` with one set-based statement per write
+   category, sent as an ordered `tx.batch`;
 4. derive the summary from the plan, not from counters.
 
-`src/routes/(api)/api/v1/admin/users/sync/+server.js` is the case study. Its
-ordered SQL statements inside `sql.begin()` are legitimate, because the plan
-decides what to write. Its counters and `.push()` accumulators are not.
+`src/routes/(api)/api/v1/admin/users/sync/+server.js` is the case study.
+`planUserSync()` decides every write, `applyUserSync()` sends the six write
+categories as one `tx.batch`, and the order in the batch is the contract: user
+rows exist before their tokens are written, and the deletes run last.
 
 ## SQL layout
 
