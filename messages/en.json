@@ -66,6 +66,7 @@
   "dashboard_welcome": "Welcome back, {name}.",
   "dashboard_signed_in_as": "You are signed in as {email}.",
   "contacts_title": "Contacts",
+  "contacts_total": "Total: {count}",
   "contacts_new_button": "+ New",
   "contacts_empty": "No contacts yet.",
   "contacts_column_nanoid": "Nanoid",

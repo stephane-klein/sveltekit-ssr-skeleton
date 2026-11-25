@@ -11,7 +11,7 @@
 <main class="page px-5 pt-7 pb-16">
     <div class="flex items-baseline gap-3 mb-5">
         <h1 class="text-xl font-bold">{m.contacts_title()}</h1>
-        <span class="text-sm text-gray-500">{data.totalPages > 0 ? `${data.contacts.length} / 1000` : ""}</span>
+        <span class="text-sm text-gray-500">{data.total > 0 ? m.contacts_total({ count: data.total }) : ""}</span>
         <div class="flex-1"></div>
         <a
             href="/contacts/new"

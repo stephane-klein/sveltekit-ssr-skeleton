@@ -1,5 +1,6 @@
 import { toJsonSchema } from "@valibot/to-json-schema";
 import { apiTokenSyncSchema } from "#lib/server/api-token-schema.js";
+import { contactCreateSchema, contactUpdateSchema } from "#lib/server/contact-schema.js";
 import { userFieldsSchema, userPatchSchema, userSyncUpsertSchema } from "#lib/server/user-schema.js";
 
 // Request-body schemas are derived from the valibot schemas that actually
@@ -9,7 +10,7 @@ import { userFieldsSchema, userPatchSchema, userSyncUpsertSchema } from "#lib/se
 // not emit) and the accurate `required` arrays on top of the derived structure.
 const stripSchemaMeta = ({ $schema: _schema, ...rest }) => rest;
 
-const annotate = (base, { required, props }) => ({
+const annotate = (base, { required = base.required, props }) => ({
     ...base,
     required,
     properties: Object.fromEntries(
@@ -46,6 +47,27 @@ const userPatchJson = annotate(stripSchemaMeta(toJsonSchema(userPatchSchema)), {
     required: [],
     props: { ...upsertAnnotations, is_active: { description: "Whether the account is active" } },
 });
+
+// Contact request bodies are derived from the same schemas the handlers use, so
+// `required` and `minLength` cannot drift from the validation.
+const contactCreateJson = annotate(
+    stripSchemaMeta(toJsonSchema(contactCreateSchema, { target: "openapi-3.0", errorMode: "ignore" })),
+    {
+        props: {
+            firstname: { description: "Non-empty string; whitespace only is rejected.", example: "Alice" },
+            lastname: { description: "Non-empty string; whitespace only is rejected.", example: "Martin" },
+        },
+    },
+);
+const contactUpdateJson = annotate(
+    stripSchemaMeta(toJsonSchema(contactUpdateSchema, { target: "openapi-3.0", errorMode: "ignore" })),
+    {
+        props: {
+            firstname: { description: "Optional. Non-empty string; null is rejected.", example: "Alice" },
+            lastname: { description: "Optional. Non-empty string; null is rejected.", example: "Martin" },
+        },
+    },
+);
 
 // The sync payload accepts the same fields as the single-user upsert plus a
 // `tokens` object. The token structure comes from apiTokenSyncSchema, so the
@@ -435,14 +457,7 @@ export function GET() {
                         required: true,
                         content: {
                             "application/json": {
-                                schema: {
-                                    type: "object",
-                                    required: ["firstname"],
-                                    properties: {
-                                        firstname: { type: "string", example: "Alice" },
-                                        lastname: { type: "string", example: "Martin" },
-                                    },
-                                },
+                                schema: { $ref: "#/components/schemas/ContactCreate" },
                             },
                         },
                     },
@@ -518,13 +533,7 @@ export function GET() {
                         required: true,
                         content: {
                             "application/json": {
-                                schema: {
-                                    type: "object",
-                                    properties: {
-                                        firstname: { type: "string", example: "Alice" },
-                                        lastname: { type: "string", example: "Martin" },
-                                    },
-                                },
+                                schema: { $ref: "#/components/schemas/ContactUpdate" },
                             },
                         },
                     },
@@ -546,7 +555,6 @@ export function GET() {
                         400: { $ref: "#/components/responses/BadRequest" },
                         401: { $ref: "#/components/responses/Unauthorized" },
                         404: { $ref: "#/components/responses/NotFound" },
-                        422: { $ref: "#/components/responses/Unprocessable" },
                     },
                 },
                 delete: {
@@ -579,6 +587,8 @@ export function GET() {
                         created_at: { type: "string", format: "date-time", example: "2026-07-11T09:00:00Z" },
                     },
                 },
+                ContactCreate: contactCreateJson,
+                ContactUpdate: contactUpdateJson,
                 Links: {
                     type: "object",
                     properties: {

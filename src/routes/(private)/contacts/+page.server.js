@@ -19,6 +19,7 @@ export async function load(event) {
     return {
         contacts: row.data.contacts,
         page,
+        total,
         totalPages: Math.ceil(total / PAGE_SIZE),
     };
 }

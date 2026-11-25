@@ -66,6 +66,7 @@
   "dashboard_welcome": "Bon retour, {name}.",
   "dashboard_signed_in_as": "Connecté en tant que {email}.",
   "contacts_title": "Contacts",
+  "contacts_total": "Total : {count}",
   "contacts_new_button": "+ Nouveau",
   "contacts_empty": "Aucun contact pour le moment.",
   "contacts_column_nanoid": "Identifiant public",

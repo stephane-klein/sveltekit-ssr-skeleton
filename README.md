@@ -338,13 +338,16 @@ API endpoints accept both session cookies and `Authorization: Bearer <token>` he
 
 ### Endpoints
 
-| Méthode  | Route                       | Description                             |
-| :------- | :-------------------------- | :-------------------------------------- |
-| `GET`    | `/api/v1/contacts/`         | List contacts                           |
-| `POST`   | `/api/v1/contacts/`         | Create a contact (`firstname` required) |
-| `GET`    | `/api/v1/contacts/:nanoid/` | Get a contact                           |
-| `PATCH`  | `/api/v1/contacts/:nanoid/` | Update a contact (partial)              |
-| `DELETE` | `/api/v1/contacts/:nanoid/` | Delete a contact                        |
+| Méthode  | Route                       | Description                                            |
+| :------- | :-------------------------- | :----------------------------------------------------- |
+| `GET`    | `/api/v1/contacts/`         | List contacts                                          |
+| `POST`   | `/api/v1/contacts/`         | Create a contact (`firstname` and `lastname` required) |
+| `GET`    | `/api/v1/contacts/:nanoid/` | Get a contact                                          |
+| `PATCH`  | `/api/v1/contacts/:nanoid/` | Update a contact (partial)                             |
+| `DELETE` | `/api/v1/contacts/:nanoid/` | Delete a contact                                       |
+
+`PATCH` accepts a partial body. A field that is present must be a non-empty
+string; `null` is rejected.
 
 ```bash
 $ curl -H "Authorization: Bearer <token>" http://localhost:5173/api/v1/contacts/

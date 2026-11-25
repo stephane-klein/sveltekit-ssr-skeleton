@@ -1,3 +1,5 @@
+import { safeParse } from "valibot";
+import { contactUpdateSchema } from "#lib/server/contact-schema.js";
 import { sql } from "#lib/server/pg.js";
 import { problem } from "#lib/server/problem.js";
 import { requireUser } from "#lib/server/require-user.js";
@@ -32,20 +34,17 @@ export async function PATCH(event) {
 
     if (!existing) return problem(404, "Contact not found", event.request.url);
 
-    const body = await event.request.json();
-
-    if (body.firstname !== undefined && (typeof body.firstname !== "string" || !body.firstname.trim())) {
-        return problem(422, "firstname must be a non-empty string", event.request.url);
+    const parsed = safeParse(contactUpdateSchema, await event.request.json());
+    if (!parsed.success) {
+        return problem(400, parsed.issues[0].message, event.request.url);
     }
 
-    if (body.lastname !== undefined && body.lastname !== null && typeof body.lastname !== "string") {
-        return problem(422, "lastname must be a string or null", event.request.url);
-    }
+    const { firstname, lastname } = parsed.output;
 
     const [contact] = await sql`
         UPDATE contacts
-        SET firstname = COALESCE(${body.firstname?.trim() || null}, firstname),
-            lastname  = COALESCE(${body.lastname?.trim() || null}, lastname)
+        SET firstname = COALESCE(${firstname?.trim() || null}, firstname),
+            lastname  = COALESCE(${lastname?.trim() || null}, lastname)
         WHERE nanoid = ${event.params.nanoid}
         RETURNING nanoid, firstname, lastname, created_at
     `;
