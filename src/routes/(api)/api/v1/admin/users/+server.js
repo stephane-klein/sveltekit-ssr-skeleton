@@ -1,9 +1,9 @@
 import { safeParse } from "valibot";
 import { generateId, hashPassword } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
-import { userFieldsSchema } from "#lib/schemas/user.js";
-import { normalizeUserFields } from "#lib/shared/user-fields.js";
 import { problem } from "#lib/server/problem.js";
+import { normalizeUserFields } from "#lib/server/user-fields.js";
+import { userFieldsSchema } from "#lib/server/user-schema.js";
 import { generateCursor, requireAdminToken } from "../_helpers.js";
 
 async function insertUser({ email, displayName, passwordHash, oidcIssuer, oidcSubject }) {

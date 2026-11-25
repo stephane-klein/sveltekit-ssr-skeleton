@@ -1,6 +1,6 @@
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { apiTokenSyncSchema } from "#lib/schemas/api-token.js";
-import { userFieldsSchema, userPatchSchema, userSyncUpsertSchema } from "#lib/schemas/user.js";
+import { apiTokenSyncSchema } from "#lib/server/api-token-schema.js";
+import { userFieldsSchema, userPatchSchema, userSyncUpsertSchema } from "#lib/server/user-schema.js";
 
 // Request-body schemas are derived from the valibot schemas that actually
 // validate the handlers, so the OpenAPI contract can never drift from the code.

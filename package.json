@@ -21,7 +21,6 @@
     "hash-password": "node src/hash-password.js"
   },
   "imports": {
-    "#lib": "./src/lib/index.js",
     "#lib/*": "./src/lib/*"
   },
   "dependencies": {

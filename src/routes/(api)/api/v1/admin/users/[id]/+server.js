@@ -1,9 +1,9 @@
 import { safeParse } from "valibot";
 import { hashPassword } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
-import { userPatchSchema } from "#lib/schemas/user.js";
-import { normalizeUserFields } from "#lib/shared/user-fields.js";
 import { problem } from "#lib/server/problem.js";
+import { normalizeUserFields } from "#lib/server/user-fields.js";
+import { userPatchSchema } from "#lib/server/user-schema.js";
 import { requireAdminToken } from "../../_helpers.js";
 
 function userLinks(id) {

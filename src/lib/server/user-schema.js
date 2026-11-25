@@ -1,5 +1,5 @@
 import { boolean, email, minLength, object, optional, pipe, string } from "valibot";
-import { apiTokenSyncSchema } from "#lib/schemas/api-token.js";
+import { apiTokenSyncSchema } from "#lib/server/api-token-schema.js";
 
 // Field-format rules shared by the admin user create/upsert endpoints and by the
 // generated OpenAPI request schemas. The required/optional branching (OIDC pair

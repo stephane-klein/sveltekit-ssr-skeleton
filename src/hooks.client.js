@@ -1,4 +1,4 @@
-import { Locale } from "#lib/locale.svelte.js";
+import { Locale } from "#lib/client/locale.svelte.js";
 
 export const init = () => {
     new Locale();

@@ -14,5 +14,8 @@ Layout rules (see AGENTS.md):
 - client-only Svelte components → `src/lib/client/` (`#lib/client/...`)
 - `src/lib/backend/` is forbidden
 
-This directory is currently empty of modules; it exists so new pure modules have
-an obvious home.
+The directory currently holds `locale-labels.js`, the language autonyms used by
+`src/routes/+layout.svelte` and `src/routes/(private)/my/preference/+page.svelte`.
+
+A pure module that only the server imports belongs in `src/lib/server/`, not
+here: a placement in `shared/` announces that browser code may import it.

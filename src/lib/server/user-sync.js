@@ -5,8 +5,8 @@
 // plan, never from counters. planApiTokenChange() is the model this follows.
 import { safeParse } from "valibot";
 import { planApiTokenChange } from "./api-token-sync.js";
-import { userSyncUpsertSchema } from "#lib/schemas/user.js";
-import { normalizeUserFields } from "#lib/shared/user-fields.js";
+import { userSyncUpsertSchema } from "#lib/server/user-schema.js";
+import { normalizeUserFields } from "#lib/server/user-fields.js";
 
 export class SyncError extends Error {
     constructor(status, detail) {
