@@ -1,12 +1,12 @@
 <script>
     import { m } from "#lib/paraglide/messages.js";
     import { locales, getLocale, setLocale } from "#lib/paraglide/runtime.js";
+    import { localeLabels } from "#lib/shared/locale-labels.js";
     import "uno.css";
     import TechInfoPopup from "#lib/client/TechInfoPopup.svelte";
 
     let { children } = $props();
 
-    const localeLabels = { en: "English", fr: "Français" };
     const localeTitles = { en: "Switch to English", fr: "Passer en français" };
 </script>
 

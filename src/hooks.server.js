@@ -1,6 +1,6 @@
 import { sequence } from "@sveltejs/kit/hooks";
 import { dev } from "$app/env";
-import { getTextDirection, serverAsyncLocalStorage } from "#lib/paraglide/runtime.js";
+import { getTextDirection, serverAsyncLocalStorage, toLocale } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import {
     SESSION_COOKIE_NAME,
@@ -77,12 +77,15 @@ async function authHandle({ event, resolve }) {
         }
     }
 
-    const effectiveLocale = event.cookies.get(LOCALE_COOKIE) || event.locals.user?.locale;
+    const rawCookieLocale = event.cookies.get(LOCALE_COOKIE);
+    const effectiveLocale = toLocale(rawCookieLocale) ?? toLocale(event.locals.user?.locale);
 
     if (effectiveLocale) {
         // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
         event.locals.effectiveLocale = effectiveLocale;
         event.cookies.set(LOCALE_COOKIE, effectiveLocale, COOKIE_OPTS);
+    } else if (rawCookieLocale) {
+        event.cookies.delete(LOCALE_COOKIE, { path: "/" });
     }
 
     const route = event.route.id;

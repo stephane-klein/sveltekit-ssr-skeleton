@@ -25,8 +25,13 @@ CREATE TABLE users (
     locale          TEXT,
     is_active       BOOLEAN                  NOT NULL DEFAULT TRUE,
     created_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    updated_at      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT users_locale_check CHECK (locale IS NULL OR locale IN ('en', 'fr'))
 );
+
+COMMENT ON CONSTRAINT users_locale_check ON users IS
+    'Only the locales the application can render; NULL means no preference and falls back to the base locale.';
 
 CREATE UNIQUE INDEX idx_users_oidc ON users (oidc_issuer, oidc_subject)
     WHERE oidc_issuer IS NOT NULL AND oidc_subject IS NOT NULL;

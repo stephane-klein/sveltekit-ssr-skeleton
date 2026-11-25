@@ -110,6 +110,7 @@
   "my_prefs_saved": "Saved.",
   "my_prefs_timezone_label": "Timezone",
   "my_prefs_language_label": "Language",
+  "my_prefs_invalid_language": "This language is not supported.",
   "my_prefs_save": "Save preferences",
   "my_profile_title": "Profile",
   "my_profile_section": "Personal information",

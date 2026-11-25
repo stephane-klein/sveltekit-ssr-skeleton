@@ -1,7 +1,9 @@
 <script>
     import { m } from "#lib/paraglide/messages.js";
+    import { locales } from "#lib/paraglide/runtime.js";
+    import { localeLabels } from "#lib/shared/locale-labels.js";
 
-    let { data } = $props();
+    let { form, data } = $props();
 </script>
 
 <svelte:head>
@@ -15,6 +17,10 @@
         <h2 class="text-sm font-bold uppercase tracking-wider text-gray-500 mb-3 pb-1.5 border-b border-gray-300">
             {m.my_prefs_section()}
         </h2>
+
+        {#if form?.errorKey === "invalid_language"}
+            <p class="text-sm text-red-600 mb-3.5">{m.my_prefs_invalid_language()}</p>
+        {/if}
 
         <form method="POST">
             <div class="mb-3.5">
@@ -53,18 +59,14 @@
                     name="language"
                     class="w-full max-w-40 px-2 py-1.5 border border-gray-300 rounded-sm text-sm text-gray-900 bg-white focus:outline-2 focus:outline-blue-600 focus:border-blue-600"
                 >
-                    <option
-                        value="en"
-                        selected={data.user.locale === "en"}
-                    >
-                        English
-                    </option>
-                    <option
-                        value="fr"
-                        selected={data.user.locale === "fr"}
-                    >
-                        Français
-                    </option>
+                    {#each locales as locale (locale)}
+                        <option
+                            value={locale}
+                            selected={data.user.locale === locale}
+                        >
+                            {localeLabels[locale]}
+                        </option>
+                    {/each}
                 </select>
             </div>
 
