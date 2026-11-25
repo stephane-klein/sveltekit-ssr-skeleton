@@ -80,6 +80,16 @@ $$;
 COMMENT ON FUNCTION generate_nanoid(INT, TEXT)
     IS 'Generates a nanoid from cryptographically secure random bytes.';
 
+CREATE OR REPLACE FUNCTION trigger_users_before_update_set_updated_at()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at := now();
+    RETURN NEW;
+END;
+$$;
+
 -- Returns one contacts page and its total in a single round-trip. The page CTE
 -- walks the primary key index, so `ORDER BY id LIMIT/OFFSET` stops after the
 -- requested rows. The JSON aggregate orders explicitly: the array order is part

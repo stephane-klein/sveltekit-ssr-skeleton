@@ -58,8 +58,7 @@ export const actions = {
             ),
             updated_user AS (
                 UPDATE users
-                SET password_hash = ${passwordHash},
-                    updated_at = now()
+                SET password_hash = ${passwordHash}
                 WHERE id = (SELECT user_id FROM consumed)
                 RETURNING id
             ),

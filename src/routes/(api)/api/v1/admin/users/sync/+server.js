@@ -50,8 +50,7 @@ async function applyUserSync(tx, plan) {
             SET display_name  = x."displayName",
                 password_hash = x."passwordHash",
                 oidc_issuer   = x."oidcIssuer",
-                oidc_subject  = x."oidcSubject",
-                updated_at    = now()
+                oidc_subject  = x."oidcSubject"
             FROM jsonb_to_recordset(${JSON.stringify(plan.userUpdates)}::jsonb)
                  AS x(
                      email text,

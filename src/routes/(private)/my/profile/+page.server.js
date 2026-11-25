@@ -20,7 +20,7 @@ export const actions = {
             return fail(400, { error: "Email is required." });
         }
 
-        await sql`UPDATE users SET display_name = ${displayName || email}, email = ${email}, updated_at = ${new Date()} WHERE id = ${user.id}`;
+        await sql`UPDATE users SET display_name = ${displayName || email}, email = ${email} WHERE id = ${user.id}`;
 
         return { saved: true };
     },

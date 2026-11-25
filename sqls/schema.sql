@@ -31,6 +31,15 @@ CREATE TABLE users (
 CREATE UNIQUE INDEX idx_users_oidc ON users (oidc_issuer, oidc_subject)
     WHERE oidc_issuer IS NOT NULL AND oidc_subject IS NOT NULL;
 
+-- trigger_users_before_update_set_updated_at() is defined in sqls/functions.sql.
+CREATE TRIGGER users_set_updated_at
+    BEFORE UPDATE ON users
+    FOR EACH ROW
+    EXECUTE FUNCTION trigger_users_before_update_set_updated_at();
+
+COMMENT ON TRIGGER users_set_updated_at ON users IS
+    'Sets users.updated_at on every UPDATE so the column cannot go stale when a caller forgets it.';
+
 CREATE TABLE sessions (
     id          TEXT                     NOT NULL PRIMARY KEY,
     user_id     TEXT                     NOT NULL REFERENCES users(id) ON DELETE CASCADE,

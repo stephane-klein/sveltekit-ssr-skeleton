@@ -48,7 +48,7 @@ export const actions = {
 
         const passwordHash = await hashPassword(newPassword);
 
-        await sql`UPDATE users SET password_hash = ${passwordHash}, updated_at = ${new Date()} WHERE id = ${user.id}`;
+        await sql`UPDATE users SET password_hash = ${passwordHash} WHERE id = ${user.id}`;
 
         return { saved: true };
     },

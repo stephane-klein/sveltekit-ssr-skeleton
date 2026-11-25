@@ -22,8 +22,7 @@ async function updateUser({ email, displayName, password, passwordHash, oidcIssu
         SET display_name  = ${displayName},
             password_hash = ${password ? passwordHash : existing.password_hash},
             oidc_issuer   = ${oidcIssuer || null},
-            oidc_subject  = ${oidcSubject || null},
-            updated_at    = ${new Date()}
+            oidc_subject  = ${oidcSubject || null}
         WHERE email = ${email}
         RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
     `;

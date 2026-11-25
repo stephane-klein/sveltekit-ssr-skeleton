@@ -73,8 +73,6 @@ export async function PATCH(event) {
         }
     }
 
-    const now = new Date();
-
     const passwordHash = password ? await hashPassword(password) : null;
 
     const [user] = await sql`
@@ -85,8 +83,7 @@ export async function PATCH(event) {
             password_hash = CASE WHEN ${!!password} THEN ${passwordHash} ELSE password_hash END,
             oidc_issuer   = COALESCE(${oidcIssuer || null}, oidc_issuer),
             oidc_subject  = COALESCE(${oidcSubject || null}, oidc_subject),
-            is_active     = COALESCE(${is_active !== undefined ? is_active : null}, is_active),
-            updated_at    = ${now}
+            is_active     = COALESCE(${is_active !== undefined ? is_active : null}, is_active)
         WHERE id = ${event.params.id}
         RETURNING id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at
     `;
