@@ -1,3 +1,4 @@
+import { dev } from "$app/env";
 import { fail } from "@sveltejs/kit";
 import { createPasswordResetToken } from "#lib/server/auth.js";
 import { isMailAvailable, sendMail } from "#lib/server/mailer.js";
@@ -40,6 +41,6 @@ export const actions = {
             return fail(500, { error: "Failed to send reset email. Please try again later." });
         }
 
-        return { sent: true, email, resetLink };
+        return dev ? { sent: true, email, resetLink } : { sent: true, email };
     },
 };
