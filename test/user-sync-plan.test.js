@@ -37,10 +37,16 @@ function fixture({ existing = null, items = [prepared()], deleteEmails = [] } = 
 test("plans an insert for a new user", () => {
     const plan = fixture();
 
-    assert.deepEqual(
-        plan.userInserts.map((insert) => insert.email),
-        ["user@example.com"],
-    );
+    assert.deepEqual(plan.userInserts, [
+        {
+            userId: USER_ID,
+            email: "user@example.com",
+            displayName: "User",
+            passwordHash: null,
+            oidcIssuer: null,
+            oidcSubject: null,
+        },
+    ]);
     assert.equal(plan.userUpdates.length, 0);
     assert.equal(plan.userDeletes.length, 0);
     assert.equal(plan.summary.created, 1);
@@ -52,9 +58,26 @@ test("plans an update for an existing user and keeps the stored hash", () => {
     const plan = fixture({ existing });
 
     assert.equal(plan.userInserts.length, 0);
-    assert.equal(plan.userUpdates.length, 1);
-    assert.equal(plan.userUpdates[0].existing.password_hash, "stored");
+    assert.deepEqual(plan.userUpdates, [
+        {
+            email: "user@example.com",
+            displayName: "User",
+            passwordHash: "stored",
+            oidcIssuer: null,
+            oidcSubject: null,
+        },
+    ]);
     assert.equal(plan.summary.updated, 1);
+});
+
+test("uses the supplied password hash for an existing user", () => {
+    const existing = { id: USER_ID, email: "user@example.com", password_hash: "stored" };
+    const plan = fixture({
+        existing,
+        items: [prepared({ password: "new-password", passwordHash: "new-hash" })],
+    });
+
+    assert.equal(plan.userUpdates[0].passwordHash, "new-hash");
 });
 
 test("plans a generated token and surfaces it once as a raw token", () => {
@@ -84,6 +107,33 @@ test("plans a generated token and surfaces it once as a raw token", () => {
     assert.equal(plan.summary.tokens.created, 1);
     assert.equal(plan.summary.tokens.updated, 0);
     assert.equal(plan.summary.tokens.unchanged, 0);
+});
+
+test("keeps clear passwords and raw tokens out of the user write rows", () => {
+    const plan = fixture({
+        items: [
+            prepared({
+                password: "clear-password",
+                passwordHash: "hashed-password",
+                tokens: {
+                    upsert: [
+                        {
+                            name: "demo",
+                            providedHash: null,
+                            generatedRaw: "raw-token",
+                            generatedHash: "h".repeat(64),
+                            expiresAt: null,
+                        },
+                    ],
+                    delete: [],
+                },
+            }),
+        ],
+    });
+
+    assert.equal("password" in plan.userInserts[0], false);
+    assert.equal("tokens" in plan.userInserts[0], false);
+    assert.deepEqual(plan.rawTokens, [{ email: "user@example.com", name: "demo", token: "raw-token" }]);
 });
 
 test("plans no token change when the supplied value matches", () => {

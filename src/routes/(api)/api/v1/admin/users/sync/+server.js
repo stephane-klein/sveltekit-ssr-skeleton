@@ -12,53 +12,100 @@ function conflictDetail(err) {
     return "A token with this name or value already exists";
 }
 
-// Applies the plan produced by planUserSync() with SQL only. The sequential
-// loops are the transaction's contract: user rows exist before their tokens
-// are written, and user deletes run last.
-async function applyUserSync(tx, plan, now) {
-    for (const insert of plan.userInserts) {
-        await tx`
-            INSERT INTO users (id, email, display_name, password_hash, oidc_issuer, oidc_subject)
-            VALUES (${insert.userId}, ${insert.email}, ${insert.displayName}, ${insert.passwordHash},
-                    ${insert.oidcIssuer}, ${insert.oidcSubject})
-        `;
-    }
+// Applies the plan produced by planUserSync() with SQL only. The batch keeps
+// the statements ordered: user rows exist before their tokens are written,
+// and user deletes run last.
+async function applyUserSync(tx, plan) {
+    const tokenInserts = plan.tokenInserts.map((insert) => ({ ...insert, id: generateId() }));
 
-    for (const update of plan.userUpdates) {
-        await tx`
-            UPDATE users
-            SET display_name  = ${update.displayName},
-                password_hash = ${update.password ? update.passwordHash : update.existing.password_hash},
-                oidc_issuer   = ${update.oidcIssuer},
-                oidc_subject  = ${update.oidcSubject},
-                updated_at    = ${now}
-            WHERE email = ${update.email}
-        `;
-    }
-
-    for (const insert of plan.tokenInserts) {
-        await tx`
-            INSERT INTO api_tokens (id, user_id, name, token_hash, expires_at)
-            VALUES (${generateId()}, ${insert.userId}, ${insert.name}, ${insert.tokenHash},
-                    ${insert.expiresAt})
-        `;
-    }
-
-    for (const update of plan.tokenUpdates) {
-        await tx`
-            UPDATE api_tokens
-            SET token_hash = ${update.tokenHash}, expires_at = ${update.expiresAt}
-            WHERE id = ${update.id}
-        `;
-    }
-
-    for (const tokenId of plan.tokenDeletes) {
-        await tx`DELETE FROM api_tokens WHERE id = ${tokenId}`;
-    }
-
-    for (const email of plan.userDeletes) {
-        await tx`DELETE FROM users WHERE email = ${email}`;
-    }
+    await tx.batch([
+        tx`
+            INSERT INTO users (
+                id,
+                email,
+                display_name,
+                password_hash,
+                oidc_issuer,
+                oidc_subject
+            )
+            SELECT
+                x."userId",
+                x.email,
+                x."displayName",
+                x."passwordHash",
+                x."oidcIssuer",
+                x."oidcSubject"
+            FROM jsonb_to_recordset(${JSON.stringify(plan.userInserts)}::jsonb)
+                 AS x(
+                     "userId" text,
+                     email text,
+                     "displayName" text,
+                     "passwordHash" text,
+                     "oidcIssuer" text,
+                     "oidcSubject" text
+                 )
+        `,
+        tx`
+            UPDATE users AS u
+            SET display_name  = x."displayName",
+                password_hash = x."passwordHash",
+                oidc_issuer   = x."oidcIssuer",
+                oidc_subject  = x."oidcSubject",
+                updated_at    = now()
+            FROM jsonb_to_recordset(${JSON.stringify(plan.userUpdates)}::jsonb)
+                 AS x(
+                     email text,
+                     "displayName" text,
+                     "passwordHash" text,
+                     "oidcIssuer" text,
+                     "oidcSubject" text
+                 )
+            WHERE u.email = x.email
+        `,
+        tx`
+            INSERT INTO api_tokens (
+                id,
+                user_id,
+                name,
+                token_hash,
+                expires_at
+            )
+            SELECT
+                x.id,
+                x."userId",
+                x.name,
+                x."tokenHash",
+                x."expiresAt"
+            FROM jsonb_to_recordset(${JSON.stringify(tokenInserts)}::jsonb)
+                 AS x(
+                     id text,
+                     "userId" text,
+                     name text,
+                     "tokenHash" text,
+                     "expiresAt" timestamptz
+                 )
+        `,
+        tx`
+            UPDATE api_tokens AS t
+            SET token_hash = x."tokenHash",
+                expires_at = x."expiresAt"
+            FROM jsonb_to_recordset(${JSON.stringify(plan.tokenUpdates)}::jsonb)
+                 AS x(
+                     id text,
+                     "tokenHash" text,
+                     "expiresAt" timestamptz
+                 )
+            WHERE t.id = x.id
+        `,
+        tx`
+            DELETE FROM api_tokens
+            WHERE id = ANY(${plan.tokenDeletes}::text[])
+        `,
+        tx`
+            DELETE FROM users
+            WHERE email = ANY(${plan.userDeletes}::text[])
+        `,
+    ]);
 }
 
 export async function PUT(event) {
@@ -133,8 +180,6 @@ export async function PUT(event) {
             })),
         );
 
-        const now = new Date();
-
         const { summary, rawTokens, users } = await sql.begin(async (tx) => {
             const emails = [...upsertEmailSet, ...deleteEmails];
             const existingRows = await tx`
@@ -142,16 +187,35 @@ export async function PUT(event) {
             `;
             const existingByEmail = new Map(existingRows.map((row) => [row.email, row]));
 
-            for (const item of preparedUpsertItems) {
-                if (!item.hasOidc) continue;
+            const oidcPairs = preparedUpsertItems
+                .map((item, ord) => ({
+                    ord,
+                    email: item.email,
+                    oidcIssuer: item.oidcIssuer,
+                    oidcSubject: item.oidcSubject,
+                }))
+                .filter((item) => item.oidcIssuer !== null && item.oidcSubject !== null);
 
-                const conflict = await tx`
-                    SELECT email FROM users
-                    WHERE oidc_issuer = ${item.oidcIssuer} AND oidc_subject = ${item.oidcSubject}
-                    AND email != ${item.email}
+            if (oidcPairs.length > 0) {
+                const [conflict] = await tx`
+                    SELECT x.email
+                    FROM jsonb_to_recordset(${JSON.stringify(oidcPairs)}::jsonb)
+                         AS x(
+                             ord int,
+                             email text,
+                             "oidcIssuer" text,
+                             "oidcSubject" text
+                         )
+                    JOIN users u
+                      ON u.oidc_issuer = x."oidcIssuer"
+                     AND u.oidc_subject = x."oidcSubject"
+                     AND u.email <> x.email
+                    ORDER BY x.ord
+                    LIMIT 1
                 `;
-                if (conflict.length > 0) {
-                    throw new SyncError(409, `A user with this OIDC pair already exists: ${item.email}`);
+
+                if (conflict) {
+                    throw new SyncError(409, `A user with this OIDC pair already exists: ${conflict.email}`);
                 }
             }
 
@@ -179,7 +243,7 @@ export async function PUT(event) {
                 existingTokens: existingTokenByUserAndName,
             });
 
-            await applyUserSync(tx, plan, now);
+            await applyUserSync(tx, plan);
 
             const users = await tx`
                 SELECT id, email, display_name, oidc_issuer, oidc_subject, is_active, created_at, updated_at

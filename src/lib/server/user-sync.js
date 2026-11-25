@@ -93,11 +93,95 @@ function tokenKey(userId, name) {
     return `${userId}\u0000${name}`;
 }
 
-// Decides the whole sync from rows already loaded from the database. The
-// caller builds userIdByEmail (it generates the ids of new users), loads
-// existingUsers and existingTokens, then applies the returned plan with SQL.
-// The sets and maps it reads must be keyed exactly as the caller loaded them:
-// existingTokens is keyed by `${userId}\u0000${name}`.
+/**
+ * Decides the whole sync from rows already loaded from the database.
+ *
+ * The caller builds userIdByEmail (it generates the ids of new users), loads
+ * existingUsers and existingTokens, then applies the returned plan with SQL.
+ * The sets and maps it reads must be keyed exactly as the caller loaded them:
+ * existingTokens is keyed by `${userId}\u0000${name}`.
+ *
+ * Example:
+ *
+ * Input:
+ *   items: [
+ *     {
+ *       email: "new@example.com",
+ *       displayName: "New User",
+ *       password: "secret",
+ *       passwordHash: "argon2-secret",
+ *       oidcIssuer: null,
+ *       oidcSubject: null,
+ *       tokens: {
+ *         upsert: [
+ *           { name: "ci", providedHash: null, generatedRaw: "raw-token",
+ *             generatedHash: "generated-hash", expiresAt: null },
+ *         ],
+ *         delete: [],
+ *       },
+ *     },
+ *     {
+ *       email: "existing@example.com",
+ *       displayName: "Existing User",
+ *       password: null,
+ *       passwordHash: null,
+ *       oidcIssuer: null,
+ *       oidcSubject: null,
+ *       tokens: {
+ *         upsert: [
+ *           { name: "ci", providedHash: "provided-hash", generatedRaw: null,
+ *             generatedHash: null, expiresAt: new Date("2027-01-01") },
+ *         ],
+ *         delete: ["old"],
+ *       },
+ *     },
+ *   ]
+ *   userIdByEmail: new Map([
+ *     ["new@example.com", "user-new"],
+ *     ["existing@example.com", "user-existing"],
+ *   ])
+ *   deleteEmails: ["gone@example.com"]
+ *   existingUsers: new Map([
+ *     ["existing@example.com", { id: "user-existing", password_hash: "stored-hash" }],
+ *     ["gone@example.com", { id: "user-gone" }],
+ *   ])
+ *   existingTokens: new Map([
+ *     ["user-existing\u0000ci", { id: "token-ci", token_hash: "old-ci-hash", expires_at: null }],
+ *     ["user-existing\u0000old", { id: "token-old" }],
+ *   ])
+ *
+ * Output:
+ *   {
+ *     userInserts: [
+ *       { userId: "user-new", email: "new@example.com", displayName: "New User",
+ *         passwordHash: "argon2-secret", oidcIssuer: null, oidcSubject: null },
+ *     ],
+ *     userUpdates: [
+ *       { email: "existing@example.com", displayName: "Existing User",
+ *         passwordHash: "stored-hash", oidcIssuer: null, oidcSubject: null },
+ *     ],
+ *     userDeletes: ["gone@example.com"],
+ *     tokenInserts: [
+ *       { userId: "user-new", name: "ci", tokenHash: "generated-hash", expiresAt: null },
+ *     ],
+ *     tokenUpdates: [
+ *       { id: "token-ci", tokenHash: "provided-hash", expiresAt: new Date("2027-01-01") },
+ *     ],
+ *     tokenDeletes: ["token-old"],
+ *     rawTokens: [
+ *       { email: "new@example.com", name: "ci", token: "raw-token" },
+ *     ],
+ *     summary: {
+ *       created: 1,
+ *       updated: 1,
+ *       deleted: 1,
+ *       tokens: { created: 1, updated: 1, deleted: 1, unchanged: 0 },
+ *     },
+ *   }
+ *
+ * `hasOidc` and the raw `token` of each upsert are omitted; planUserSync does
+ * not read them.
+ */
 export function planUserSync({ items, userIdByEmail, deleteEmails, existingUsers, existingTokens }) {
     const rows = items.map((item) => ({
         item,
@@ -105,11 +189,26 @@ export function planUserSync({ items, userIdByEmail, deleteEmails, existingUsers
         existing: existingUsers.get(item.email) ?? null,
     }));
 
-    const userInserts = rows.filter((row) => !row.existing).map((row) => ({ userId: row.userId, ...row.item }));
+    const userInserts = rows
+        .filter((row) => !row.existing)
+        .map((row) => ({
+            userId: row.userId,
+            email: row.item.email,
+            displayName: row.item.displayName,
+            passwordHash: row.item.passwordHash,
+            oidcIssuer: row.item.oidcIssuer,
+            oidcSubject: row.item.oidcSubject,
+        }));
 
     const userUpdates = rows
         .filter((row) => row.existing)
-        .map((row) => ({ userId: row.userId, ...row.item, existing: row.existing }));
+        .map((row) => ({
+            email: row.item.email,
+            displayName: row.item.displayName,
+            passwordHash: row.item.password ? row.item.passwordHash : row.existing.password_hash,
+            oidcIssuer: row.item.oidcIssuer,
+            oidcSubject: row.item.oidcSubject,
+        }));
 
     const tokenPlans = rows.flatMap((row) =>
         row.item.tokens.upsert.map((token) => {
