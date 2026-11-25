@@ -1,5 +1,5 @@
 import { redirect } from "@sveltejs/kit";
-import { createSession, setSessionCookie, validateMagicLoginToken } from "#lib/server/auth.js";
+import { createSession, hashToken, setSessionCookie } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
 
 export async function load({ url, cookies }) {
@@ -9,19 +9,25 @@ export async function load({ url, cookies }) {
         return { invalid: true };
     }
 
-    const result = await validateMagicLoginToken(raw);
-
-    if (!result) {
-        return { invalid: true };
-    }
-
-    const [user] = await sql`SELECT is_active, locale FROM users WHERE id = ${result.userId}`;
+    const [user] = await sql`
+        WITH consumed AS (
+            UPDATE magic_link_tokens
+            SET used = TRUE
+            WHERE token_hash = ${await hashToken(raw)}
+              AND used = FALSE
+              AND expires_at > now()
+            RETURNING user_id
+        )
+        SELECT u.id AS user_id, u.is_active, u.locale
+        FROM consumed c
+        JOIN users u ON u.id = c.user_id
+    `;
 
     if (!user?.is_active) {
         return { invalid: true };
     }
 
-    const session = await createSession(result.userId);
+    const session = await createSession(user.user_id);
 
     setSessionCookie(cookies, session.id);
 

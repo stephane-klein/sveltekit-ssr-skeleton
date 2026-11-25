@@ -180,21 +180,3 @@ export async function createMagicLoginToken(email) {
 
     return raw;
 }
-
-export async function validateMagicLoginToken(raw) {
-    const tokenHash = await hashToken(raw);
-
-    const [token] = await sql`
-        SELECT t.id, t.user_id
-        FROM magic_link_tokens t
-        WHERE t.token_hash = ${tokenHash}
-          AND t.used = FALSE
-          AND t.expires_at > ${new Date()}
-    `;
-
-    if (!token) return null;
-
-    await sql`UPDATE magic_link_tokens SET used = TRUE WHERE id = ${token.id}`;
-
-    return { userId: token.user_id };
-}
