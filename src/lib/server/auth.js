@@ -29,7 +29,7 @@ export async function createSession(userId, expiresInMs = SESSION_EXPIRES_IN_MS)
     return { id, userId, expiresAt };
 }
 
-export async function validateSession(sessionId) {
+export async function getSession(sessionId) {
     const [session] = await sql`
         SELECT s.id,
                s.expires_at,
@@ -45,28 +45,10 @@ export async function validateSession(sessionId) {
 
     if (!session) return null;
 
-    const nowMs = new Date().getTime();
-
-    if (nowMs >= session.expires_at.getTime()) {
-        await sql`DELETE FROM sessions WHERE id = ${session.id}`;
-        return null;
-    }
-
-    if (!session.is_active) {
-        await sql`DELETE FROM sessions WHERE id = ${session.id}`;
-        return null;
-    }
-
-    const renewed = nowMs >= session.expires_at.getTime() - SESSION_EXPIRES_IN_MS / 2;
-
-    if (renewed) {
-        const newExpiresAt = new Date(nowMs + SESSION_EXPIRES_IN_MS);
-        await sql`UPDATE sessions SET expires_at = ${newExpiresAt} WHERE id = ${session.id}`;
-    }
-
     return {
         id: session.id,
-        renewed,
+        expiresAt: session.expires_at,
+        userIsActive: session.is_active,
         user: {
             id: session.user_id,
             email: session.email,
@@ -74,6 +56,12 @@ export async function validateSession(sessionId) {
             locale: session.locale,
         },
     };
+}
+
+export async function renewSession(sessionId) {
+    const expiresAt = new Date(new Date().getTime() + SESSION_EXPIRES_IN_MS);
+
+    await sql`UPDATE sessions SET expires_at = ${expiresAt} WHERE id = ${sessionId}`;
 }
 
 export async function invalidateSession(sessionId) {
@@ -101,12 +89,17 @@ export async function createApiToken(userId, name, expiresInDays = null) {
     return { id, name, raw };
 }
 
-export async function validateApiToken(raw) {
+export async function authenticateApiToken(raw) {
     const tokenHash = await hashToken(raw);
 
     const [token] = await sql`
-        SELECT t.id, t.expires_at,
-               u.id AS user_id, u.email, u.display_name, u.locale, u.is_active
+        SELECT t.id,
+               t.expires_at,
+               u.id AS user_id,
+               u.email,
+               u.display_name,
+               u.locale,
+               u.is_active
         FROM api_tokens t
         INNER JOIN users u ON u.id = t.user_id
         WHERE t.token_hash = ${tokenHash}
@@ -116,9 +109,8 @@ export async function validateApiToken(raw) {
     if (!token.is_active) return null;
     if (token.expires_at && new Date().getTime() >= token.expires_at.getTime()) return { expired: true };
 
-    await sql`UPDATE api_tokens SET last_used = ${new Date()} WHERE id = ${token.id}`;
-
     return {
+        id: token.id,
         user: {
             id: token.user_id,
             email: token.email,
@@ -126,6 +118,10 @@ export async function validateApiToken(raw) {
             locale: token.locale,
         },
     };
+}
+
+export async function recordApiTokenUse(tokenId) {
+    await sql`UPDATE api_tokens SET last_used = ${new Date()} WHERE id = ${tokenId}`;
 }
 
 export async function deleteApiToken(tokenId) {

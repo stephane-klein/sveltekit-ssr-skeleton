@@ -2,7 +2,16 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { dev } from "$app/env";
 import { getTextDirection, serverAsyncLocalStorage } from "#lib/paraglide/runtime.js";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
-import { SESSION_COOKIE_NAME, setSessionCookie, validateApiToken, validateSession } from "#lib/server/auth.js";
+import {
+    SESSION_COOKIE_NAME,
+    SESSION_EXPIRES_IN_MS,
+    authenticateApiToken,
+    getSession,
+    invalidateSession,
+    recordApiTokenUse,
+    renewSession,
+    setSessionCookie,
+} from "#lib/server/auth.js";
 import { logger } from "#lib/server/logger.js";
 import { renderDuration } from "#lib/server/metrics.js";
 import { runWithMetrics as runWithPgMetrics, summarize as summarizePgMetrics } from "#lib/server/pg-metrics.js";
@@ -26,17 +35,26 @@ async function authHandle({ event, resolve }) {
     const sessionId = event.cookies.get(SESSION_COOKIE_NAME);
 
     if (sessionId) {
-        const session = await validateSession(sessionId);
+        const session = await getSession(sessionId);
 
-        if (session) {
-            if (session.renewed) {
-                setSessionCookie(event.cookies, session.id);
-            }
-
-            // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
-            event.locals.user = session.user;
-        } else {
+        if (!session) {
             event.cookies.delete(SESSION_COOKIE_NAME, { path: "/" });
+        } else {
+            const nowMs = new Date().getTime();
+            const expiresAtMs = session.expiresAt.getTime();
+
+            if (!session.userIsActive || nowMs >= expiresAtMs) {
+                await invalidateSession(session.id);
+                event.cookies.delete(SESSION_COOKIE_NAME, { path: "/" });
+            } else {
+                if (nowMs >= expiresAtMs - SESSION_EXPIRES_IN_MS / 2) {
+                    await renewSession(session.id);
+                    setSessionCookie(event.cookies, session.id);
+                }
+
+                // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
+                event.locals.user = session.user;
+            }
         }
     }
 
@@ -45,12 +63,14 @@ async function authHandle({ event, resolve }) {
 
         if (authHeader?.startsWith("Bearer ")) {
             const raw = authHeader.slice(7);
-            const token = await validateApiToken(raw);
+            const token = await authenticateApiToken(raw);
 
             if (token?.expired) {
                 // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
                 event.locals.authFailure = "expired";
             } else if (token) {
+                await recordApiTokenUse(token.id);
+
                 // eslint-disable-next-line no-param-reassign -- event.locals is SvelteKit's per-request store
                 event.locals.user = token.user;
             }
