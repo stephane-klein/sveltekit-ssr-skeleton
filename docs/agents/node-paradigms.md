@@ -177,24 +177,69 @@ For a new importer or a batch endpoint, follow the same split:
 
 1. normalize the input and hash what must be hashed, before the transaction;
 2. plan the changes from the rows already loaded;
-3. apply the plan inside `sql.begin()`, with a loop when the order matters;
+3. apply the plan inside `sql.begin()`, in the order the transaction requires;
 4. derive the summary from the plan, not from counters.
 
 `src/routes/(api)/api/v1/admin/users/sync/+server.js` is the case study. Its
-`for` loops around SQL statements are legitimate. Its counters and `.push()`
-accumulators are not.
+ordered SQL statements inside `sql.begin()` are legitimate, because the plan
+decides what to write. Its counters and `.push()` accumulators are not.
+
+## SQL layout
+
+Prettier formats the JavaScript around a tagged template, not the SQL inside it.
+Write a multi-column list vertically, so the reader can compare it with the
+table definition.
+
+Before:
+
+```js
+await sql`
+    INSERT INTO users (id, email, display_name, password_hash)
+    SELECT x."userId", x.email, x."displayName", x."passwordHash"
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+         AS x("userId" text, email text, "displayName" text, "passwordHash" text)
+`;
+```
+
+After:
+
+```js
+await sql`
+    INSERT INTO users (
+        id,
+        email,
+        display_name,
+        password_hash
+    )
+    SELECT
+        x."userId",
+        x.email,
+        x."displayName",
+        x."passwordHash"
+    FROM jsonb_to_recordset(${JSON.stringify(rows)}::jsonb)
+         AS x(
+             "userId" text,
+             email text,
+             "displayName" text,
+             "passwordHash" text
+         )
+`;
+```
+
+The rule covers the target column list, the `SELECT` list, the `SET`
+assignments, and the `jsonb_to_recordset` column definitions. A list with one
+column stays on one line. `tx` tagged templates follow the same layout.
 
 ## Approved exceptions
 
-| Construct                    | Where                                                 | Why                                                |
-| :--------------------------- | :---------------------------------------------------- | :------------------------------------------------- |
-| Retry with early exit        | `src/lib/server/pg.js` (`waitForDb`)                  | The sequence and the stop condition are the point. |
-| Ordered SQL in a transaction | `src/routes/(api)/api/v1/admin/users/sync/+server.js` | The order is the contract.                         |
-| Stream read                  | `src/add-user.js` (`for await` on `process.stdin`)    | The stream produces chunks.                        |
-| Registry                     | `src/lib/server/lifecycle.js` (`onShutdown`)          | The callback list is the state.                    |
-| Module cache                 | `src/lib/server/oidc.js` (`endpointsCache`)           | The cache is the design.                           |
-| Rune declaration             | `.svelte` files                                       | The documented Svelte form uses `let`.             |
-| URL builder                  | `src/lib/server/oidc.js`                              | `URL` and `URLSearchParams` mutate by design.      |
+| Construct             | Where                                              | Why                                                |
+| :-------------------- | :------------------------------------------------- | :------------------------------------------------- |
+| Retry with early exit | `src/lib/server/pg.js` (`waitForDb`)               | The sequence and the stop condition are the point. |
+| Stream read           | `src/add-user.js` (`for await` on `process.stdin`) | The stream produces chunks.                        |
+| Registry              | `src/lib/server/lifecycle.js` (`onShutdown`)       | The callback list is the state.                    |
+| Module cache          | `src/lib/server/oidc.js` (`endpointsCache`)        | The cache is the design.                           |
+| Rune declaration      | `.svelte` files                                    | The documented Svelte form uses `let`.             |
+| URL builder           | `src/lib/server/oidc.js`                           | `URL` and `URLSearchParams` mutate by design.      |
 
 Do not "fix" an exception. When a new case looks like one, add a row with the
 file and the reason. `AGENTS.md` already points to this table.
@@ -209,6 +254,8 @@ file and the reason. `AGENTS.md` already points to this table.
   including an `await` expression in a template interpolation.
 - Is a callback passed as a bare identifier? Name its argument.
 - Does a function decide and write? Extract the decision.
+- Is a multi-column SQL list packed onto one line? Put each column on its own
+  line.
 - Does the construct appear in the exceptions table? Leave it alone.
 - Did the behavior change? For a refactor, no.
 
