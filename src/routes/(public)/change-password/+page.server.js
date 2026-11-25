@@ -1,5 +1,6 @@
 import { redirect, fail } from "@sveltejs/kit";
-import { hashPassword, validatePasswordResetToken, usePasswordResetToken } from "#lib/server/auth.js";
+import { hashPassword, hashToken, validatePasswordResetToken } from "#lib/server/auth.js";
+import { sql } from "#lib/server/pg.js";
 
 export async function load(event) {
     const token = event.url.searchParams.get("token");
@@ -44,7 +45,34 @@ export const actions = {
         }
 
         const passwordHash = await hashPassword(password);
-        await usePasswordResetToken(resetToken.id, resetToken.user_id, passwordHash);
+        const tokenHash = await hashToken(raw);
+
+        const [row] = await sql`
+            WITH consumed AS (
+                UPDATE password_reset_tokens
+                SET used = TRUE
+                WHERE token_hash = ${tokenHash}
+                  AND used = FALSE
+                  AND expires_at > now()
+                RETURNING user_id
+            ),
+            updated_user AS (
+                UPDATE users
+                SET password_hash = ${passwordHash},
+                    updated_at = now()
+                WHERE id = (SELECT user_id FROM consumed)
+                RETURNING id
+            ),
+            deleted_sessions AS (
+                DELETE FROM sessions
+                WHERE user_id IN (SELECT id FROM updated_user)
+            )
+            SELECT EXISTS (SELECT 1 FROM updated_user) AS applied
+        `;
+
+        if (!row.applied) {
+            return fail(400, { error: "Invalid or expired reset token." });
+        }
 
         throw redirect(302, "/login");
     },

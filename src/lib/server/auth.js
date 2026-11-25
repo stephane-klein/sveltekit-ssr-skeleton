@@ -80,10 +80,6 @@ export async function invalidateSession(sessionId) {
     await sql`DELETE FROM sessions WHERE id = ${sessionId}`;
 }
 
-export async function invalidateAllUserSessions(userId) {
-    await sql`DELETE FROM sessions WHERE user_id = ${userId}`;
-}
-
 export async function hashToken(token) {
     const hash = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
     return Array.from(new Uint8Array(hash), (b) => b.toString(16).padStart(2, "0")).join("");
@@ -169,12 +165,6 @@ export async function validatePasswordResetToken(raw) {
     if (!token) return null;
 
     return token;
-}
-
-export async function usePasswordResetToken(tokenId, userId, newPasswordHash) {
-    await sql`UPDATE users SET password_hash = ${newPasswordHash}, updated_at = ${new Date()} WHERE id = ${userId}`;
-    await sql`UPDATE password_reset_tokens SET used = TRUE WHERE id = ${tokenId}`;
-    await invalidateAllUserSessions(userId);
 }
 
 export async function createMagicLoginToken(email) {
