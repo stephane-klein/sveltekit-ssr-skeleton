@@ -9,6 +9,10 @@
 -- the matching update of this file, otherwise the next `pnpm migrate` fails
 -- loudly here.
 --
+-- When a route calls a function directly, put `-- Used by route: <path>` on the
+-- line above its definition, one line per calling file. Internal functions
+-- (trigger functions, helpers, default-value functions) carry no route comment.
+--
 -- `DROP FUNCTION IF EXISTS` statements emit "does not exist, skipping" NOTICEs,
 -- which the pino `onnotice` hook logs at debug. Wrap them in
 -- `SET LOCAL client_min_messages = warning` ... `= notice` when they would emit
@@ -94,6 +98,7 @@ $$;
 -- walks the primary key index, so `ORDER BY id LIMIT/OFFSET` stops after the
 -- requested rows. The JSON aggregate orders explicitly: the array order is part
 -- of the contract, not a side effect of the plan.
+-- Used by route: src/routes/(private)/contacts/+page.server.js
 CREATE OR REPLACE FUNCTION get_contacts_page_data(
     _limit integer,
     _offset integer
