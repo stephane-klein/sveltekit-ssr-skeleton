@@ -7,6 +7,9 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;
 CREATE DOMAIN nanoid AS TEXT
     CONSTRAINT nanoid_format CHECK (VALUE ~ '^[0-9a-z]{10}$');
 
+COMMENT ON DOMAIN nanoid IS
+    'Public identifier: 10 lowercase base36 characters, as produced by generate_nanoid(10). Not a secret and carries no ordering.';
+
 CREATE TABLE contacts (
     id         BIGINT                   GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     nanoid     nanoid                   NOT NULL UNIQUE DEFAULT generate_nanoid(10),
@@ -29,6 +32,9 @@ CREATE TABLE users (
 
     CONSTRAINT users_locale_check CHECK (locale IS NULL OR locale IN ('en', 'fr'))
 );
+
+COMMENT ON COLUMN users.locale IS
+    'Language saved from /my/preference; NULL means no preference, so pages and emails fall back to the base locale (en).';
 
 COMMENT ON CONSTRAINT users_locale_check ON users IS
     'Only the locales the application can render; NULL means no preference and falls back to the base locale.';
@@ -66,6 +72,9 @@ CREATE TABLE api_tokens (
 CREATE INDEX idx_api_tokens_user_id ON api_tokens (user_id);
 CREATE UNIQUE INDEX idx_api_tokens_user_id_name ON api_tokens (user_id, name);
 
+COMMENT ON COLUMN api_tokens.last_used IS
+    'Written by the bearer-token check on each authenticated API request; NULL means never used. Token validity depends on expires_at, not on this column.';
+
 CREATE TABLE password_reset_tokens (
     id         TEXT                     NOT NULL PRIMARY KEY,
     user_id    TEXT                     NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -76,6 +85,9 @@ CREATE TABLE password_reset_tokens (
 );
 
 CREATE INDEX idx_password_reset_tokens_user_id ON password_reset_tokens (user_id);
+
+COMMENT ON COLUMN password_reset_tokens.used IS
+    'Set to TRUE when the reset link is consumed; a used token no longer validates, so each link works once.';
 
 CREATE TABLE magic_link_tokens (
     id         TEXT                     NOT NULL PRIMARY KEY,
@@ -88,6 +100,9 @@ CREATE TABLE magic_link_tokens (
 
 CREATE INDEX idx_magic_link_tokens_user_id ON magic_link_tokens (user_id);
 
+COMMENT ON COLUMN magic_link_tokens.used IS
+    'Set to TRUE when the magic link is consumed; a used token no longer validates, so each link works once.';
+
 -- Anti-brute-force: records sign-in attempts (password + magic link) so the
 -- server can throttle repeated failures per client IP and per email.
 CREATE TABLE IF NOT EXISTS login_attempts (
@@ -98,6 +113,9 @@ CREATE TABLE IF NOT EXISTS login_attempts (
     success      BOOLEAN      NOT NULL,
     attempted_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
 );
+
+COMMENT ON TABLE login_attempts IS
+    'Sign-in attempts behind the throttle: failures are counted per client IP and per email within the application window; a successful password sign-in deletes the rows for that IP and email.';
 
 CREATE INDEX IF NOT EXISTS idx_login_attempts_ip
     ON login_attempts (ip, attempted_at DESC);
