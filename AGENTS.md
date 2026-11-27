@@ -229,7 +229,8 @@ User-facing text goes through Paraglide JS (`@inlang/paraglide-js`); never hardc
 a string in a page or component. Add every new key to `messages/en.json` and
 `messages/fr.json`, call it with `m.key_name()`, then run `pnpm build` to
 regenerate `src/lib/paraglide/`. Prefix keys per page or section (`login_title`).
-Implementation details: [`docs/agents/i18n.md`](docs/agents/i18n.md). Decision:
+Long-form documentation pages are the exception: one component per language,
+selected with `getLocale()`. See [`docs/agents/i18n.md`](docs/agents/i18n.md) and
 [ADR 001](docs/decisions/2026-07_001-paraglide-i18n.md).
 
 ## Supplementary Documentation
