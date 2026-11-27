@@ -113,14 +113,16 @@
     </form>
 
     <p class="mt-5 pt-4 border-t border-gray-300 text-sm text-gray-500">
-        {m.login_no_account()}
-        <a
-            href="/signup"
-            class="text-blue-600 hover:underline"
-        >
-            {m.login_create_one()}
-        </a>
-        |
+        {#if data.signupEnabled}
+            {m.login_no_account()}
+            <a
+                href="/signup"
+                class="text-blue-600 hover:underline"
+            >
+                {m.login_create_one()}
+            </a>
+            |
+        {/if}
         <a
             href="/"
             class="text-blue-600 hover:underline"

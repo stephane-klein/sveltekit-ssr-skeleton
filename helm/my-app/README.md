@@ -88,6 +88,20 @@ $ helm upgrade --install my-app oci://ghcr.io/stephane-klein/charts/my-app \
     --set oidc.clientSecret=...
 ```
 
+### Signup
+
+Public signup is closed by default: `/signup` shows a message and the "Create
+account" links are hidden. When signup is closed, you can create accounts with the
+admin API (`PUT /api/v1/admin/users`) or the `pnpm add-user` CLI.
+
+Open signup with:
+
+```bash
+$ helm upgrade --install my-app oci://ghcr.io/stephane-klein/charts/my-app \
+    --namespace my-app \
+    --set signup.enabled=true
+```
+
 ## Managing users (idempotent GitOps)
 
 After deploying the chart, provision or reconcile the set of users idempotently

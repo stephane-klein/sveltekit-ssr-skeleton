@@ -4,6 +4,11 @@
 seed:
   enabled: false
 
+# Public signup page (/signup). Closed by default: create accounts with the
+# admin API (PUT /api/v1/admin/users) or `pnpm add-user`.
+signup:
+  enabled: false
+
 app:
   image:
     repository: ghcr.io/stephane-klein/my-app

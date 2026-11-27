@@ -32,6 +32,8 @@
   "signup_password_hint": "At least 12 characters.",
   "signup_already_account": "Already have an account?",
   "signup_back_home": "Back to homepage",
+  "signup_closed_title": "Signups closed",
+  "signup_closed_message": "Account creation is disabled. Contact an administrator to get access.",
   "change_password_title": "Set new password",
   "change_password_new_label": "New password",
   "change_password_confirm_label": "Confirm new password",

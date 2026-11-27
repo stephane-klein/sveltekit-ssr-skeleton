@@ -32,6 +32,8 @@
   "signup_password_hint": "Au moins 12 caractères.",
   "signup_already_account": "Vous avez déjà un compte ?",
   "signup_back_home": "Retour à l'accueil",
+  "signup_closed_title": "Inscriptions fermées",
+  "signup_closed_message": "La création de compte est désactivée. Contactez un administrateur pour obtenir un accès.",
   "change_password_title": "Définir un nouveau mot de passe",
   "change_password_new_label": "Nouveau mot de passe",
   "change_password_confirm_label": "Confirmer le mot de passe",

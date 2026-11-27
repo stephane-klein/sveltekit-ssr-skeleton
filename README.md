@@ -28,7 +28,7 @@ This new skeleton is built on top of [nodejs-pg-playground](https://github.com/s
 
 ## Included Features
 
-- **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations), with login rate limiting to slow down brute-force attacks
+- **Authentication** — sessions, API tokens, password reset, magic link login (following [Lucia](https://lucia-auth.com/sessions/overview) security recommendations), with login rate limiting to slow down brute-force attacks, and public signup closed by default (`SIGNUP_ENABLED=true` to open it)
 - **OIDC** — external provider authentication (authorization code flow with PKCE)
 - **API documentation** — interactive reference at `/api/reference` powered by [Scalar](https://scalar.com/)
 - **OpenAPI spec** — auto-generated and served at `/api/v1/openapi.json`
@@ -268,6 +268,18 @@ $ curl -s -X PUT -H "Authorization: Bearer ${MY_APP_ADMIN_TOKEN}" \
 
 Users authenticate via the web UI at `/login`. Sessions are stored in PostgreSQL with
 rolling expiration (30 days, refreshed when more than 50% elapsed).
+
+### Signup
+
+Public signup is closed by default. The `/signup` page shows a message and the
+"Create account" links are hidden. Set `SIGNUP_ENABLED=true` to open it.
+
+Local development enables signup through `.envrc`, which mise and direnv load.
+The Helm chart exposes `signup.enabled`, which defaults to `false`.
+
+When signup is closed, you can create accounts with the admin API
+(`PUT /api/v1/admin/users`, see [Creating a user via REST API](#creating-a-user-via-rest-api))
+or the `pnpm add-user` CLI.
 
 ### Login rate limiting
 

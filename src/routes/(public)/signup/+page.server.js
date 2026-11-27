@@ -1,9 +1,14 @@
-import { redirect, fail } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { hashPassword, generateId } from "#lib/server/auth.js";
 import { sql } from "#lib/server/pg.js";
+import { isSignupEnabled } from "#lib/server/signup.js";
 
 export const actions = {
     default: async ({ request }) => {
+        if (!isSignupEnabled()) {
+            return fail(403, { signupClosed: true });
+        }
+
         const data = await request.formData();
         const email = data.get("email");
         const displayName = data.get("display-name");

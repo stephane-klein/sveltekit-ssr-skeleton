@@ -90,6 +90,8 @@ spec:
             - name: ADDRESS_HEADER
               value: {{ $addressHeader }}
             {{- end }}
+            - name: SIGNUP_ENABLED
+              value: {{ .Values.signup.enabled | quote }}
             {{- if .Values.oidc.enabled }}
             - name: AUTHELIA_ISSUER
               value: {{ .Values.oidc.issuer }}
