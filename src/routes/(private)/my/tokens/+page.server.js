@@ -49,7 +49,9 @@ export const actions = {
             return fail(400, { error: "Token ID is required." });
         }
 
-        await deleteApiToken(tokenId);
+        const deleted = await deleteApiToken(user.id, tokenId);
+
+        if (!deleted) return fail(404, { errorKey: "token_not_found" });
 
         return { deleted: true };
     },

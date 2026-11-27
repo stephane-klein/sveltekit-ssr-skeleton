@@ -124,8 +124,14 @@ export async function recordApiTokenUse(tokenId) {
     await sql`UPDATE api_tokens SET last_used = ${new Date()} WHERE id = ${tokenId}`;
 }
 
-export async function deleteApiToken(tokenId) {
-    await sql`DELETE FROM api_tokens WHERE id = ${tokenId}`;
+export async function deleteApiToken(userId, tokenId) {
+    const rows = await sql`
+        DELETE FROM api_tokens
+        WHERE id = ${tokenId} AND user_id = ${userId}
+        RETURNING id
+    `;
+
+    return rows.length > 0;
 }
 
 export async function listUserApiTokens(userId) {

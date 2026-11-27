@@ -125,6 +125,7 @@
   "my_tokens_created_section": "Jeton créé",
   "my_tokens_created_desc": "Copiez ce jeton maintenant — vous ne pourrez plus le voir.",
   "my_tokens_deleted": "Jeton supprimé.",
+  "my_tokens_token_not_found": "Jeton introuvable.",
   "my_tokens_create_section": "Créer un jeton",
   "my_tokens_name_label": "Nom du jeton",
   "my_tokens_name_placeholder": "ex. Déploiement CI/CD",
