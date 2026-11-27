@@ -1,5 +1,6 @@
 import { dev } from "$app/env";
 import { fail } from "@sveltejs/kit";
+import { getAppOrigin } from "#lib/server/app-origin.js";
 import { createPasswordResetToken } from "#lib/server/auth.js";
 import { isMailAvailable, sendMail } from "#lib/server/mailer.js";
 import { logger } from "#lib/server/logger.js";
@@ -25,8 +26,7 @@ export const actions = {
             return { sent: true, email };
         }
 
-        const origin = request.headers.get("origin") || "";
-        const resetLink = `${origin}/change-password?token=${token}`;
+        const resetLink = `${getAppOrigin()}/change-password?token=${token}`;
 
         try {
             const [userLocale] = await sql`SELECT locale FROM users WHERE email = ${email}`;

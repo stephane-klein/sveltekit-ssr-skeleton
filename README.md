@@ -312,6 +312,11 @@ Users can reset their password via `/reset-password`. A time-limited token
 (30 minutes) is generated and stored in the database. The token is presented via
 query parameter to `/change-password`.
 
+Reset links, like magic-login links and the OIDC callback URL, are built from
+`MY_APP_ORIGIN`. The variable is unset in local development, where the origin
+defaults to `http://localhost:5173`; export it when the dev server runs on
+another port.
+
 ### OpenID Connect
 
 Authentication via an external OIDC provider (like [Authelia](https://www.authelia.com/))

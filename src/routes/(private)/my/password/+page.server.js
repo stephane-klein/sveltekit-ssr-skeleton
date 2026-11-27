@@ -1,4 +1,5 @@
 import { fail } from "@sveltejs/kit";
+import { getAppOrigin } from "#lib/server/app-origin.js";
 import { createPasswordResetToken, hashPassword, verifyPassword } from "#lib/server/auth.js";
 import { renderEmail } from "#lib/server/email/index.js";
 import { logger } from "#lib/server/logger.js";
@@ -53,7 +54,7 @@ export const actions = {
         return { saved: true };
     },
 
-    sendResetLink: async ({ request, locals }) => {
+    sendResetLink: async ({ locals }) => {
         const user = locals.user;
         if (!user) return fail(401);
 
@@ -66,8 +67,7 @@ export const actions = {
             return { resetSent: true };
         }
 
-        const origin = request.headers.get("origin") || "";
-        const resetLink = `${origin}/change-password?token=${token}`;
+        const resetLink = `${getAppOrigin()}/change-password?token=${token}`;
 
         try {
             const { subject, text } = renderEmail("reset-password", {

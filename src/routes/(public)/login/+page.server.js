@@ -1,4 +1,5 @@
 import { fail, redirect } from "@sveltejs/kit";
+import { getAppOrigin } from "#lib/server/app-origin.js";
 import { createSession, createMagicLoginToken, setSessionCookie, verifyPassword } from "#lib/server/auth.js";
 import { isMailAvailable, sendMail } from "#lib/server/mailer.js";
 import { logger } from "#lib/server/logger.js";
@@ -92,8 +93,7 @@ export const actions = {
             throw redirect(302, "/magic-link/sent?email=" + encodeURIComponent(email));
         }
 
-        const origin = request.headers.get("origin") || "";
-        const magicLink = `${origin}/magic-login/callback?token=${raw}`;
+        const magicLink = `${getAppOrigin()}/magic-login/callback?token=${raw}`;
 
         try {
             const [userLocale] = await sql`SELECT locale FROM users WHERE email = ${email}`;

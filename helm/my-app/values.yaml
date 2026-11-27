@@ -55,6 +55,7 @@ smtp:
   testTo: ""
 
 # Public origin URL (e.g. https://my-app.example.com).
+# Builds the OIDC callback URL and the links sent by email.
 # Auto-derived from ingress.host when ingress is enabled.
 # Explicitly set this value to override.
 origin: ""

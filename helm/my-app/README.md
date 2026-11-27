@@ -64,13 +64,15 @@ The application can authenticate users via OpenID Connect. The implementation
 is currently specific to **Authelia** (endpoint paths are hardcoded to
 Authelia's convention).
 
-`MY_APP_ORIGIN` (required for the OIDC callback URL) is automatically derived
-from `ingress.host` when ingress is enabled. Set `origin` explicitly to
-override.
+`MY_APP_ORIGIN` is the public origin of the application. It builds the OIDC
+callback URL and the links sent by email (password reset, magic login). It is
+automatically derived from `ingress.host` when ingress is enabled. Set `origin`
+explicitly to override, and set it when ingress is disabled: without it, email
+links fall back to `http://localhost:5173`.
 
-This variable only feeds the OIDC callback URL. SvelteKit derives the origin
-used for CSRF checks from the `Host` and `X-Forwarded-Proto` headers that the
-ingress already forwards, so no build-time `paths.origin` is needed.
+SvelteKit derives the origin used for CSRF checks from the `Host` and
+`X-Forwarded-Proto` headers that the ingress already forwards, so no build-time
+`paths.origin` is needed.
 
 Enable OIDC with:
 
